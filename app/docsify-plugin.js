@@ -1113,51 +1113,184 @@ window.$docsify = {
           return String(bp || '');
         };
 
-        const getDate8FromDayLi = (li, dayKeyOrLabel) => {
-          // 优先从 HTML comment marker 读取：<!--dpr-date:YYYYMMDD> / <!--dpr-date:YYYYMMDD-YYYYMMDD-->
-          try {
-            const nodes = Array.from(li.childNodes || []);
-            for (const n of nodes) {
-              if (n && n.nodeType === Node.COMMENT_NODE) {
-                const m = String(n.textContent || '').match(
-                  /dpr-date:(\d{8}(?:-\d{8})?)/,
-                );
-                if (m) return m[1];
-              }
-            }
-          } catch {
-            // ignore
-          }
+        const canDeleteWithLogin = () =>
+          String(window.DPR_ACCESS_MODE || '') === 'full';
 
-          // 兜底：从 dayKey / label 解析（区间返回 rangeKey）
-          const s = String(dayKeyOrLabel || '').trim();
-          const m = s.match(
-            /(\d{4})-(\d{2})-(\d{2})(?:\s*~\s*(\d{4})-(\d{2})-(\d{2}))?$/,
-          );
-          if (!m) return null;
-          if (m[4]) return `${m[1]}${m[2]}${m[3]}-${m[4]}${m[5]}${m[6]}`;
-          return `${m[1]}${m[2]}${m[3]}`;
+        const normalizeHashHref = (href) => {
+          const raw = String(href || '').trim();
+          if (!raw) return '';
+          if (raw.startsWith('#/')) return raw;
+          if (raw.startsWith('#')) return `#/${raw.slice(1).replace(/^\//, '')}`;
+          return `#/${raw.replace(/^\//, '')}`;
         };
 
-        const buildDayIndexJsonUrl = (date8) => {
-          const s = String(date8 || '');
-          let rel = '';
-          if (/^\d{8}-\d{8}$/.test(s)) {
-            rel = `${s}/papers.meta.json`;
-          } else if (/^\d{8}$/.test(s)) {
-            const ym = s.slice(0, 6);
-            const day = s.slice(6);
-            rel = `${ym}/${day}/papers.meta.json`;
-          } else {
-            return null;
+        const isPaperRouteHash = (hash) => {
+          const route = String(hash || '')
+            .replace(/^#\/?/, '')
+            .replace(/\.md$/i, '')
+            .replace(/\/$/, '');
+          return (
+            /^(\d{6}\/\d{2}|\d{8}(?:-\d{8}))\/(?!README$).+/i.test(route) &&
+            /^(\d{6}\/\d{2}|\d{8}(?:-\d{8}))\/[^/]+$/i.test(route)
+          );
+        };
+
+        const getDirectText = (li) => {
+          if (!li) return '';
+          if (typeof Node !== 'undefined') {
+            const directTextNode = Array.from(li.childNodes || []).find((n) => {
+              if (!n || n.nodeType !== Node.TEXT_NODE) return false;
+              return String(n.textContent || '').trim();
+            });
+            if (directTextNode) {
+              return String(directTextNode.textContent || '').trim();
+            }
           }
-          const baseHref = window.location.href.split('#')[0];
-          const fullRel = joinUrlPath(getDocsifyBasePath(), rel);
-          try {
-            return new URL(fullRel, baseHref).toString();
-          } catch {
-            return null;
+          const title = li.querySelector(
+            ':scope > .sidebar-day-toggle .sidebar-day-toggle-label',
+          );
+          return String((title && title.textContent) || '').trim();
+        };
+
+        const getPaperSectionFromAnchor = (anchor, rowLi) => {
+          if (!anchor || !rowLi) return '';
+          let currentLi = anchor.closest('li');
+          while (currentLi) {
+            const parentUl = currentLi.parentElement;
+            const parentLi = parentUl ? parentUl.closest('li') : null;
+            if (!parentLi || parentLi === rowLi) break;
+            const text = getDirectText(parentLi);
+            if (
+              text &&
+              !/^(\d{4}-\d{2}-\d{2})(\s*~\s*\d{4}-\d{2}-\d{2})?$/.test(
+                text,
+              )
+            ) {
+              return text;
+            }
+            currentLi = parentLi;
           }
+          return '';
+        };
+
+        const collectDayPaperItems = (rowLi) => {
+          if (!rowLi) return [];
+          const anchors = Array.from(rowLi.querySelectorAll('a[href*=\"#/\"]'));
+          const out = [];
+          const seen = new Set();
+
+          anchors.forEach((anchor) => {
+            const href = normalizeHashHref(anchor.getAttribute('href'));
+            if (!href || !isPaperRouteHash(href)) return;
+            const paperId = href.replace(/^#\//, '');
+            if (!paperId || paperId.endsWith('/README')) return;
+            if (seen.has(paperId)) return;
+            seen.add(paperId);
+            out.push({
+              anchor,
+              href,
+              paperId,
+              section: getPaperSectionFromAnchor(anchor, rowLi),
+            });
+          });
+          return out;
+        };
+
+        const normalizeSection = (section) => {
+          const v = String(section || '').trim();
+          if (!v) return '';
+          if (/深度|精读|deep/i.test(v)) return 'deep';
+          if (/速读|速览|quick/i.test(v)) return 'quick';
+          return v.toLowerCase();
+        };
+
+        const normalizeAuthorsForExport = (authors) => {
+          if (Array.isArray(authors)) {
+            return authors
+              .map((item) => String(item || '').trim())
+              .filter(Boolean)
+              .join(', ');
+          }
+          return String(authors || '').trim();
+        };
+
+        const normalizeTagsForExport = (tags) => {
+          if (!tags) return '';
+          if (Array.isArray(tags)) {
+            return tags
+              .map((tag) => {
+                if (typeof tag === 'string') return tag.trim();
+                if (!tag || typeof tag !== 'object') return '';
+                const kind = String(tag.kind || '').trim();
+                const label = String(tag.label || '').trim();
+                return kind ? `${kind}:${label}` : label;
+              })
+              .filter(Boolean)
+              .join(', ');
+          }
+          return String(tags || '').trim();
+        };
+
+        const normalizeDateField = (value) => {
+          const text = String(value || '').trim();
+          if (!text) return '';
+          const m = text.match(/(\d{4})(\d{2})(\d{2})/);
+          if (!m) return text;
+          return `${m[1]}-${m[2]}-${m[3]}`;
+        };
+
+        const buildPaperMetaFromMarkdown = (paperId, section, markdownText) => {
+          const parsed = parseFrontMatter(markdownText || '');
+          const meta = parsed && parsed.meta ? parsed.meta : {};
+          const body = parsed && parsed.body ? parsed.body : '';
+
+          const title_en = String(meta.title_en || meta.title || '').trim();
+          const abstractFromFrontMatter = String(
+            meta.abstract_en || meta.abstract || '',
+          ).trim();
+          const authors = normalizeAuthorsForExport(meta.authors || meta.author);
+          const score = String(meta.score || '').trim();
+          const evidence = String(meta.evidence || '').trim();
+          const tldr = String(meta.tldr || meta.summary || '').trim();
+
+          const abstractFromBody = trimBeforeMarkers(
+            extractSectionByTitle(body, (title) => {
+              const normalized = String(title || '').trim().toLowerCase();
+              return normalized === 'abstract' || normalized === '摘要';
+            }),
+            [],
+          ).trim();
+
+          return {
+            paper_id: paperId,
+            section: normalizeSection(section) || 'quick',
+            title_en,
+            authors,
+            date: normalizeDateField(meta.date || ''),
+            pdf: String(meta.pdf || meta.PDF || '').trim(),
+            score,
+            evidence,
+            tldr,
+            tags: normalizeTagsForExport(meta.tags || []),
+            abstract_en: abstractFromFrontMatter || abstractFromBody,
+          };
+        };
+
+        const markDayPapersUnrecommended = (paperItems) => {
+          if (!Array.isArray(paperItems) || !paperItems.length) return;
+          let readState = loadReadState();
+          if (!readState || typeof readState !== 'object') readState = {};
+          const toClear = new Set(['good', 'blue', 'orange', 'bad']);
+          let changed = false;
+          paperItems.forEach((item) => {
+            const paperId = item && typeof item.paperId === 'string' ? item.paperId : '';
+            if (!paperId) return;
+            if (toClear.has(String(readState[paperId] || '').trim().toLowerCase())) {
+              delete readState[paperId];
+              changed = true;
+            }
+          });
+          if (changed) saveReadState(readState);
         };
 
         const closeAllDayMenus = () => {
@@ -1175,6 +1308,31 @@ window.$docsify = {
             if (!target.closest('.sidebar-day-toggle-actions')) {
               closeAllDayMenus();
             }
+          });
+        }
+
+        const applyDeleteAuth = () => {
+          const canDelete = canDeleteWithLogin();
+          const title = canDelete
+            ? '删除该日期分组'
+            : '未登录：请先登录后再删除';
+          nav
+            .querySelectorAll('.sidebar-day-menu-item-delete')
+            .forEach((btn) => {
+              btn.disabled = !canDelete;
+              btn.title = title;
+              if (canDelete) {
+                btn.classList.remove('sidebar-day-menu-item-locked');
+              } else {
+                btn.classList.add('sidebar-day-menu-item-locked');
+              }
+            });
+        };
+
+        if (!nav.dataset.dprDayAccessBound) {
+          nav.dataset.dprDayAccessBound = '1';
+          document.addEventListener('dpr-access-mode-changed', () => {
+            applyDeleteAuth();
           });
         }
 
@@ -1293,17 +1451,16 @@ window.$docsify = {
         };
 
         const downloadDayMeta = async (opts) => {
-          const { li: rowLi, rawText: rowText, dateKey } = opts || {};
-          const date8 = getDate8FromDayLi(rowLi, dateKey || rowText);
-          const indexUrl = buildDayIndexJsonUrl(date8);
-          if (!indexUrl) {
-            console.warn('[DPR Export] 无法解析索引 JSON 路径：', {
-              rawText: rowText,
-              dayKey: dateKey,
-              date8,
-            });
-            return;
-          }
+          const { li: rowLi, rawText: rowText } = opts || {};
+          const dayPaperItems = collectDayPaperItems(rowLi);
+          const payload = {
+            label: String(rowText || 'daily-papers').trim(),
+            date: String(rowText || '').trim(),
+            generated_at: new Date().toISOString(),
+            count: 0,
+            papers: [],
+            errors: [],
+          };
 
           const menuDownload = rowLi
             ? rowLi.querySelector('.sidebar-day-menu-item-download')
@@ -1314,12 +1471,53 @@ window.$docsify = {
             menuDownload.textContent = '下载中...';
           }
           try {
-            const resp = await fetch(indexUrl, { cache: 'no-store' });
-            if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-            const payload = await resp.json();
+            if (!dayPaperItems.length) {
+              payload.errors.push({
+                paper_id: '',
+                error: '本日分组下未找到可导出的论文',
+              });
+            } else {
+              const baseHref = window.location.href.split('#')[0];
+              await Promise.all(
+                dayPaperItems.map(async (item) => {
+                  let rawMarkdown = '';
+                  try {
+                    const rel = joinUrlPath(
+                      getDocsifyBasePath(),
+                      `${item.paperId}.md`,
+                    );
+                    const mdUrl = new URL(rel, baseHref).toString();
+                    const resp = await fetch(mdUrl, { cache: 'no-store' });
+                    if (!resp.ok) {
+                      throw new Error(`HTTP ${resp.status}`);
+                    }
+                    rawMarkdown = await resp.text();
+                  } catch (err) {
+                    payload.errors.push({
+                      paper_id: item.paperId,
+                      error: String(err && err.message ? err.message : err),
+                    });
+                    return;
+                  }
+
+                  try {
+                    payload.papers.push(
+                      buildPaperMetaFromMarkdown(item.paperId, item.section, rawMarkdown),
+                    );
+                  } catch (err) {
+                    payload.errors.push({
+                      paper_id: item.paperId,
+                      error: String(err && err.message ? err.message : err),
+                    });
+                  }
+                }),
+              );
+            }
+
+            payload.count = payload.papers.length;
             window.DPRLastDayExport = payload;
 
-            const safeLabel = String(rowText || payload.label || 'daily-papers')
+            const safeLabel = String(payload.label || 'daily-papers')
               .replace(/\s+/g, ' ')
               .trim()
               .replace(/[^\d\-~_ ]/g, '')
@@ -1330,7 +1528,7 @@ window.$docsify = {
             if (rowLi) {
               const trigger = rowLi.querySelector('.sidebar-day-menu-trigger');
               if (trigger) {
-                trigger.title = `已下载：${payload && payload.count ? payload.count : 0} 篇`;
+                trigger.title = `已下载：${payload.count || 0} 篇`;
               }
             }
           } catch (err) {
@@ -1355,7 +1553,9 @@ window.$docsify = {
         const deleteDaySection = ({ rowLi, rowText, dayKey }) => {
           if (!rowLi) return;
           if (dayKey) hiddenDays.add(dayKey);
+          if (dayKey) delete state[dayKey];
           if (rowText) delete state[rowText];
+          markDayPapersUnrecommended(collectDayPaperItems(rowLi));
           closeAllDayMenus();
           ensureStateSaved();
           rowLi.remove();
@@ -1518,6 +1718,10 @@ window.$docsify = {
               e.preventDefault();
               e.stopPropagation();
               if (e.stopImmediatePropagation) e.stopImmediatePropagation();
+              if (!canDeleteWithLogin() || deleteBtn.disabled) {
+                applyDeleteAuth();
+                return;
+              }
               deleteDaySection({
                 rowLi: li,
                 rowText: rawText,
@@ -1525,6 +1729,8 @@ window.$docsify = {
               });
             });
           }
+
+          applyDeleteAuth();
 
           // 决定默认展开 / 收起：
           // - 如果本次是“出现了新的一天”：清空历史，只展开最新一天；

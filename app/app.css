@@ -2031,6 +2031,18 @@ article.markdown-section {
   background: rgba(207, 19, 34, 0.08);
 }
 
+.sidebar-day-menu-item[disabled],
+.sidebar-day-menu-item-locked {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.sidebar-day-menu-item[disabled]:hover,
+.sidebar-day-menu-item-locked:hover {
+  background: transparent;
+}
+
 /* 日期分组展开/收起动效：由 JS 动态设置 max-height，这里负责过渡效果 */
 .sidebar-day-content {
   overflow: hidden;
