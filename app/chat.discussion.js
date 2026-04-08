@@ -89,28 +89,6 @@ window.PrivateDiscussionChat = (function () {
       stream: true,
     };
   };
-  const buildChatCompletionsEndpoint = (value) => {
-    const utils = window.DPRLLMConfigUtils || {};
-    if (typeof utils.buildChatCompletionsEndpoint === 'function') {
-      return utils.buildChatCompletionsEndpoint(value);
-    }
-    const raw = String(value || '').trim();
-    if (!raw) return '';
-    if (raw.includes('/chat/completions')) return raw;
-    const normalized = raw.replace(/\/+$/, '');
-    if (/\/v\d+$/i.test(normalized)) {
-      return `${normalized}/chat/completions`;
-    }
-    return `${normalized}/v1/chat/completions`;
-  };
-  const buildChatCompletionsEndpointCandidates = (baseUrl, model) => {
-    const utils = window.DPRLLMConfigUtils || {};
-    if (typeof utils.buildChatCompletionsEndpointCandidates === 'function') {
-      return utils.buildChatCompletionsEndpointCandidates(baseUrl, model);
-    }
-    const endpoint = buildChatCompletionsEndpoint(baseUrl);
-    return endpoint ? [endpoint] : [];
-  };
 
   let chatDbPromise = null;
 
@@ -1043,10 +1021,24 @@ window.PrivateDiscussionChat = (function () {
       return;
     }
 
-    const baseUrl = (modelEntry && modelEntry.baseUrl ? modelEntry.baseUrl : '').trim();
-    const endpointCandidates = buildChatCompletionsEndpointCandidates(baseUrl, model);
+    const endpoint = (() => {
+      const raw = (modelEntry && modelEntry.baseUrl ? modelEntry.baseUrl : '').trim();
+      if (!raw) return '';
+      if (
+        window.DPRLLMConfigUtils &&
+        typeof window.DPRLLMConfigUtils.buildChatCompletionsEndpoint === 'function'
+      ) {
+        return window.DPRLLMConfigUtils.buildChatCompletionsEndpoint(raw);
+      }
+      if (raw.includes('/chat/completions')) return raw;
+      const normalized = raw.replace(/\/+$/, '');
+      if (/\/v\d+$/i.test(normalized)) {
+        return `${normalized}/chat/completions`;
+      }
+      return `${normalized}/v1/chat/completions`;
+    })();
 
-    if (!endpointCandidates.length) {
+    if (!endpoint) {
       aiAnswerDiv.textContent = '当前模型配置缺少 baseUrl。';
       if (statusEl) {
         statusEl.textContent = 'Chat 模型配置缺少 baseUrl，请在配置页修正。';
@@ -1171,6 +1163,8 @@ window.PrivateDiscussionChat = (function () {
       const timerId = setTimeout(() => controller.abort(), timeoutMs);
       let resp = null;
 
+      const baseUrl = (modelEntry && modelEntry.baseUrl ? modelEntry.baseUrl : '').trim();
+      const chatProfile = inferChatApiProfile(baseUrl, model);
       const primaryPayload = buildStreamingChatPayload(baseUrl, model, messages);
       const fallbackPayload = {
         model,
@@ -1178,21 +1172,21 @@ window.PrivateDiscussionChat = (function () {
         stream: true,
       };
 
-      const doChatFetch = async (endpoint, payload) => fetch(endpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${apiKey}`,
-        },
-        signal: controller.signal,
-        body: JSON.stringify(payload),
-      });
+      const doChatFetch = async (payload) => fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${apiKey}`,
+          },
+          signal: controller.signal,
+          body: JSON.stringify(payload),
+        });
 
-      const doChatFetchWithFallback = async (endpoint) => {
-        let currentResp = await doChatFetch(endpoint, primaryPayload);
+      try {
+        resp = await doChatFetch(primaryPayload);
         if (
-          currentResp
-          && !currentResp.ok
+          resp
+          && !resp.ok
           && (
             JSON.stringify(primaryPayload).includes('"reasoning"')
             || JSON.stringify(primaryPayload).includes('"extra_body"')
@@ -1201,39 +1195,17 @@ window.PrivateDiscussionChat = (function () {
         ) {
           let retryText = '';
           try {
-            retryText = await currentResp.text();
+            retryText = await resp.text();
           } catch {
             retryText = '';
           }
           if (
-            currentResp.status === 400
+            resp.status === 400
             && /reasoning|extra_body|return_reasoning|thinking/i.test(retryText)
           ) {
-            currentResp = await doChatFetch(endpoint, fallbackPayload);
+            resp = await doChatFetch(fallbackPayload);
           } else {
-            currentResp._dprErrorPreview = retryText;
-          }
-        }
-        return currentResp;
-      };
-
-      try {
-        for (let endpointIndex = 0; endpointIndex < endpointCandidates.length; endpointIndex += 1) {
-          resp = await doChatFetchWithFallback(endpointCandidates[endpointIndex]);
-          if (resp.ok) {
-            break;
-          }
-          const preview = resp._dprErrorPreview || await resp.text().catch(() => '');
-          resp._dprErrorPreview = preview;
-          if (
-            endpointIndex + 1 >= endpointCandidates.length
-            || !(
-              resp.status === 401
-              || resp.status === 403
-              || /invalid api key|authorized_error/i.test(preview)
-            )
-          ) {
-            break;
+            resp._dprErrorPreview = retryText;
           }
         }
       } finally {

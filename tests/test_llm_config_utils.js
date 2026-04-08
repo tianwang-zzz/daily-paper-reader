@@ -3,7 +3,6 @@ const assert = require('node:assert/strict');
 const {
   normalizeBaseUrlForStorage,
   buildChatCompletionsEndpoint,
-  buildChatCompletionsEndpointCandidates,
   sanitizeModelList,
   resolveChatModels,
   resolveSummaryLLM,
@@ -33,27 +32,6 @@ function testBuildChatCompletionsEndpoint() {
   assert.equal(
     buildChatCompletionsEndpoint('https://api.example.com/custom-root'),
     'https://api.example.com/custom-root/v1/chat/completions',
-  );
-}
-
-function testBuildChatCompletionsEndpointCandidates() {
-  assert.deepEqual(
-    buildChatCompletionsEndpointCandidates('https://api.minimax.io/v1', 'MiniMax-M2.5'),
-    [
-      'https://api.minimax.io/v1/chat/completions',
-      'https://api.minimaxi.com/v1/chat/completions',
-    ],
-  );
-  assert.deepEqual(
-    buildChatCompletionsEndpointCandidates('https://api.minimaxi.com/v1', 'MiniMax-M2.5'),
-    [
-      'https://api.minimaxi.com/v1/chat/completions',
-      'https://api.minimax.io/v1/chat/completions',
-    ],
-  );
-  assert.deepEqual(
-    buildChatCompletionsEndpointCandidates('https://api.openai.com/v1', 'gpt-4.1-mini'),
-    ['https://api.openai.com/v1/chat/completions'],
   );
 }
 
@@ -268,7 +246,6 @@ function testBuildConnectivityTestPayload() {
 
 testNormalizeBaseUrlForStorage();
 testBuildChatCompletionsEndpoint();
-testBuildChatCompletionsEndpointCandidates();
 testSanitizeModelList();
 testResolveChatModelsAndSummary();
 testInferProviderType();

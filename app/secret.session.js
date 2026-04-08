@@ -145,14 +145,6 @@
     if (/\/v\d+$/i.test(raw)) return `${raw}/chat/completions`;
     return `${raw}/v1/chat/completions`;
   };
-  const buildChatCompletionsEndpointCandidates = (value, model) => {
-    const utils = getLLMUtils();
-    if (typeof utils.buildChatCompletionsEndpointCandidates === 'function') {
-      return utils.buildChatCompletionsEndpointCandidates(value, model);
-    }
-    const endpoint = buildChatCompletionsEndpoint(value);
-    return endpoint ? [endpoint] : [];
-  };
   const sanitizeModelList = (values, maxCount) => {
     const utils = getLLMUtils();
     if (typeof utils.sanitizeModelList === 'function') {
@@ -283,7 +275,7 @@
     }
 
     const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 30000);
+    const timeout = setTimeout(() => controller.abort(), 20000);
     const results = [];
 
     try {
@@ -292,69 +284,54 @@
         const model = normalizeText(entry.model || entry.name || '');
         const apiKey = normalizeText(entry.apiKey || '');
         const baseUrl = normalizeBaseUrlForStorage(entry.baseUrl || '');
-        const endpointCandidates = buildChatCompletionsEndpointCandidates(baseUrl, model);
+        const endpoint = buildChatCompletionsEndpoint(baseUrl);
 
-        if (!model || !apiKey || !endpointCandidates.length) {
+        if (!model || !apiKey || !endpoint) {
           throw new Error('模型配置缺少 apiKey、baseUrl 或 model。');
         }
-        let lastError = null;
-        for (let endpointIndex = 0; endpointIndex < endpointCandidates.length; endpointIndex += 1) {
-          const endpoint = endpointCandidates[endpointIndex];
-          if (statusEl) {
-            const attemptHint = endpointCandidates.length > 1
-              ? `（候选 ${endpointIndex + 1}/${endpointCandidates.length}）`
-              : '';
-            statusEl.textContent = `正在测试模型 ${i + 1}/${entries.length}：${model} ${attemptHint}...`;
-            statusEl.style.color = '#666';
-          }
+        if (statusEl) {
+          statusEl.textContent = `正在测试模型 ${i + 1}/${entries.length}：${model} ...`;
+          statusEl.style.color = '#666';
+        }
 
-          const payload = buildConnectivityTestPayload(baseUrl, model);
-          const headers = {
-            'Content-Type': 'application/json',
-            Accept: 'application/json',
-            Authorization: `Bearer ${apiKey}`,
-            'x-api-key': apiKey,
-          };
-          const doFetch = (requestPayload) => fetch(endpoint, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify(requestPayload),
-            signal: controller.signal,
-          });
+        const payload = buildConnectivityTestPayload(baseUrl, model);
 
-          try {
-            let resp = await doFetch(payload);
-            if (!resp.ok && payload.max_completion_tokens != null) {
-              const text = await resp.text().catch(() => '');
-              if (resp.status === 400 && /max_completion_tokens/i.test(text)) {
-                const fallbackPayload = { ...payload };
-                delete fallbackPayload.max_completion_tokens;
-                resp = await doFetch(fallbackPayload);
-              } else {
-                resp._dprErrorPreview = text;
-              }
-            }
-            if (!resp.ok) {
-              const text = resp._dprErrorPreview || await resp.text().catch(() => '');
-              throw new Error(
-                `${model} 请求失败：HTTP ${resp.status} ${resp.statusText}${text ? ` - ${text.slice(0, 160)}` : ''}`,
-              );
-            }
-            const data = await resp.json().catch(() => null);
-            const text = extractChatResponseText(data);
-            if (!normalizeText(text)) {
-              throw new Error(`${model} 返回为空，请检查模型兼容性。`);
-            }
-            results.push(model);
-            lastError = null;
-            break;
-          } catch (error) {
-            lastError = error;
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          Authorization: `Bearer ${apiKey}`,
+          'x-api-key': apiKey,
+        };
+
+        const doFetch = (requestPayload) => fetch(endpoint, {
+          method: 'POST',
+          headers,
+          body: JSON.stringify(requestPayload),
+          signal: controller.signal,
+        });
+        let resp = await doFetch(payload);
+        if (!resp.ok && payload.max_completion_tokens != null) {
+          const text = await resp.text().catch(() => '');
+          if (resp.status === 400 && /max_completion_tokens/i.test(text)) {
+            const fallbackPayload = { ...payload };
+            delete fallbackPayload.max_completion_tokens;
+            resp = await doFetch(fallbackPayload);
+          } else {
+            resp._dprErrorPreview = text;
           }
         }
-        if (lastError) {
-          throw lastError;
+        if (!resp.ok) {
+          const text = resp._dprErrorPreview || await resp.text().catch(() => '');
+          throw new Error(
+            `${model} 请求失败：HTTP ${resp.status} ${resp.statusText}${text ? ` - ${text.slice(0, 160)}` : ''}`,
+          );
         }
+        const data = await resp.json().catch(() => null);
+        const text = extractChatResponseText(data);
+        if (!normalizeText(text)) {
+          throw new Error(`${model} 返回为空，请检查模型兼容性。`);
+        }
+        results.push(model);
       }
     } finally {
       clearTimeout(timeout);
@@ -1281,12 +1258,8 @@
         customModel2Input.value = preset.models[1] || '';
         customModel3Input.value = preset.models[2] || '';
         resetCustomStatus();
-        const hint =
-          preset.key === 'minimax'
-            ? '已填入 MiniMax 预设；若你的账号属于中国站，系统会自动补试 `api.minimaxi.com/v1`。'
-            : `已填入 ${preset.label} 预设，请补充 API Key 后点击“测试当前配置”。`;
         setErrorText(
-          hint,
+          `已填入 ${preset.label} 预设，请补充 API Key 后点击“测试当前配置”。`,
           '#666',
         );
       };

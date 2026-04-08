@@ -68,38 +68,6 @@
     return `${normalized}/v1/chat/completions`;
   };
 
-  const buildChatCompletionsEndpointCandidates = (value, model) => {
-    const normalizedBaseUrl = normalizeBaseUrlForStorage(value || '');
-    const normalizedModel = normalizeText(model || '').toLowerCase();
-    const endpoints = [];
-    const pushUnique = (endpoint) => {
-      const normalizedEndpoint = normalizeText(endpoint);
-      if (!normalizedEndpoint || endpoints.includes(normalizedEndpoint)) return;
-      endpoints.push(normalizedEndpoint);
-    };
-
-    pushUnique(buildChatCompletionsEndpoint(normalizedBaseUrl));
-
-    const isMiniMax =
-      /^minimax-/i.test(normalizedModel)
-      || /(^|\/\/)api\.minimax(?:i)?\.(?:io|com)(?:$|\/)/i.test(normalizedBaseUrl);
-    if (!isMiniMax) {
-      return endpoints;
-    }
-
-    let alternateBaseUrl = '';
-    if (/api\.minimax\.io/i.test(normalizedBaseUrl)) {
-      alternateBaseUrl = normalizedBaseUrl.replace(/api\.minimax\.io/ig, 'api.minimaxi.com');
-    } else if (/api\.minimaxi\.com/i.test(normalizedBaseUrl)) {
-      alternateBaseUrl = normalizedBaseUrl.replace(/api\.minimaxi\.com/ig, 'api.minimax.io');
-    } else if (normalizedBaseUrl) {
-      alternateBaseUrl = 'https://api.minimaxi.com/v1';
-    }
-
-    pushUnique(buildChatCompletionsEndpoint(alternateBaseUrl));
-    return endpoints;
-  };
-
   const sanitizeModelList = (values, maxCount = 3) => {
     const rawList = Array.isArray(values) ? values : [values];
     const out = [];
@@ -266,7 +234,6 @@
     normalizeText,
     normalizeBaseUrlForStorage,
     buildChatCompletionsEndpoint,
-    buildChatCompletionsEndpointCandidates,
     sanitizeModelList,
     resolveChatModels,
     resolveSummaryLLM,
