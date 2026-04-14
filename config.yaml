@@ -68,6 +68,47 @@ subscriptions:
           source: manual
           note: ''
       updated_at: '2026-04-14T12:21:18.039Z'
+    - tag: MCI AD
+      description: MCI/AD病人脑电预测研究
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: MCI
+          keyword_cn: 轻度认知障碍
+          query: Mild Cognitive Impairment
+        - keyword: Alzheimer's Disease
+          keyword_cn: 阿尔茨海默病
+          query: Alzheimer's Disease diagnosis and progression
+        - keyword: EEG
+          keyword_cn: 脑电图
+          query: Electroencephalogram signal analysis
+        - keyword: Prediction
+          keyword_cn: 预测
+          query: Predictive modeling and forecasting
+        - keyword: Machine Learning
+          keyword_cn: 机器学习
+          query: Machine learning algorithms for neurodegeneration
+        - keyword: Deep Learning
+          keyword_cn: 深度学习
+          query: Deep learning architectures for EEG classification
+      intent_queries:
+        - query: Machine learning models for AD diagnosis using EEG signals
+          query_cn: 利用脑电信号进行阿尔茨海默病诊断的机器学习模型
+          enabled: true
+          source: manual
+          note: ''
+        - query: Deep learning techniques for automated MCI detection from EEG
+          query_cn: 从脑电图中自动检测MCI的深度学习技术
+          enabled: true
+          source: manual
+          note: ''
+        - query: Review of EEG biomarkers for early Alzheimer's disease prediction
+          query_cn: 早期阿尔茨海默病预测的脑电生物标志物综述
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-04-14T12:39:46.316Z'
 source_backends:
   arxiv:
     papers_table: arxiv_papers
