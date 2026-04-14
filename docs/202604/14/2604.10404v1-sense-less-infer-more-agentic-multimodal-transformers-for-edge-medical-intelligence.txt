@@ -1,0 +1,554 @@
+Title: Sense Less, Infer More: Agentic Multimodal Transformers for Edge Medical Intelligence
+
+URL Source: https://arxiv.org/pdf/2604.10404v1
+
+Published Time: Tue, 14 Apr 2026 01:08:46 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# Sense Less, Infer More: Agentic Multimodal Transformers for Edge Medical Intelligence 
+
+## Chengwei Zhou 1,∗, Zhaoyan Jia 2,∗, Haotian Yu 1, Xuming Chen 1, Brandon Lee 1
+
+## Christopher Pulliam 1, Steve Majerus 1, Massoud Pedram 2, and Gourav Datta 1
+
+> 1
+
+Case Western Reserve University, USA 
+
+> 2
+
+University of Southern California, USA 
+
+> ∗
+
+Equal contributions 
+
+## ABSTRACT 
+
+Edge-based multimodal medical monitoring requires models that balance diagnostic accuracy with severe energy constraints. Con-tinuous acquisition of ECG, PPG, EMG, and IMU streams rapidly drains wearable batteries, often limiting operation to under 10 hours, while existing systems overlook the high temporal redun-dancy present in physiological signals. We introduce Adaptive Multimodal Intelligence (AMI) , an end-to-end framework that jointly learns when to sense and how to infer. AMI integrates three components: (1) a lightweight Agentic Modality Controller that uses differentiable Gumbel–Sigmoid gating to dynamically select active sensors based on model confidence and task relevance; (2) a Learned Sigma–Delta Sensing module that applies patch-wise Delta–Sigma operations with learnable thresholds to skip temporally redundant samples; and (3) a Foundation-backed Multimodal Prediction Model 
+
+built on unimodal foundation encoders and a cross-modal trans-former with temporal context, enabling robust fusion even under gated or missing inputs. These components are trained jointly via a multi-objective loss combining classification accuracy, sparsity regularization, cross-modal alignment, and predictive coding. AMI is hardware-aware, supporting dynamic computation graphs and masked operations, leading to real energy and latency savings. Across MHEALTH, HMC Sleep, and WESAD datasets, it reduces sensor usage by 48 .8% while improving the state-of-the-art accu-racy by 1.9% on average. Theoretically, AMI achieves O( 𝑘 ∗/𝜖 2)
+
+sample complexity with logarithmic convergence, improving upon the O( 𝑀 /𝜖 2) requirement of decoupled sensing. 
+
+## KEYWORDS 
+
+multimodal, agentic, Gumbel-Sigmoid, Sigma-Delta, gating. 
+
+## 1 INTRODUCTION 
+
+Edge-based medical monitoring systems face a fundamental chal-lenge: multimodal sensors (ECG, PPG, EMG, IMU, and even audio or respiration) provide rich physiological data, but dramatically in-crease energy consumption on battery-powered devices [ 1, 25 , 26 ]. Fig. 1 illustrates this issue: using power values reported in sensor datasheets (e.g., 0.3–1 mW IMU, 1–5 mW ECG, 6–15 mW EMG, 4–10 mW PPG), a wearable with a 300 mWh battery can support each sensor alone for hundreds of hours, yet combining them reduces runtime to under 10 hours. This mismatch between multimodal sensing and limited battery capacity severely restricts long-term, continuous monitoring scenarios such as sleep staging, cardiac surveillance, or stress detection [ 8, 43 ]. This challenge has become even more severe with the rise of on-device multimodal machine 
+
+Figure 1: Illustrative battery life for uni-modal vs. multi-modal sensing (300 mWh battery). Low-power IMU-only monitoring can last for many days, but adding ECG, PPG, and EMG rapidly reduces battery life to tens of hours. 
+
+learning (ML) technologies. Modern architectures, including cross-modal Transformers, multimodal sleep staging models, and physi-ological foundation models [ 2 , 16 , 41 , 50 ], achieve state-of-the-art (SOTA) accuracy by aligning and fusing heterogeneous biosignals, but their attention layers, tensor operations, and memory access patterns substantially exceed the energy cost of sensing itself [ 40 ]. Hence, multimodal sensing combined with continuous on-device ML inference can drain a wearable battery in under an hour, making current approaches incompatible with even continuous monitoring. The core insight of this work is that sensing decisions—both which sensors to activate and when to sample them—must be learned together with the inference task itself . By making the multimodal model agentic, allowing it to dynamically control its own sensing policy while simultaneously learning to fuse and exploit discriminative information across modalities, the system can dramatically reduce energy consumption without compromising diagnostic accuracy. This requires solving three interconnected challenges :
+
+1. Joint optimization of sensing and inference. Prior works treat sensor selection and model inference separately, relying on heuristics or independently trained selection policies. This discon-nect leads to poor decisions, activating sensors when unnecessary or disabling them when crucial. A unified approach is needed where sensing is guided by the model’s confidence and task demands. 
+
+2. Leveraging temporal redundancy. Biosignals are highly cor-related over time (e.g., stable heart rate, persistent motion patterns), yet existing multimodal models process every window indepen-dently. Integrating temporal reuse into end-to-end training is key to reducing sampling and computation. 
+
+3. Hardware-aware adaptation. Energy-constrained edge de-vices require models that adjust computation to available resources, support variable input sizes, and guarantee predictable runtime behavior. Current multimodal architectures assume fixed computa-tional graphs and cannot dynamically scale with hardware budgets. To address these challenges, we introduce Adaptive Multi-modal Intelligence (AMI) , an end-to-end trainable framework 
+
+> arXiv:2604.10404v1 [cs.ET] 12 Apr 2026
+
+(see Fig. 2) that unifies sensing decisions and inference within a sin-gle optimization process. AMI encompasses three key contributions: 
+
+• A unified architecture for joint sensing and inference opti-mization. We use lightweight unimodal foundation models as modality-specific encoders, providing rich features from large-scale pretraining. The agentic controller jointly learns when 
+
+to sense each modality and how to fuse the unimodal features through cross-modal attention, with causal temporal layers cap-turing context across signals. We jointly train sensor selection and multimodal fusion with the prediction task using a novel multi-objective loss that combines classification accuracy, spar-sity regularization, cross-modal alignment, and predictive cod-ing. This directs sensing effort where it is most needed, improv-ing accuracy and efficiency while leveraging the robustness of foundation-model representations. 
+
+• Temporal-aware sensing through learned Sigma-Delta ( Σ-
+
+Δ) modulation. We develop a differentiable Σ-Δ Sensing mech-anism that identifies and skips temporally redundant samples. Unlike traditional Σ-Δ converters that use fixed thresholds, our approach learns modality-specific change thresholds that balance information preservation with sampling reduction. 
+
+• Hardware-efficient implementation with dynamic compu-tation graphs. Through careful co-design with TensorRT opti-mization, we design our architecture to support variable-length inputs and masked computation, enabling true energy savings on resource-constrained edge devices. We evaluate AMI on three publicly available multimodal biomedi-cal datasets: MHEALTH (activity recognition), HMC Sleep (sleep staging), and WESAD (stress detection). AMI reduces latency and energy consumption by 31.9% and 24.8% respectively (directly trans-lating to extended battery life in continuous monitoring settings) on average, while simultaneously surpassing the SOTA accuracy by 1.4%. Beyond empirical results, we prove that our joint optimization achieves: (1) factor 𝑀 /𝑘 ∗ fewer samples through selective sensing, and (2) logarithmic O( log (1/𝜖 )) convergence versus O( 𝑀 /𝜖 2) for decoupled methods. AMI supports not only efficient state prediction from biosignals but also the downstream step in closed-loop systems: converting predicted states into actions. In many neuro-stimulation and inter-vention settings, this state-to-action mapping is governed by simple, validated clinical rules (e.g., trigger stimulation when a patholog-ical state is detected). By delivering accurate, low-latency state estimates under reduced sensing budgets, our model strengthens the reliability of these rule-based controllers. Although our learning focuses on sensing and inference, it completes the active-sensing loop, enabling wearable and implantable systems that both identify patient state efficiently and initiate timely therapeutics. 
+
+## 2 RELATED WORK 
+
+Multimodal Learning and Adaptive Sensing : Multimodal deep learning has driven major progress in biomedical monitoring. Early CNN-based fusion of ECG, EEG, and motion signals [ 17 ] improved robustness, while transformer architectures [ 21 , 53 ] enabled more expressive fusion mechanisms beyond simple concatenation. More recently, medical foundation models such as PhysioOmni [ 29 ], SleepMG [ 34 ], and medical vision–language adaptations [ 31 ] have demonstrated strong generalization across tasks and modalities. This work Better Performance 
+
+> ✅
+> Improved
+> Battery Life
+> ❌
+> Task -driven Agentic Controller
+> Continuous Sensing
+> & Inference
+> Agentic Multi -
+> modal Controller
+> Multi -Modal
+> Foundation
+> Models
+
+Figure 2: Our Unified Agentic Multimodal Sensing and Inference Framework for Efficient, High-Accuracy Biomedical AI. 
+
+However, these models rely on dense, continuous sampling from all sensors and incur heavy computational and energy costs. In parallel, sensor selection has been explored through sparsity meth-ods [ 51 , 54 ], RL-based policies [ 48 ], contextual bandits [ 14 ], differen-tiable gating [ 28 ], information-theoretic selection [ 30 ], Bayesian op-timization [ 20 ], meta-learning [ 18 ], and neural architecture search (NAS) [ 15 ]. Yet these techniques operate outside the prediction model and therefore cannot jointly optimize sensing, multimodal fusion, and task accuracy, limiting their practical effectiveness for energy-constrained, real-time medical devices. 
+
+Temporal Redundancy Reduction and Hardware Optimiza-tion : Temporal redundancy has long been exploited in efficient sensing. Examples include Σ-Δ modulation [ 44 ], neuromorphic event sensors [ 32 ], compressed sensing [ 11 ], predictive coding [ 42 ], next-frame prediction [ 33 ], change detection [ 7 ], asynchronous processing [ 47 ], Skip-RNNs [ 10 ], and delta encoding [ 12 ]. Yet these methods mostly target single modalities and are rarely paired with multimodal deep learning or optimized toward task-specific objec-tives. On the hardware side, edge-efficient inference has benefited from pruning, quantization, and distillation [ 22 , 24 , 27 ], hardware-aware NAS [ 52 ], dynamic/conditional computation [ 9, 23 ], early exits [ 49 ], accelerator-level optimizations [ 37 ], biomedical-specific hardware [ 19 ], in-memory computing [ 45 ], approximate comput-ing [ 36 ], and software–hardware co-design [ 39 ]. However, these techniques optimize fixed computational graphs and cannot adapt to varying sampling rates or input dimensionality on the fly as signal content evolves. 
+
+## 3 METHODOLOGY 
+
+In this section, we formalize the AMI framework (see Fig. 3 and Al-gorithm 1) that integrates three key components: (1) a Foundation-backed Multimodal Prediction Model (FMPM), (2) an Agentic Modality Controller (AMC) responsible for modality-level gating, and (3) a Sigma–Delta Sensing Module for patch-level temporal gating. We subsequently introduce our training objective, and pro-vide theoretical support for jointly optimizing masked sensing and inference for multimodal bio-signals. 
+
+## 3.1 Multimodal Prediction Model 
+
+The proposed Foundation-backed Multimodal Prediction Model (FMPM) integrates foundation model-embedding encoder, cross-modal fusion, and temporal context into a unified Transformer-based framework. It aims to improve robustness under modality dropout and enhance inter-modality information flow.  
+
+> 2Myoelectric
+> State
+> Modality 𝑛
+> . .
+> . .
+> 𝑓 !
+
+∆ Cross−                 
+
+> attention
+> Tiny -
+> transform
+> er Blocks
+> Head
+> MLP
+> 1∗
+> 0∗
+> 1∗
+> 0∗
+> 0∗
+> Foundation Modality
+> Encoders
+> Agentic Modality Controller
+> Prediction Backbone
+> Mask
+> . .
+> Windows
+> ∑
+> …
+> 𝑓 "#
+> $
+> 𝑓 "#
+> %
+> 𝑓 "#
+> &
+> ∆∑…
+> 𝑙 !
+> w!
+> 𝑙 $𝑙 &
+> w"……
+> ∆∑…
+> …
+> 𝑙 !
+> w!
+> 𝑙 $𝑙 &
+> w"……
+> ∆∑…
+> …
+> 𝑙 !
+> w!
+> 𝑙 $𝑙 &
+> w"……
+> 𝑓 (
+
+∆ ∑    
+
+> Delta operator Sigma operator
+> Linear weight
+> in FM layers
+> ∆∑
+> 𝑤 !𝑙 (𝑛th FM layer
+> Past state
+> cache avg. of past
+> 10 states
+> Gumbel
+> 𝜎
+> Cross -modal
+> Fusion
+> 𝑇 "
+> Concat .Cross
+> atten .
+> Cross
+> atten .
+> Cross
+> atten .
+> Cross
+> atten .
+> 𝑇 #
+> 𝑇 $
+> 𝑇 !
+> set( 𝑇 %&!)
+> set( 𝑇 %&")
+> set( 𝑇 %&#)
+> set( 𝑇 %&')
+> . .
+> Cross
+> atten .
+> 𝑇 (
+> set( 𝑇 %&$)
+
+Figure 3: Proposed AMI architecture. The Σ-Δ module performs patch-wise computation and adaptive skipping. Features are fused via early cross-attention and processed by a Tiny-Transformer back-bone with context reasoning. A Gumbel-MLP agent dynamically produces per-modality masks for the next window. 
+
+Foundation Modality Encoders : Instead of learning each modal-ity tokenizer from scratch, we employ SOTA lightweight foundation modality encoders 𝑓 (𝑚 ) 
+
+> FM
+
+pretrained on large-scale unimodal datasets. Specifically, we deployed ECG-FM [ 35 ] for ECG signals and Pa-PaGei [ 41 ] for PPG signals. Each encoder converts a raw signal 𝑥 (𝑚 )
+
+into token embeddings as 𝑇 (𝑚 ) = 𝑓 (𝑚 ) 
+
+> FM
+
+(𝑥 (𝑚 ) ) ∈ R𝐵 ×𝐿 ×𝐷 . These pretrained encoders provide domain-aware feature extraction, ac-celerating convergence and improving downstream generalization. Depending on compute constraints, the encoders can be fine-tuned or frozen during training. 
+
+Cross-Modal Attention Fusion : To enable fine-grained infor-mation exchange among heterogeneous modalities, we design an all-to-all cross-attention fusion module. Given 𝑀 modality-specific token sequences {𝑇 (1) ,𝑇 (2) , . . . ,𝑇 (𝑀 ) }, each modality 𝑖 attends to the token representations of all other modalities: 
+
+KV (𝑖 ) = concat  {𝑇 ( 𝑗 ) }𝑗 ≠𝑖 
+
+, ˆ𝑇 (𝑖 ) = CrossAttn  𝑇 (𝑖 ) , KV (𝑖 ) , (1) where CrossAttn (·) denotes a pre-norm multi-head attention fol-lowed by a feed-forward block with residual connections. The at-tended representations are concatenated to form the fused multi-modal feature as 𝐻 fused = concat   ˆ𝑇 (1) , ˆ𝑇 (2) , . . . , ˆ𝑇 (𝑀 ) ∈R𝐵 × ( 𝑀𝐿 ) × 𝐷 .This design allows each modality to dynamically query relevant features from other modalities, improving representational consis-tency and information sharing. 
+
+Cross-Attention-based Temporal Encoding : To incorporate temporal priors and reduce degradation under partial sensor gating, we add a cross-attention-based contextual encoder that integrates recent history. Let ¯𝐻 𝑡 −𝐾 :𝑡 −1 be a compact memory of the past 𝐾 
+
+fused representations (mean-aggregated). At time 𝑡 , the current fea-tures R𝐿 𝑡 attend to this memory via 𝐻 ′ 
+
+> 𝑡
+
+= CrossAttn  𝐻 𝐿 𝑡 , ¯𝐻 𝑡 −𝐾 :𝑡 −1
+
+,which enables the model to capture temporal coherence and long-range dependencies without a full recurrent state. After cross-modal fusion and contextual encoding, the fused representation is processed by a lightweight Transformer fusion block, followed a learned [CLS] token and a linear classification head. 
+
+## 3.2 Agentic Modality Controller 
+
+The Agentic Modality Controller (AMC) is a lightweight module that adaptively selects which modalities to process in the next time window. It takes the current FMPM representation and outputs per-modality gating decisions, and is trained jointly with the FMPM to balance task accuracy and sensing cost. 𝑥 ! ∆𝑥 " (𝑎 "     
+
+> "<𝜃 ")
+> Modality 1
+> Modality 2
+> Modality 𝑛
+> ∆𝑥 "#$
+
+. . . 
+
+. . .   
+
+> skip 𝑛 patche s
+> . .
+
+Figure 4: Thresholding and skipping in Sigma–Delta Sensing. Feature aggregation and gate logits : We first aggregate patch-level representations R ∈ R𝐵 × ( 𝑀𝐿 ) × 𝐷 into modality-level features, where 𝑀 is total modality number and 𝐿 is the number of patches per modality. Reshape and average over patches, and then we flatten the per-modality means to get ¯R ∈ R𝐵 ×𝑀 ×𝐷 , and feed them into a small MLP gate feature extractor 𝑔 𝜙 (·) : ℓ = 𝑔 𝜙 
+
+  ¯R ∈ R𝐵 ×𝑀 , where 
+
+ℓ are pre-sigmoid gate logits with one logit per modality. 
+
+Gumbel–Sigmoid sampling and straight-through estimator :To enable exploration during training we apply a Gumbel perturba-tion to logits and compute a continuous relaxation: 
+
+𝑢 ∼ Uniform (0, 1), 𝑔 = − log   − log (𝑢 + 𝜀 ) + 𝜀 , (2) 
+
+˜ℓ = (ℓ + 𝑔 )/ 𝜏, 𝑝 soft = 𝜎 ( ˜ℓ). (3) When 𝜏 is small the relaxation concentrates near {0, 1}; at in-ference we omit noise and set 𝑝 soft = 𝜎 (ℓ). We use binary gat-ing in the forward pass but propagate gradients through contin-uous relaxation. Formally, the binary decision for each modality is 𝑝 hard = 1{𝑝 soft > 0.5} ∈ { 0, 1}𝐵 ×𝑀 , and the AMC applies 𝑝 hard 
+
+to mask sensors when computing the next-window inputs. Dur-ing backpropagation we treat the forward output as if it were the continuous 𝑝 soft when computing gradients. Equivalently, for any scalar loss L that depends on the forward gating output 𝑝 forward ,we use the chain rule approximation: 𝜕 L 
+
+> 𝜕ℓ
+
+≈ 𝜕 L 
+
+> 𝜕𝑝 forward
+
+· 𝜕𝑝 soft  
+
+> 𝜕ℓ
+
+.The AMC adds a small feedback latency, but the combined delay of the FMPM and AMC (tens of milliseconds) is far shorter than the 1s input window we process for continuous monitoring (100 samples at 100 Hz). Thus, sensor-mask decisions always arrive before the next window, and the method introduces no throughput or timing overhead compared to the baseline. 
+
+## 3.3 Sigma-Delta Sensing 
+
+To further improve efficiency and reduce redundant sampling and sensing, we propose a Sigma–Delta ( Σ-Δ) Sensing mechanism that exploits temporal redundancy across consecutive patches within each modality. Inspired by Σ-Δ modulation [ 38 ], the module oper-ates during tokenization and adaptively determines whether the current patch contains sufficiently informative temporal change. Only patches exhibiting meaningful variations are actively tok-enized, while stable patches reuse previously emitted tokens. 
+
+Patch-wise Σ-Δ Operation : Let x(𝑚 ) ∈ R𝐶 𝑚 ×𝑇 denote the raw input of modality 𝑚 . We partition it into 𝐿 = 𝑇 /𝑃 non-overlapping patches of size 𝑃 to get x(𝑚 ) 
+
+> 𝑙
+
+∈ R𝐶 𝑚 ×𝑃 . To capture temporal change within a window, we compute the patch-wise difference: Δx(𝑚 ) 
+
+> 𝑙
+
+=
+
+x(𝑚 ) 
+
+> 𝑙
+
+− x(𝑚 )  
+
+> 𝑙 −1
+
+, where ℓ ∈ [ 1, 𝐿 ]. For convolution-based tokenizers, Conv1D only processes the difference patch Δx(𝑚 ) 
+
+> 𝑙
+
+. For foundation-model tokenizers, the Δ is applied prior to the initial linear projec-tion (normally, it is a convolutional layer, the patch size is equal to kernel size), while subsequent layers operate on the accumulated (Σ) output signal.            
+
+> 3Memory Bank Queue
+> 𝑆 !𝐴 !𝑆 !"#𝐴 !"#𝑆 !"$𝐴 !"$
+> push push push
+> MLP
+> Head Head Head 𝐿 %&'(
+> !
+> 𝐼 !
+> 𝐿 )&%*+)
+> !
+
+. . . 
+
+> BPTT
+
+. . .    
+
+> 𝐿 )&%*+)
+> !"#
+> 𝐿 ,-./ .
+> !"#
+> 𝐿 12+%-&'%*3.
+> !
+> 𝐿 %&'(
+> !"#𝐿 %&'(
+> !"$
+> 𝐿 ,-./ .
+> !"$
+> 𝐿 12+%-&'%*3.
+> !"#𝐿 12+%-&'%*3.
+> !"$
+> 𝐿 )&%*+)
+> !"$
+> 𝐼 !"#𝐼 !"$
+
+... 𝐿 ,-./ .     
+
+> !
+> 𝑔 !"#𝑔 !"$𝑔 !
+> MSE MLP MSE MLP MSE MSE
+
+... Figure 5: Training pipeline with unrolled timesteps optimized via BPTT. Each fused state 𝑆 𝑡 produces a prediction loss, gating loss, predictive coding loss, and a contrastive alignment loss computed against a memory bank. The controller’s gating actions 𝐴 𝑡 influence future observations, and all losses jointly update the model through temporal backpropagation. 
+
+Adaptive Thresholding and Skip Policy : As shown in Fig. 4, each modality maintains a sensitivity threshold 𝜃 𝑚 and a skip hori-zon 𝑘 skip . To quantify patch activity, we compute the normalized magnitude of temporal change as 𝑎 (𝑚 ) 
+
+> 𝑙
+
+= 1 
+
+> 𝐶 𝑚 𝑃
+
+Í𝑐,𝑝 Δx(𝑚 ) 
+
+> 𝑙,𝑐,𝑝
+
+. A patch is considered inactive (stable) if 𝑎 (𝑚 ) 
+
+> 𝑙
+
+< 𝜃 𝑚 , in which case tokeniza-tion is skipped for up to 𝑘 skip consecutive patches. Otherwise, the patch is active. The emitted token sequence is updated recursively: 
+
+˜T(𝑚 ) 
+
+> 𝑙
+
+=
+
+
+
+Tokenizer  Δx(𝑚 )
+
+> 𝑙
+
+, if patch 𝑙 is active ,
+
+˜T(𝑚 )  
+
+> 𝑙 −1
+
+, if patch 𝑙 is skipped .
+
+(4) This patch-wise, intra-window Σ-Δ design needs only a single patch buffer per modality and adds negligible memory overhead. It enables true sensor duty-cycling: skipped patches incur no sampling or tokenization cost, significantly reducing the active sampling rate of the sensors with minimal impact on accuracy.  
+
+> Algorithm 1:
+
+Pseudo code of AMI: Combining FMPM, AMC, Σ-Δ Sens-ing.                                                                                                                    
+
+> Input: Multimodal signal 𝑋 ∈R𝐵 ×𝑀 ×𝑇 ; optional history 𝐻 hist
+> Output: Predicted logits yand current representation features 𝐻
+> 1for 𝑚 =1to 𝑀 do
+> 2𝑥 𝑚 ←𝑋 [:, 𝑚, :]
+> 3𝑇 (𝑚 )←Σ𝑓 (𝑚 )(Δ𝑥 𝑚 )
+> 4foreach modality 𝑖 do
+> 5KV (𝑖 )←concat  {𝑇 (𝑗 )}𝑗 ≠𝑖
+> 
+> 6ˆ𝑇 (𝑖 )←CrossAttn  𝑇 (𝑖 ),KV (𝑖 )
+> 7𝐻 fused ←concat  ˆ𝑇 (1), . . . , ˆ𝑇 (𝑀 )
+> 8𝐻 fused ←PositionalEncoding (𝐻 fused )
+> 9𝐻 fused ←CrossAttn (𝐻 fused , 𝐻 hist )
+> 10 𝐻 ←Tiny-Transformer (𝐻 fused )
+> 11 y←Classifier  𝐻 𝑐𝑙𝑠 _𝑡𝑜𝑘𝑒𝑛
+> 
+> 12 𝑅 ←𝐻, ℓ ←𝑔 𝜙 (mean (𝑅 ) )
+> 13 if train then
+> 14 add Gumbel noise, 𝑝 soft ←𝜎 ( ( ℓ+𝑔 )/ 𝜏 );𝑝 hard ←1{𝑝 soft >0.5}(ST)
+> 15 else
+> 16 𝑝 soft ←𝜎 (ℓ);𝑝 hard ←1{𝑝 soft >0.5}
+> 17 return y, 𝐻, 𝑝 soft , 𝑝 hard
+
+## 3.4 Training Objective 
+
+To jointly optimize predictive accuracy, sensing efficiency, and tem-poral consistency, AMI combines complementary objectives in a unified loss. Fig. 5 shows the goal is to (i) ensure accurate pre-dictions, (ii) encourage sensor sparsity, (iii) maintain cross-modal alignment, and (iv) preserve temporal predictability. Formally, the total loss is defined as Ltotal = 𝜆 1 Ltask + 𝜆 2 Lgating + 𝜆 3 Lcontrastive +
+
+𝜆 4 Lpredictive , where each 𝜆 𝑖 is a balancing coefficient controlling the contribution of the corresponding term. 
+
+Task Loss : For accurate medical condition or activity classification based on multimodal input, we employ the standard cross-entropy loss: Ltask = − 1
+
+> 𝑁
+
+Í𝑁 𝑖 =1 𝑦 𝑖 log ˆ 𝑦 𝑖 , where 𝑦 𝑖 and ˆ𝑦 𝑖 denote the ground-truth and predicted class distributions, respectively. 
+
+Gating Regularization : To encourage the AMC to minimize un-necessary sensor activations and thus improve energy efficiency, we introduce a sparsity-inducing regularization term: Lgating =
+
+> 1
+> 𝑀
+
+Í𝑀 𝑚 =1 𝑝 (𝑚 ) 
+
+> soft
+
+, where 𝑝 (𝑚 ) 
+
+> soft
+
+is the continuous gating probability for modality 𝑚 . Intuitively, this term penalizes frequent activations, pushing the AMC to learn an optimal trade-off between predictive performance and sensing cost. During backpropagation, this reg-ularization interacts with the task loss to teach the AMC when a sensor is worth activating. 
+
+Contrastive Alignment Loss : Biomedical signals from different sensors often capture correlated physiological phenomena. To en-sure cross-modal consistency even under modality dropout, we apply a contrastive alignment loss using an InfoNCE formulation: 
+
+Lcontrastive = log exp (sim (h𝑖 , h𝑗 )/ 𝜏 )
+
+Í𝑘 ≠𝑖 exp (sim (h𝑖 , h𝑘 )/ 𝜏 ) , (5) where sim (· , ·) denotes cosine similarity and 𝜏 is a temperature hyperparameter. By pulling synchronized modalities closer in la-tent space and pushing unrelated ones apart, this term improves robustness to missing or gated inputs. 
+
+Predictive Coding Loss : Our predictive coding term improves robustness when future sensory inputs are masked. Since the AMC may deactivate sensors to save energy, the model must preserve predictive capability by internally forecasting future multimodal states from current representations. We define the predictive loss as Lpredictive = ∥MLP (h𝑡 ) − h𝑡 +𝛿 ∥22, where h𝑡 is the fused latent representation at time 𝑡 , h𝑡 +𝛿 is the target future embedding, 𝛿 is a small temporal offset, and MLP (·) is the predictor network. 
+
+## 3.5 Theoretical Analysis 
+
+Consider 𝑀 modalities with information gains 𝐼 1 ≥ 𝐼 2 ≥ ... ≥ 𝐼 𝑀 
+
+relative to target 𝑦 . Let 𝑘 ∗ (𝜖 ) = |{ 𝑚 : 𝐼 𝑚 ≥ 𝜖 }| be the number of modalities needed for error at most 𝜖 , and 𝑇 be the time horizon. 
+
+Theorem (Sample Complexity). To achieve prediction error ≤ 𝜖 ,the required samples are: 
+
+• Decoupled: O( 𝑀 · 𝑇 /𝜖 2) samples 
+
+• Joint (Ours): O( 𝑘 ∗ (𝜖 ) · 𝑇 /𝜖 2) samples in O( log (𝑀 /𝜖 )) rounds Proof. Decoupled methods require O( 1/𝜖 2) samples per modality to estimate 𝜖 -level contributions with high probability, totaling 
+
+O( 𝑀 /𝜖 2) samples. Joint optimization leverages gradient ∇𝜙 L𝑡𝑎𝑠𝑘 
+
+providing simultaneous estimates for all modalities. Using succes-sive elimination with doubling batch sizes, round 𝑟 uses 2𝑟 samples achieving confidence width O( 1/√2𝑟 ). Reaching 𝜖 -accuracy needs 
+
+𝑟 = O( log (1/𝜖 2)) = O( log (1/𝜖 )) rounds, with only 𝑘 ∗ modalities surviving elimination. This yields factor 𝑀 /𝑘 ∗ sample reduction and logarithmic convergence. The advantage is most significant when 𝑘 ∗ (𝜖 )≪ 𝑀 (sparse suffi-cient statistics). Our results confirm this: MHEALTH has 𝑘 ∗/𝑀 ≈0.38 
+
+(high sparsity), while HMC has 𝑘 ∗/𝑀 ≈0.69 (low sparsity). 
+
+> 4
+
+Table 1: Performance comparison of the proposed method and prior state-of-the-art approaches on MHEALTH, HMC, and WESAD datasets. Accuracy (Acc.), F1 score (F1), and average modality sensing rate (Sensing) are reported. We also show the effect of varying the gating loss coefficient 𝜆 2 on the trade-off between predictive perfor-mance and sensor efficiency.                                                                               
+
+> Dataset Method Acc. (%) F1 Sensing (%) MHEALTH Almujally et al. (2025) [4] 94.67 -100 Debache et al. [13] 98.2 -100 Sharma et al. [46] 99.07 99.1 100 AMI (no sensing reduction) 99.10 99.13 100 AMI ( 𝜆 2=0.05 )99.12 99.12 38.19 AMI ( 𝜆 2=0.1)99.04 99.04 33.3 AMI ( 𝜆 2=0.2)92.89 91.78 26.5 HMC Estevez et al. (2022) [6] 79.0 -100 SleepMG [34] 69.24 71.68 100 PhysioOmni [29] 73.77 77.79 100 AMI (no sensing reduction) 79.89 79.12 100 AMI ( 𝜆 2=0.001 )78.21 77.91 73.01 AMI ( 𝜆 2=0.005 )76.81 77.21 69.1 AMI ( 𝜆 2=0.01 )67.43 68.5 53.54 WESAD Schmidt et al. [43] 79.57 68.85 100 Aleem et al. [3] 90.2 90.0 100 AMI (no sensing reduction) 91.4 90.02 100 AMI ( 𝜆 2=0.05 )91.4 89.61 42.6 AMI ( 𝜆 2=0.1)89.41 88.21 37.2
+
+## 4 EXPERIMENTS 4.1 Setup 
+
+Datasets : We evaluate AMI on three public multimodal datasets. 
+
+MHEALTH [ 8 ] provides 12 activity classes from 3 wearable devices (ACC, GYRO, MAG, ECG), sampled at 50 Hz and segmented into 2 s windows. HMC Sleep [5] includes EEG, ECG, PPG, EOG, and EMG overnight recordings; all channels are resampled to 100 Hz and divided into standard 30 s epochs. WESAD [ 43 ] contains multimodal physiological signals (e.g., ECG, EDA, respiration, ACC) from chest and wrist devices; we resample to 100 Hz and use 15 s windows aligned with stress labels in 3 classes. 
+
+Models and Training Settings : We use a unified hyperparame-ter setup across all experiments. Each modality is tokenized with specific patch size(10 for MHEALTH, 30 for HMC, 15 for WESAD), with a model embedding dimension of 256. The multimodal trans-former backbone has 4 layers, 8 attention heads, and a feed-forward size of 1024, operating over a temporal history of 10 windows. The AMC is a lightweight MLP with a hidden size of 256. For temporal efficiency, we set 𝑘 skip = 2 and a initial threshold 𝜃 = 0.1 for all modalities. Models are trained for 100 epochs with batch size 32, learning rate 1 × 10 −4 (cosine decay), and weight decay 1 × 10 −3.Since the AMC and FMPM are trained jointly, we apply BPTT with a gradient window of 10 steps. The total loss is a weighted sum of task ( 𝜆 1=1.0), gating ( 𝜆 2=0.1), contrastive ( 𝜆 3=0.05 ), and predictive (𝜆 4=0.2) objectives. 
+
+## 4.2 Accuracy Results 
+
+We compare AMI with several recent SOTA approaches on three multimodal physiological datasets. On MHEALTH , our model achieves 99.12% accuracy and 99.12 F1, outperforming strong prior base-lines such as Almujally et al. [ 4 ] (94.67%) and Debache et al. [ 13 ](98.2%). Notably, this result is attained while activating only 38.19% of sensing on average, showing that the agentic modality-selection mechanism can aggressively skip redundant samples without harm-ing predictive performance. Even under stronger regularization (𝜆 2 = 0.1), the model retains competitive accuracy (99.04%) while further lowering modality sensing to 33.3%, demonstrating a stable efficiency–accuracy trade-off. On the HMC sleep-staging dataset —a more challenging, long-horizon temporal task(where we take 30 sec-onds as our predict window length)—AMI achieves 78.21% accuracy and 77.91 F1, closely matching or exceeding prominent supervised baselines [ 6, 29 , 34 ]. While previous fully-supervised models rely on full multimodal streams, our model requires only 73.01% of sensing on average. This highlights the ability of the AMC to selectively activate modalities that are informative for sleep-stage transitions. 
+
+On WESAD , AMI achieves 91.4% accuracy and 89.61 F1, surpass-ing recent deep multimodal architectures such as Aleem et al. [ 3 ](90.2%), using only 42.6% of modalities. Averaging across the three datasets, AMI reduces sensor usage by 48 .8% while increasing the SOTA accuracy by 1.9% .We also show the trade-off between sensing rate and perfor-mance when varying the gating coefficient 𝜆 2. For MHEALTH, a small weight (0.05) results in 99.23% accuracy but limited reduc-tion in sensing (38.19%). Increasing 𝜆 2 strengthens sensing sparsity, reaching 33.3% modality usage at 𝜆 2 = 0.1 with negligible accuracy change (99.04%). A larger value (0.2) further reduces sensing to 26.5%, but at the cost of performance degradation to 92.89%. Visualization heatmaps on MHEALTH and HMC (Fig. 6) fur-ther demonstrate that the AMI and Σ-Δ Sensing effectively learns modality-dependent activation patterns. 
+
+## 4.3 Ablation Studies 
+
+To better understand the contribution of each component in our architecture, we perform ablation experiments on the MHEALTH, shown in Table 2. 
+
+Impact of AMC and Σ-Δ Sensing : With only Σ-Δ Sensing enabled, the sensing rate increases to 78.90% while achieving 99.09% accuracy. Conversely, using only AMC results in a sensing rate of 41.67% with 98.89% accuracy. These results show that both mechanisms reduce sensing: AMC handles coarse-grained modality selection, while 
+
+Σ–Δ suppresses redundant intra-window measurements, making the two strategies complementary. 
+
+Impact of components in FMPM : Removing cross-modal fusion leads to notable performance degradation gives 98.11% accuracy, confirming its function for learning joint multimodal representa-tions. Eliminating contextual temporal encoding reduces accuracy to 93.21% (a 5.91% drop), showing that long-range temporal context is critical, especially for physiological dynamics. Removing both components results in a further decrease to 92.80%. 
+
+Loss-function ablations : Removing the contrastive consistency loss drops accuracy from 99.12% to 97.61% (1.51%), indicating re-duced robustness to modality corruption. Removing predictive cod-ing yields 98.64% (0.48% drop), showing its role in stabilizing AMC decisions. Disabling both losses further reduces accuracy to 97.21%. 
+
+## 4.4 Robustness Studies 
+
+Random modality masking : The AMC is disabled and we use a pretrained model by randomly dropping modalities according to a Bernoulli mask with probability 𝑝 , simulating unexpected sen-sor failures or severe signal corruption. This setup isolates the robustness of the FMPM, as predictions rely solely on the learned multimodal representations without adaptive scheduling. As shown 
+
+> 5
+
+Figure 6: Sensing rate heatmap over patches obtained from the proposed method on ( Left ) MHEALTH and ( Right ) HMC. 
+
+Table 2: Ablation study on MHEALTH. We report metrics for the AMI pipeline (all components turned on) and for variants with in-dividual components removed. Sensing reduction, FMPM, and loss-function contributions are evaluated separately to isolate their ef-fects.                                 
+
+> Configuration Acc. F1 Sensing AMI (full model) 99.12 99.12 38.19
+> Sensing reduction ablation
+> w/o AMC 98.89 99.02 78.90 w/o Σ-ΔSensing 99.09 99.12 41.67
+> FMPM ablation (w/o any sensing reduction)
+> w/o cross-modal fusion 98.11 98.12 -w/o context encoding 93.21 92.17 -w/o cross-modal fusion and context encoding 92.80 91.45 -
+> loss ablation (w/o any sensing reduction)
+> w/o contrastive loss 97.61 97.84 -w/o predictive coding loss 98.64 98.21 -w/o contrastive loss and predictive coding loss 97.21 97.41 -
+
+Table 3: (Left) Robustness under random modality dropout, and                     
+
+> (Right) Effect of input sampling rate on MHEALTH.
+> 𝑝 Acc. (%) F1 (%) 099.12 99.12 0.2 99.10 99.12 0.5 99.08 99.01 0.8 87.21 88.47 Sampling rate Acc. (%) F1 (%) Sensing (%) 50Hz (default) 99.12 99.12 38.19 25Hz 94.30 94.18 39.0 5Hz 87.04 86.85 39.0
+
+in Table 3, at 𝑝 = 0.2, accuracy remains at 99.10%. Even when 50% of modalities are randomly removed ( 𝑝 = 0.5), accuracy only drops slightly to 99.08%. Significant degradation occurs for high masking rates ( 𝑝 = 0.8). 
+
+Low sampling rate evaluation : We further assess robustness to temporal signal degradation on MHEALTH by resampling all sensor streams to lower sampling rates. Since reducing the sam-pling frequency reduces the number of samples per window, we proportionally adjust the patch size to preserve consistent temporal coverage per patch, specifically for any new sampling rate 𝑓 we have 𝑃 (𝑓 ) = 𝑃 0 · 𝑓 𝑓 0 , where 𝑓 0 is the default sampling rate (50 Hz in MHEALTH) and 𝑃 0 is the base patch size. We observe that the model maintains performance at 25 Hz with 4.8% accuracy degradation, and remains functional even at 5 Hz with an acc. of 87 .04% .
+
+## 4.5 Hardware Analysis 
+
+We benchmark our system across the HMC, MHEALTH, and WE-SAD datasets on four representative hardware platforms: an ARM CPU (Apple M1), NVIDIA Jetson Orin (TensorRT), RTX A6000 (Py-Torch), and RTX A6000 (TensorRT). For each dataset–platform pair, we report per-iteration latency and energy for: (i) the AMC , (ii) the 
+
+FMPM , and (iii) the AMI pipeline, consisting of AMC and FMPM .
+
+Setup. All latency and energy measurements use a batch size of 𝐵 =1,with 𝐾 =10 warm-up iterations and 𝑁 =100 timed iterations. GPU energy is measured from the NVML total-energy counter. TensorRT 
+
+Table 4: Runtime latency and energy comparison between the base-line and proposed AMI during inference on an ARM CPU.                       
+
+> Dataset Model Lat. (ms) Eng. (mJ) Savings (lat./eng.) MHEALTH FMPM (100% sensing) 5.28 254.74 –AMI (38% sensing) 3.69 200.14 30.01% / 21.40% HMC FMPM (100% sensing) 3.17 175.39 –AMI (73% sensing) 2.87 147.31 9.46% / 16.01% WESAD FMPM (100% sensing) 5.68 257.32 –AMI (42% sensing) 2.48 161.64 56.33% / 37.1%
+
+Figure 7: Per-iteration latency (left) and energy (right) as the sens-ing rate varies on MHEALTH. Measurements are across ARM CPU, Jetson (TensorRT) and A6000 (PyTorch and TensorRT). Latency is decomposed into AMC and FMPM and values are in √ of ms. 
+
+deployments on Jetson and A6000 apply standard optimizations such as layer fusion, kernel autotuning, and FP16 execution. 
+
+Latency & Energy Savings : To evaluate the runtime impact of AMC and Σ-Δ Sensing, we compare AMI with an FMPM-only base-line under the same sensing configuration. Table 4 shows that on the RTX A6000 (TensorRT), among all three datasets. AMI achieves its strongest gains on WESAD, reducing latency by 56.33% and en-ergy by 37.1% while sensing only 42% of the modalities. On average across datasets, AMI delivers 31.9% lower latency and 24.8% lower energy consumption, which directly translates to longer battery life in continuous monitoring scenarios. Fig. 7 summarizes per-iteration latency and energy across the four hardware platforms as the number of modalities varies. On the left, latency is decomposed into AMC and FMPM. Across all platforms, the FMPM dominates the end-to-end latency, while the AMC branch remains consistently much smaller, reinforcing that the AMC overhead is negligible relative to FMPM cost and sub-stantially smaller than the gains obtained by reducing sensing. On the right, we report per-iteration energy on the GPU platforms. TensorRT significantly accelerates the AMI: Across sensing-rate settings, A6000 (TensorRT) achieves a 5.1–5.4 × latency speedup over A6000 (PyTorch) and reduces GPU energy consumption by 68.2–75.1%. Comparing hardware platforms, Jetson (TensorRT) pro-vides a 49.3% energy reduction, while being 36.4% slower in latency than A6000 (TensorRT) on average across sensing rates. 
+
+## 5 CONCLUSIONS 
+
+This paper presented a unified framework that jointly learns when to sense and how to infer, addressing the core energy–accuracy bottlenecks of multimodal medical monitoring. By integrating a learned agent, Σ–Δ temporal sensing, and a foundation-backed prediction model, our framework enables dynamic sensing policies that adapt to both task demands and signal redundancy. Our multi-objective training aligns sensing, fusion, and temporal prediction in 
+
+> 6
+
+a single end-to-end system, yielding substantial reductions in sens-ing cost while improving the SOTA accuracy. Experiments across three diverse biomedical datasets show 31.9% lower latency and 24.8% lower energy consumption. These results show that joint sens-ing–inference optimization is a principled and practical path toward efficient edge intelligence in wearable and implantable systems. By enabling long-duration, low-power multimodal monitoring with reliable on-device inference, this work offers a promising founda-tion for continuous clinical assessment and earlier intervention in real-world patient care. 
+
+## REFERENCES 
+
+[1] 2020. Shimmer3 Wearable Sensor Specifications. https://www.shimmersensing. com. [2] Salar Abbaspourazad et al . 2024. Large-scale Training of Foundation Models for Wearable Biosignals. In The Twelfth International Conference on Learning Representations . https://openreview.net/forum?id=pC3WJHf51j [3] Abd Al Aleem et al . 2024. A Deep Learning Approach Using WESAD Data for Multi-Class Classification with Wearable Sensors. In 2024 6th Novel Intelligent and Leading Emerging Sciences Conference (NILES) . IEEE, 194–197. [4] N. Almujally et al . 2025. Wearable sensors-based assistive technologies for patient health monitoring. Frontiers in Bioengineering and Biotechnology 13 (2025), 1437877. [5] Diego Alvarez-Estevez and Ronald Rijsman. 2022. Haaglanden Medisch Cen-trum sleep staging database (version 1.1) . https://doi.org/10.13026/t79q-fr32 RRID:SCR_007345. [6] Diego Alvarez-Estevez and Roselyne M Rijsman. 2021. Inter-database validation of a deep learning approach for automatic sleep scoring. PloS one 16, 8 (2021), e0256111. [7] Samaneh Aminikhanghahi and Diane J Cook. 2017. A survey of methods for time series change point detection. Knowledge and Information Systems 51, 2 (2017), 339–367. [8] O. Banos et al . 2014. MHEALTH. UCI Machine Learning Repository. DOI: https://doi.org/10.24432/C5TW22. [9] Yoshua Bengio et al . 2013. Estimating or propagating gradients through stochastic neurons for conditional computation. arXiv preprint arXiv:1308.3432 (2013). [10] Víctor Campos et al . 2017. Skip RNN: Learning to skip state updates in recurrent neural networks. In International Conference on Learning Representations .[11] Emmanuel J Candès et al . 2006. Robust uncertainty principles: Exact signal reconstruction from highly incomplete frequency information. IEEE Transactions on Information Theory 52, 2 (2006), 489–509. [12] Feng Chen and TODO. 2010. Compressed sensing for wireless ECG bio-sensor networks. IEEE Transactions on Biomedical Engineering 57, 2 (2010), 139–148. [13] Isaac Debache et al . 2020. A lean and performant hierarchical model for human activity recognition using body-mounted sensors. Sensors 20, 11 (2020), 3090. [14] B. Demirel et al . 2022. Neural Contextual Bandits Based Dynamic Sensor Se-lection for Low-Power Body-Area Networks. In Proceedings of the ACM/IEEE International Symposium on Low Power Electronics and Design (ISLPED) . Boston, MA, USA, 1–6. https://doi.org/10.1145/3531437.3539713 [15] Thomas Elsken, Jan Hendrik Metzen, and Frank Hutter. 2019. Neural architecture search: A survey. Journal of Machine Learning Research 20, 1 (2019), 1997–2017. [16] Ching Fang et al . 2024. Promoting cross-modal representations to improve multimodal foundation models for physiological signals. In Advancements In Medical Foundation Models: Explainability, Robustness, Security, and Beyond . https: //openreview.net/forum?id=HNQxrUOvX4 [17] Oliver Faust et al . 2018. Deep Learning for Healthcare Applications Based on Physiological Signals: A Review. Computer Methods and Programs in Biomedicine 
+
+161 (2018), 1–13. [18] Chelsea Finn, Pieter Abbeel, and Sergey Levine. 2017. Model-agnostic meta-learning for fast adaptation of deep networks. In International Conference on Machine Learning . 1126–1135. [19] Sebastian Frey, Marco Guermandi, Simone Benatti, Victor Kartsch, Andrea Cosset-tini, and Luca Benini. 2023. BioGAP: a 10-Core FP-capable Ultra-Low Power IoT Processor, with Medical-Grade AFE and BLE Connectivity for Wearable Biosig-nal Processing. In 2023 IEEE International Conference on Omni-layer Intelligent Systems (COINS) , Vol. 1. 1–7. https://doi.org/10.1109/COINS57856.2023.10189286 [20] R. Garnett et al . 2010. Bayesian optimization for sensor set selection. In Proceed-ings of the 9th ACM/IEEE International Conference on Information Processing in Sensor Networks . 209–219. https://doi.org/10.1145/1791212.1791238 [21] Yi Gu et al . 2026. Learning Contrastive Multimodal Fusion with Improved Modal-ity Dropout for Disease Detection and Prediction. In Medical Image Computing and Computer Assisted Intervention – MICCAI 2025 . 280–290. [22] Song Han, Huizi Mao, and William J Dally. 2016. Deep compression: Compressing deep neural networks with pruning, trained quantization and Huffman coding. 
+
+International Conference on Learning Representations (2016). [23] Yi. Han et al . 2021. Dynamic neural networks: A survey. IEEE Transactions on Pattern Analysis and Machine Intelligence (2021). [24] Geoffrey Hinton, Oriol Vinyals, and Jeff Dean. 2015. Distilling the knowledge in a neural network. arXiv preprint arXiv:1503.02531 (2015). [25] Texas Instruments. 2019. ADS1292R Low-Power Analog Front-End for ECG and Bioelectrical Measurements. Datasheet. [26] Maxim Integrated. 2018. MAX30101 Optical Pulse Oximeter and Heart-Rate Sensor. Datasheet. [27] B. Jacob et al . 2018. Quantization and training of neural networks for efficient integer-arithmetic-only inference. In Proceedings of the IEEE Conference on Com-puter Vision and Pattern Recognition . 2704–2713. [28] Eric Jang, Shixiang Gu, and Ben Poole. 2017. Categorical reparameterization with Gumbel-Softmax. In International Conference on Learning Representations .[29] W. Jiang et al . 2025. Towards Robust Multimodal Physiological Foundation Models: Handling Arbitrary Missing Modalities. arXiv preprint arXiv:2504.19596 
+
+(2025). [30] M. Kolba and L. Collins. 2006. Information-theoretic Sensor Management for Multimodal Sensing. In 2006 IEEE International Symposium on Geoscience and Remote Sensing , Vol. 1. 3935–3938. https://doi.org/10.1109/IGARSS.2006.1009 [31] Christoph F. Kurz et al . 2025. Benchmarking vision–language models for diag-nostics in emergency and critical care settings. npj Digital Medicine 8 (2025), 423. https://doi.org/10.1038/s41746-025-01837-2 [32] Shih-Chii Liu and Tobi Delbruck. 2010. Neuromorphic sensory systems. Current Opinion in Neurobiology 20, 3 (2010), 288–295. [33] William Lotter, Gabriel Kreiman, and David Cox. 2017. Deep Predictive Coding Networks for Video Prediction and Unsupervised Learning. In International Conference on Learning Representations .[34] Shuo Ma et al . 2024. SleepMG: Multimodal generalizable sleep staging with inter-modal balance of classification and domain discrimination. In Proceedings of the 32nd ACM International Conference on Multimedia . 4004–4013. [35] Kaden McKeen, Sameer Masood, Augustin Toma, Barry Rubin, and Bo Wang. 2025. Ecg-fm: An open electrocardiogram foundation model. JAMIA open 8, 5 (2025), ooaf122. [36] Sparsh Mittal. 2016. A survey of techniques for approximate computing. Comput. Surveys 48, 4 (2016), 1–33. [37] NVIDIA Corporation. 2023. TensorRT Developer Guide . https://docs.nvidia.com/ deeplearning/tensorrt/developer-guide/ [38] Peter O’Connor and Max Welling. 2016. Sigma delta quantized networks. arXiv preprint arXiv:1611.02024 (2016). [39] Yanghua Peng et al . 2021. DL2: A Deep Learning-Driven Scheduler for Deep Learning Clusters. , 1947-1960 pages. https://doi.org/10.1109/TPDS.2021.3052895 [40] C. Pereira et al . 2024. Machine Learning Applied to Edge Computing and Wear-able Devices for Healthcare: Systematic Mapping of the Literature. Sensors 24, 19 (2024). https://doi.org/10.3390/s24196322 [41] A. Pillai et al . 2025. PaPaGei: Open Foundation Models for Optical Physiological Signals. In The Thirteenth International Conference on Learning Representations .https://openreview.net/forum?id=kYwTmlq6Vn [42] Rajesh PN Rao and Dana H Ballard. 1999. Predictive coding in the visual cortex: a functional interpretation of some extra-classical receptive-field effects. Nature Neuroscience 2, 1 (1999), 79–87. [43] Philip Schmidt et al . 2018. Introducing wesad, a multimodal dataset for wearable stress and affect detection. In Proceedings of the 20th ACM international conference on multimodal interaction . 400–408. [44] Richard Schreier and Gabor C. Temes. 2005. Understanding Delta–Sigma Data Converters . IEEE Press. [45] Abu Sebastian, Manuel Le Gallo, Riduan Khaddam-Aljameh, and Evangelos Eleftheriou. 2020. Memory devices and applications for in-memory computing. 
+
+Nature Nanotechnology 15, 7 (2020), 529–544. [46] Deepak Sharma, Arup Roy, Sankar Prasad Bag, Pawan Kumar Singh, and Youakim Badr. 2023. A hybrid deep learning-based approach for human activity recogni-tion using wearable sensors. In Innovations in Machine and Deep Learning: Case Studies and Applications . Springer, 231–259. [47] Basit Riaz Sheikh and Rajit Manohar. 2011. Energy-Efficient Pipeline Templates for High-Performance Asynchronous Circuits. J. Emerg. Technol. Comput. Syst. 
+
+7, 4, Article 19 (Dec. 2011), 26 pages. https://doi.org/10.1145/2043643.2043649 [48] Ali Tazarv et al . 2023. Active Reinforcement Learning for Personalized Stress Monitoring in Everyday Settings. In 2023 IEEE/ACM Conference on Connected Health: Applications, Systems and Engineering Technologies (CHASE) , Vol. 1. 44–55. https://doi.org/10.1145/3580252.3586979 [49] Surat Teerapittayanon, Bradley McDanel, and HT Kung. 2016. BranchyNet: Fast inference via early exiting from deep neural networks. In 2016 23rd International Conference on Pattern Recognition (ICPR) . IEEE, 2464–2469. [50] R. Thapa et al . 2025. A Multimodal Sleep Foundation Model Developed with 500K Hours of Sleep Recordings for Disease Predictions. medRxiv (2025). https: //doi.org/10.1101/2025.02.04.25321675 [51] Robert Tibshirani. 1996. Regression shrinkage and selection via the lasso. Journal of the Royal Statistical Society: Series B 58, 1 (1996), 267–288. 
+
+> 7
+
+[52] Bichen Wu et al . 2019. FBNet: Hardware-aware efficient convnet design via differentiable neural architecture search. In Proceedings of the IEEE Conference on Computer Vision and Pattern Recognition . 10734–10742. [53] Jinghua Xu and Michael Staniek. 2025. Multimodal Transformers for Clinical Time Series Forecasting and Early Sepsis Prediction. In Proceedings of the Second Workshop on Patient-Oriented Language Processing (CL4Health) . Association for Computational Linguistics. https://doi.org/10.18653/v1/2025.cl4health-1.8 [54] Hui Zou and Trevor Hastie. 2005. Regularization and variable selection via the elastic net. Journal of the Royal Statistical Society: Series B 67, 2 (2005), 301–320.

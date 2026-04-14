@@ -1,0 +1,395 @@
+Title: Cognitive-Causal Multi-Task Learning with Psychological State Conditioning for Assistive Driving Perception
+
+URL Source: https://arxiv.org/pdf/2604.07651v1
+
+Published Time: Fri, 10 Apr 2026 00:19:27 GMT
+
+Number of Pages: 15
+
+Markdown Content:
+# Cognitive-Causal Multi-Task Learning with Psychological State Conditioning for Assistive Driving Perception 
+
+Keito Inoshita 
+
+Kansai University 3-3-35, Yamatecho, Suita Osaka, Japan 564-8680 
+
+inosita.2865@gmail.com 
+
+Nobuhiro Hayashida 
+
+ISUZU Advanced Engineering Center, Ltd. 8, Tsuchidana, Fujisawa City Kanagawa, Japan 252-0881 
+
+nobuhiro_hayashida@isuzu.com 
+
+Akira Imanishi 
+
+ISUZU Advanced Engineering Center, Ltd. 8, Tsuchidana, Fujisawa City Kanagawa, Japan 252-0881 
+
+akira_imanishi@isuzu.com 
+
+## Abstract 
+
+Multi-task learning for advanced driver assistance systems requires modeling the complex interplay between driver internal states and external traffic environments. However, existing methods treat recognition tasks as flat and independent objec-tives, failing to exploit the cognitive causal structure underlying driving behavior. In this paper, we propose CauPsi, a cognitive science-grounded causal multi-task learning framework that explicitly models the hierarchical dependencies among Traffic Context Recognition (TCR), Vehicle Context Recognition (VCR), Driver Emotion Recognition (DER), and Driver Behavior Recognition (DBR). The pro-posed framework introduces two key mechanisms. First, a Causal Task Chain propagates upstream task predictions to downstream tasks via learnable prototype embeddings, realizing the cognitive cascade from environmental perception to behavioral regulation in a differentiable manner. Second, Cross-Task Psychological Conditioning (CTPC) estimates a psychological state signal from driver facial expressions and body posture and injects it as a conditioning input to all tasks including environmental recognition, thereby modeling the modulatory effect of driver internal states on cognitive and decision-making processes. Evaluated on the AIDE dataset, CauPsi achieves a mean accuracy of 82.71% with only 5.05M parameters, surpassing prior work by +1.0% overall, with notable improvements on DER (+3.65%) and DBR (+7.53%). Ablation studies validate the independent contribution of each component, and analysis of the psychological state signal con-firms that it acquires systematic task-label-dependent patterns in a self-supervised manner without explicit psychological annotations. 
+
+## 1 Introduction 
+
+During driving, drivers simultaneously perceive the external traffic environment and regulate their own emotions and behaviors. According to Endsley’s situation awareness model [Endsley, 1995], this cognitive processing comprises perception, comprehension, and projection of future states, and is further modulated by the driver’s psychological state. As the Yerkes-Dodson law [Yerkes and Dodson, 1908] demonstrates, arousal exerts a nonlinear influence on task performance, and even 
+
+> Preprint.
+> arXiv:2604.07651v1 [cs.LG] 8 Apr 2026
+
+under identical traffic conditions, environmental perception and vehicle operation decisions differ substantially depending on whether the driver is fatigued or tense [Liu and Wu, 2009]. Advanced Driver Assistance Systems (ADAS) have increasingly adopted Multi-Task Learning (MTL) to jointly address Driver Emotion Recognition (DER), Driver Behavior Recognition (DBR), Traffic Context Recognition (TCR), and Vehicle Context Recognition (VCR) [Gong et al., 2024, Zhang et al., 2024, Yang et al., 2023]. MTL enhances generalization through inter-task feature sharing [Chowdhuri et al., 2019], yet negative transfer caused by inter-task conflicts remains a challenge [Liu et al., 2019]. Existing methods have addressed this primarily through feature fusion [Liu et al., 2026, 2025], but share two fundamental limitations. First, despite a cognitively well-established causal structure among the four tasks—drivers perceive the traffic situation (TCR), make vehicle operation decisions (VCR), experience emotions through cognitive appraisal (DER), and exhibit behaviors governed by action readiness (DBR)—existing methods treat tasks in a flat manner, failing to exploit the cognitive cascade of “perception →
+
+judgment → emotion → behavior.” Second, the modulatory effect of driver psychological states on environmental recognition has not been modeled. Driver fatigue degrades cognitive processing capacity, and arousal level directly affects the perceptual accuracy of traffic environments [Liu and Wu, 2009], yet no existing ADAS-oriented MTL method utilizes driver internal states, inferable from facial expressions and body posture, as inputs to TCR or VCR. To address these challenges, we propose CauPsi, a cognitive science-grounded causal MTL framework comprising: a Causal Task Chain that implements inter-task causal structure as soft-label propagation via prototype embeddings; Cross-Task Psychological Conditioning (CTPC), which estimates a psychological state signal ψ from driver facial expressions and body posture and injects it into all tasks; and bidirectional Cross-View Attention between inside and scene views, built on a frozen MobileNetV3-Small [Howard et al., 2019] backbone. Our main contributions are: i) A Causal Task Chain that realizes the cognitive cascade of environmental perception →
+
+vehicle operation judgment → emotion elicitation → behavioral regulation as end-to-end differentiable soft-label propagation via learnable prototype embeddings. ii) CTPC, the first framework to incorporate the modulatory effect of driver internal states on environmental cognition into MTL, injecting the psychological state signal ψ estimated from facial expressions and body posture as a conditioning input to all tasks including TCR and VCR. iii) CauPsi achieves 82.7% mean accuracy with only 5.05M parameters on the AIDE benchmark, surpassing prior work with notable improvements on DER (+3.7%) and DBR (+7.5%), with ablation studies validating each component’s independent contribution. 
+
+## 2 Related Work 
+
+2.1 Multi-Task Learning for Driver Assistance 
+
+MTL improves the generalization performance of individual tasks by sharing representations across tasks [Chowdhuri et al., 2019, Ishihara et al., 2021]. Hard parameter sharing reserves only the final layers for task-specific heads while sharing most parameters across tasks [Cao et al., 2023, Cui et al., 2024]. Wu et al. [2022] employed this approach to jointly learn traffic object detection, drivable area segmentation, and lane detection, and Zhan et al. [2024] realized MTL for panoptic driving perception using an anchor-free architecture. While computationally efficient, hard parameter sharing is susceptible to negative transfer when inter-task discrepancy is large [Liu et al., 2019]. Soft parameter sharing allows each task to maintain independent parameters while leveraging shared features [Gao et al., 2023], as in AdaMV-MoE [Chen et al., 2023] and task-adaptive attention generators [Choi et al., 2024], though at the cost of increased parameter count. For the four-task ADAS setting on the AIDE dataset [Yang et al., 2023], Liu et al. [2026] proposed MMTL-UniAD, separating task-shared and task-specific features via dual-branch multimodal embed-ding, while Liu et al. [2025] proposed TEM3-Learning with Mamba-based spatiotemporal feature extraction and gating-based modality fusion, achieving high accuracy across all four tasks under 6M parameters. Xing et al. [2021] addressed joint learning of driver emotion and behavior, though 2without integration of traffic environment recognition tasks. However, all of these methods treat tasks in a flat manner, limiting inter-task information transfer to implicit feature sharing. In contrast, CauPsi incorporates the cognitively grounded causal structure among tasks directly into the network architecture via differentiable soft-label propagation through prototype embeddings. 
+
+2.2 Multimodal Learning and Feature Fusion 
+
+In ADAS, leveraging multiple modalities enables more comprehensive environmental understanding [Alaba et al., 2024, Li et al., 2025]. For driver state recognition, Zhou et al. [2021] predicted driver behavior by fusing forward-view images, driver images, and vehicle speed data, while Mou et al. [2023] improved emotion recognition through a hybrid attention mechanism combining driver images and eye movement data. Liu et al. [2024] proposed GLMDriveNet, demonstrating the effectiveness of fusing global and local multimodal features for driving behavior classification. A key challenge lies in effective inter-modality fusion. Many methods employ independent feature extraction branches per modality [Guo et al., 2023, Zhou et al., 2021], risking the omission of latent inter-modality interactions. Liu et al. [2025] addressed this via shared feature extraction across inside-view and scene-view images, while Liu et al. [2026] introduced per-task gating to dynamically adjust modality importance. However, these methods perform fusion in a later integration layer without explicit inter-view interaction at the encoder output level. In this work, bidirectional Cross-View Attention between the inside view and scene views explicitly models the interaction between driver internal states and the external environment at the encoder output level. 
+
+2.3 Cognitive, Emotional, and Behavioral Interactions in Driving 
+
+Cognitive, emotional, and behavioral processes in driving form a mutually interacting hierarchical system. Endsley’s SA model [Endsley, 1995] formalizes cognitive processing into three levels: perception (Level 1), comprehension (Level 2), and projection (Level 3). Baumann and Krems [2007] demonstrated that SA forms the core of driver decision-making, with TCR corresponding to Level 1–2 and VCR to Level 2–3, establishing a hierarchical dependency between them. Lazarus’s cognitive appraisal theory [Lazarus, 1991] explains how environmental cognition gives rise to emotion: emotions are elicited by the subject’s appraisal of stimuli relative to personal goals, not by external stimuli per se [Moors, 2013]. In driving, recognizing a traffic jam induces anxiety through appraisal of “delayed arrival,” while an approaching vehicle triggers fear as a “threat to safety,” establishing a causal link from TCR/VCR outputs to DER. Frijda’s action tendency theory [Frijda, 1987] further links emotion to behavior, anger promotes aggressive driving while fear induces avoidance, establishing a causal link from DER to DBR. Crucially, this causal chain is not unidirectional: the Yerkes-Dodson law [Yerkes and Dodson, 1908] shows that arousal nonlinearly modulates cognitive performance, with fatigue impairing attention and excessive tension inducing attentional narrowing [Hadi et al., 2025]. Russell’s circumplex model [Russell, 1980] provides a unified two-dimensional (arousal–valence) framework for quantifying these psychological states. Together, these theories establish the causal structure TCR/VCR → DER 
+
+→ DBR with psychological state modulation at every stage. Nevertheless, existing ADAS-oriented MTL methods have not incorporated these insights: although face and body information is used for DER/DBR, no mechanism feeds back the estimated psychological state into TCR or VCR. CTPC addresses this gap by estimating ψ from facial expressions and body posture and injecting it as a conditioning input to all tasks. 
+
+## 3 Cognitive-Causal Multi-Task Learning with Psychological State Conditioning 
+
+3.1 Framework Overview 
+
+CauPsi jointly recognizes driver cognitive, emotional, and behavioral states alongside the traffic environment from multi-view video. As shown in Figure. 1, the input comprises an inside view, multiple scene views, and cropped face/body regions, each provided as T consecutive frames. The framework consists of: i) multi-view feature processing with bidirectional Cross-View Attention between the inside and scene views; ii) CTPC, which estimates the psychological state signal ψ from 3Figure 1: Overall architecture of CauPsi. driver facial expressions and body posture and injects it as a conditioning input to all tasks; iii) a Causal Task Chain that explicitly models inter-task causal dependencies via prototype embeddings; and iv) loss functions and training stabilization techniques. The overall processing flow is as follows. Each view’s video is processed by a frozen pre-trained encoder and temporally aggregated via average pooling, after which scene view features are integrated through an attention mechanism. Bidirectional Cross-View Attention is then applied between the inside-view and scene-view features, and the fused representation is linearly projected to obtain the latent representation z. In parallel, CTPC estimates ψ from face and body features. Finally, the Causal Task Chain produces hierarchical predictions for all four tasks, taking as input z, individual view features, prototype embeddings from upstream tasks, and ψ.
+
+3.2 Multi-View Feature Processing with Cross-View Attention 
+
+Let the input for view v be Xv ∈ RC×T ×Hv ×Wv . Frames are processed by frozen pre-trained encoders ϕin , ϕsc (shared across scene views), ϕface , and ϕbody , followed by Global Average Pooling (GAP) and temporal averaging: 
+
+¯hv = 1
+
+T
+
+> T
+
+X
+
+> t=1
+
+
+
+Wgap  
+
+> v
+
+· GAP 
+
+
+
+ϕv
+
+
+
+X(t)
+
+> v
+
+ 
+
++ bgap 
+
+> v
+
+
+
+∈ Rdc (1) Face and body features fface , fbody ∈ Rdf are obtained analogously with a nonlinear projection. The 
+
+Ns scene view features are aggregated via attention-weighted fusion: 
+
+¯hscene =
+
+> Ns
+
+X
+
+> i=1
+
+αi ¯hsc ,i , α = softmax  W2 · ReLU  W1[¯hsc ,1; · · · ; ¯hsc ,N s ] (2) The attention weights α dynamically adjust the contribution of each viewpoint according to the scene context. The inside-view and scene features are projected to fin , fscene ∈ Rdf via two-layer MLPs. To capture the interaction between driver internal states and the external environment, bidirectional Cross-View Attention is applied between fin and fscene . For the Inside →Scene direction: 4cin = MHA( Q = LN( fin ), K = fscene , V = fscene ) (3) 
+
+gin = σ Win  
+
+> g
+
+[fin ; cin ] + bin 
+
+> g
+
+ (4) 
+
+˜fin = fin + gin ⊙ cin (5) The Scene →Inside direction is defined symmetrically, yielding ˜fscene . The gating mechanism g
+
+adaptively controls the amount of cross-view information incorporated at each dimension, and applying Layer Normalization (LN) only to the query ensures stable attention computation. 
+
+3.3 Cross-Task Psychological Conditioning 
+
+Driver psychological states modulate environmental cognition and behavioral decision-making, yet this effect has not been modeled in existing methods. CTPC estimates ψ from face and body features and injects it as a conditioning input to all task predictions. Motivated by Russell’s circumplex model [Russell, 1980] and Frijda’s action tendency theory [Frijda, 1987], CTPC introduces a structural inductive bias: affect-related components are extracted from fface and action-related components from fbody via independent two-layer MLPs: 
+
+aaffect = W(2)  
+
+> a
+
+· ReLU 
+
+
+
+W(1)  
+
+> a
+
+fface + b(1) 
+
+> a
+
+
+
++ b(2)  
+
+> a
+
+∈ Rdψ (6) 
+
+aaction = W(2)  
+
+> r
+
+· ReLU 
+
+
+
+W(1)  
+
+> r
+
+fbody + b(1) 
+
+> r
+
+
+
++ b(2)  
+
+> r
+
+∈ Rdψ (7) 
+
+ψ = tanh(LN( Wψ [aaffect ; aaction ] + bψ )) ∈ Rdψ (8) The Tanh activation constrains ψ ∈ [−1, 1] , enabling representation of psychological polarity (positive/negative valence, high/low arousal). Critically, ψ requires no ground-truth psychological labels and is learned entirely via backpropagation from the four task losses, acquiring driver internal state representations in a self-supervised manner. The structurally separated pathways for face and body provide affect-related and action-related inductive biases, but what information is ultimately encoded in ψ is determined by the task losses. Whereas prior methods use face/body information only for DER/DBR, CTPC injects ψ into all tasks including TCR and VCR, incorporating the Yerkes-Dodson modulatory effect [Yerkes and Dodson, 1908] directly into the architecture. 
+
+3.4 Causal Task Chain 
+
+A causal structure of environmental cognition → vehicle operation judgment → emotion elicitation 
+
+→ behavioral regulation exists among the four recognition tasks. The Causal Task Chain explicitly models this structure by propagating upstream task predictions to downstream tasks as learnable prototype embeddings, as illustrated in Figure. 2. The Cross-View Attention-enhanced features are projected to task-shared and task-specific representations: 
+
+z = Wz [˜fin ; ˜fscene ] + bz ∈ Rdz , zr = Wπr z + bπr ∈ Rdt (9) For upstream tasks ( r = 1 , 2, 3), the soft-label embedding er = ˆ yr · Pr ∈ Rde is computed from the predicted distribution ˆyr and a learnable prototype matrix Pr ∈ RCr ×de , and propagated to downstream tasks. Since ˆyr is softmax-normalized, er is a confidence-weighted average of per-class prototype vectors. Unlike hard-label propagation via argmax, this is fully differentiable, enabling gradients from downstream losses to backpropagate through upstream parameters and realizing end-to-end cooperative learning. The four tasks are predicted hierarchically, with each task head being a two-layer MLP ( Linear →
+
+ReLU → Dropout → Linear ) with softmax output. The input composition reflects the progressive accumulation of cognitive information per Endsley’s SA model [Endsley, 1995]: 
+
+ˆy1 = Head 1([ z1; ˜fscene ; ψ]) (TCR) (10) 
+
+ˆy2 = Head 2([ z2; ˜fin ; ˜fscene ; ψ]) (VCR) (11) 
+
+ˆy3 = Head 3([ z3; e1; e2; fface ; ψ]) (DER) (12) 
+
+ˆy4 = Head 4([ z4; e3; e1; e2; ˜fscene ; ˜fin ; fbody ; ψ]) (DBR) (13) 5Figure 2: Detailed architecture of the Causal Task Chain. TCR receives only scene features as the most upstream task; VCR additionally receives inside-view features; DER receives upstream embeddings e1, e2 grounded in Lazarus’s appraisal theory [Lazarus, 1991]; DBR integrates all upstream embeddings alongside multi-view and body features per Frijda’s action tendency theory [Frijda, 1987], reflecting that behavior emerges as the cumulative outcome of all preceding cognitive stages. 
+
+3.5 Loss Functions and Training 
+
+Each task is trained with class-weighted Label Smoothing Cross-Entropy loss, with higher weights assigned to psychological state-related tasks ( λ3 > λ 1, λ4 > λ 2) to promote learning on tasks with pronounced class imbalance: 
+
+L =
+
+> 4
+
+X
+
+> r=1
+
+λr L(r)CE (ˆ yr , y r ; wr , ϵ ) + γadv Ladv (14) The adversarial loss Ladv is produced by a domain classifier with a Gradient Reversal Layer (GRL), regularizing z to suppress domain-specific information via unsupervised K-means domain labels. Training is further stabilized via frozen encoders, Exponential Moving Average (EMA) of model parameters, mixup augmentation, gradient accumulation, and warmup cosine annealing. The complete processing procedure of CauPsi is summarized in Appendix A, and full training details including the EMA and learning rate schedule are provided in Appendix B. 
+
+## 4 Experiments 
+
+4.1 Experimental Setup Dataset. We evaluate CauPsi on the AIDE dataset [Yang et al., 2023], an open-source multimodal time-series dataset for driver assistance research comprising 2,898 samples. Each sample includes multi-view images from four viewpoints (front, left, right, and inside) and is annotated with labels for all four tasks: DER, DBR, TCR, and VCR. The dataset is split into training, validation, and test sets at ratios of 65%, 15%, and 20%, respectively. As preprocessing, the driver’s face and upper-body regions are cropped from inside-view images based on bounding box coordinates. Each input sequence consists of 16 consecutive frames at 16 fps, and random horizontal flipping is applied as data augmentation. 
+
+Implementation Details. MobileNetV3-Small [Howard et al., 2019] pre-trained on ImageNet is used as the frozen backbone encoder. Optimization uses AdamW (learning rate 3 × 10 −4, weight decay 6Table 1: Comparison with existing methods. Pattern Backbone αacc (%) ↑ βmacc P(M) Multi-view Scene Driver Images Joints DER DBR TCR VCR (%) ↑ ↓                                                                                                                                                                                 
+
+> 2D VGG16 [Simonyan and Zisserman, 2014] VGG16 [Simonyan and Zisserman, 2014] 3DCNN 69.12 64.57 84.77 74.08 73.15 127.48 Res18 [He et al., 2016] Res18 [He et al., 2016] 3DCNN 68.78 64.33 89.76 78.59 75.37 107.77 CMT [Guo et al., 2022] CMT [Guo et al., 2022] 3DCNN 68.75 68.75 93.75 81.38 78.16 72.33 GLMDriveNet [Liu et al., 2024] GLMDriveNet [Liu et al., 2024] 3DCNN 71.38 66.57 90.23 77.19 76.34 78.17 2D + Timing PP-Res18+TransE Res18/34+TransE MLP+TE 70.83 67.32 90.54 79.97 77.17 -Res34+TransE Res18/34+TransE MLP+TE 72.65 67.08 86.63 78.46 76.21 -Res50+TransE Res34/50+TransE MLP+TE 70.24 65.65 82.57 77.29 73.94 -VGG16+TransE VGG13/16+TransE MLP+TE 71.12 67.15 85.13 78.58 75.50 -VGG19+TransE VGG16/19+TransE MLP+TE 69.46 65.48 85.74 77.91 74.65 -3D 3D-Res34 [Hara et al., 2018] 3D-Res34 [Hara et al., 2018] 3DCNN 69.13 63.05 87.82 79.31 74.83 303.10 MobileNet-V1-3D [Howard et al., 2019] MobileNet-V1-3D [Howard et al., 2019] ST-GCN 72.23 64.20 88.34 77.83 75.65 54.05 MobileNet-V2-3D [Sandler et al., 2018] MobileNet-V2-3D [Sandler et al., 2018] ST-GCN 68.47 61.74 86.54 78.66 73.85 83.78 ShuffleNet-V1-3D [Zhang et al., 2018] ShuffleNet-V1-3D [Zhang et al., 2018] ST-GCN 72.41 68.97 90.64 80.79 78.20 31.49 ShuffleNet-V2-3D [Ma et al., 2018] ShuffleNet-V2-3D [Ma et al., 2018] ST-GCN 70.94 64.04 89.33 78.98 75.82 35.09 C3D [Tran et al., 2015] C3D [Tran et al., 2015] ST-GCN 63.05 63.95 85.41 77.01 72.36 158.46 I3D [Carreira and Zisserman, 2017] I3D [Carreira and Zisserman, 2017] ST-GCN 70.94 66.17 87.68 79.81 76.15 -SlowFast [Feichtenhofer et al., 2019] SlowFast [Feichtenhofer et al., 2019] ST-GCN 72.38 61.58 86.86 78.33 74.79 -TimeSFormer [Bertasius et al., 2021] TimeSFormer [Bertasius et al., 2021] ST-GCN 74.87 65.18 92.12 78.81 77.75 158.46 Video Swin Trans. [Liu et al., 2021] Video Swin Trans. [Liu et al., 2021] 3DCNN 73.44 65.63 93.75 75.00 76.96 119.80 MARNet [Liu et al., 2026] MARNet [Liu et al., 2026] 3DCNN 76.67 73.61 93.19 85.00 82.30 -MTS-Mamba [Liu et al., 2025] MTS-Mamba [Liu et al., 2025] 3DCNN 75.00 69.31 96.29 86.11 81.68 5.99 CauPsi (ours) MobileNetV3-S MobileNetV3-S —78.65 76.84 92.11 83.25 82.71 5.05
+
+1 × 10 −4) with Warmup Cosine Annealing. The effective batch size is 64 via gradient accumulation over 4 steps. Task loss weights are set to λTCR = 1 .0, λVCR = 1 .0, λDER = 1 .5, λDBR = 2 .0,assigning higher weights to psychological state-related tasks. Full hyperparameter details are provided in Appendix C. 
+
+Metrics. Per-task accuracy ( αacc ) and mean accuracy across all four tasks ( βmacc ) are the primary evaluation metrics. Macro-averaged F1 score is additionally reported as a supplementary metric. 
+
+4.2 Comparison with Existing Methods 
+
+Table 1 presents a comparison with existing methods following the experimental setup of Liu et al. [2025]. Methods are categorized by backbone type: 2D Convolutional Neural Network (CNN), 2D CNN with temporal embedding, and 3D CNN. CauPsi achieves a mean accuracy of 82.71%, surpassing TEM 3-Learning [Liu et al., 2025], the highest-performing and most parameter-efficient prior model, by 1.0 percentage point (81.68%). Most notably, substantial improvements are observed on DER (78.65%, +3.65%) and DBR (76.84%, +7.53%), both directly linked to driver psychological states, suggesting that the Causal Task Chain and CTPC function effectively for psychological state-related tasks. CauPsi falls below TEM 3-Learning on TCR (92.11%, −4.18%) and VCR (83.25%, −2.86%), attributable to encoder architecture differences: whereas TEM 3-Learning directly models spatiotem-poral features via a Mamba-based State Space Model, CauPsi processes each frame independently with MobileNetV3-Small and aggregates via temporal averaging, limiting dynamic temporal mod-eling. Nevertheless, CauPsi achieves this with only 5.05M parameters, a 16% reduction from TEM 3-Learning’s 5.99M, demonstrating a competitive balance between efficiency and accuracy. Furthermore, CauPsi uses no joint position information, yet surpasses methods that incorporate joint data in mean accuracy, confirming that face and body features combined with CTPC serve as an effective alternative representation of driver state. Per-class analysis is provided in Appendix D. 
+
+4.3 Ablation Study 
+
+To quantitatively evaluate the contribution of each component, we design five ablation conditions, each removing one component while keeping all training settings and random seeds fixed. Results are presented in Table 2. The full model outperforms all ablation conditions. Removing face and body features causes the largest drop ( −2.46%), with DBR declining 6.73 points (76.84% →70.11%), demonstrating that localized face and body features are indispensable for behavior recognition. A 3.12-point drop on VCR further confirms that fine-grained driver appearance contributes to vehicle operation judgment as well. Removing the Causal Task Chain ( −2.30%) yields the largest single-task drop: DBR declines 8.70 points (76.84% →68.14%), strongly indicating that prototype embedding-based causal propagation from upstream tasks is decisive for behavior recognition. Without the Causal Task Chain, each task 7Table 2: Ablation study results. ∆ denotes the change in mean accuracy relative to the full model.                                     
+
+> Model βmacc ∆DER DBR TCR VCR CauPsi 82.71 —78.65 76.84 92.11 83.25
+> −CTPC 81.77 −0.94 79.63 73.89 91.95 81.60
+> −CrossView 82.38 −0.33 79.96 75.69 92.28 81.60
+> −CausalChain 80.41 −2.30 78.16 68.14 92.93 82.43
+> −FaceBody 80.25 −2.46 78.65 70.11 92.11 80.13
+
+Figure 3: Mean values across the 16 dimensions of ψ, stratified by class for each task. predicts solely from its task-specific projection zr and scene features, unable to exploit upstream cognitive outputs. Removing CTPC ( −0.94%) degrades VCR ( −1.65%) and DBR ( −2.95%), corroborating that ψ contributes to both environmental and behavioral recognition. Cross-View Attention contributes modestly overall ( −0.33%) but shows a −1.65% effect on VCR. The full model’s superiority is consistent on βmacc , reflecting that per-task trade-offs are inherent to MTL. 
+
+4.4 Analysis of the Psychological State Signal 
+
+To verify whether ψ acquires meaningful representations that vary systematically with task labels, we collect ψ from all 609 test-set samples. Figure. 3 presents heatmaps of the mean values across all 16 dimensions, stratified by class for each task. Clear inter-class differences in ψ patterns are observed across all tasks. In DER, Weariness and Happiness form contrasting patterns on d7 and d10, consistent with opposing poles of the arousal axis in Russell’s circumplex model [Russell, 1980]. In DBR, Phone and DozingOff are encoded by qualitatively distinct dimensional patterns, reflecting the difference between active attentional distraction and passive arousal degradation. For VCR, LaneChange shows the largest positive value on d6 among all classes, possibly reflecting the higher cognitive load of lane changing relative to other maneuvers. 8Cross-task analysis reveals that d7 consistently takes positive values for low-arousal passive states (Weariness, DozingOff) and negative values for high-arousal externally directed states (Anxiety, LookAround, Backward), suggesting it encodes arousal-related information corresponding to the affect-related component in CTPC. Crucially, these systematic patterns are acquired without any explicit psychological state annotations, through minimization of task losses alone, confirming that CTPC extracts meaningful driver internal state representations in a self-supervised manner. Detailed per-dimension analysis is provided in Appendix E. 
+
+## 5 Discussion 
+
+5.1 Key Findings 
+
+The most important finding of this work is that the Causal Task Chain, which propagates upstream task predictions to downstream tasks via prototype embeddings, is indispensable for behavior recognition. Its removal causes DBR to decline sharply by 8.70 percentage points (76.84% →68.14%), the largest single-task drop across all ablation conditions. This result underscores a broader insight: driver emotion and behavior cannot be treated in isolation from the vehicle and traffic context. Just as Frijda’s action tendency theory [Frijda, 1987] holds that behavior emerges as the cumulative outcome of cognition and emotion, a driver’s emotional and behavioral states are inherently shaped by the surrounding traffic situation. Modeling driver and vehicle context jointly, rather than independently, is therefore essential for accurate recognition. Soft-label propagation via prototype embeddings realizes this joint modeling in a differentiable manner, enabling upstream task training to also contribute to downstream task accuracy. A second key finding is the empirical demonstration that the psychological state signal ψ, extracted from driver facial expressions and body posture, enables face and body information previously used exclusively for DER and DBR to be leveraged for TCR and VCR as well. The CTPC ablation results in a mean accuracy drop of 0.94 percentage points, with pronounced effects on VCR ( −1.65%) and DBR ( −2.95%), consistent with the Yerkes-Dodson law [Yerkes and Dodson, 1908] that vehicle operation judgment varies with driver internal state even under identical traffic conditions. While it is well established in cognitive psychology that arousal level and fatigue affect environmental cognition performance [Liu and Wu, 2009, Baumann and Krems, 2007], this work is the first to model this effect in an MTL framework and empirically demonstrate a corresponding accuracy improvement. Notably, face and body features serve a dual function in CauPsi. Removing them disables CTPC as well (effectively ψ = 0), so the accuracy drop ( −2.46%) subsumes the CTPC contribution ( −0.94%). The residual ( −1.52%) represents the direct contribution of face and body features to the DER and DBR task heads, independent of CTPC. This confirms that face and body information simultaneously acts as direct local appearance descriptors and as a source of psychological state information mediated by ψ.In contrast, CauPsi falls below TEM 3-Learning [Liu et al., 2025] on TCR ( −4.18%) and VCR (−2.86%), attributable to the encoder architecture: frame-level CNN processing with temporal averaging loses dynamic temporal information, as directly evidenced by LaneChange in VCR being misclassified as Forward at a rate of 78% (Appendix D). The structural strengths of CauPsi—CTPC and the Causal Task Chain—partially compensate for this encoder-level limitation but do not fully overcome it. 
+
+5.2 Limitations 
+
+First, although ψ exhibits systematic task-label-dependent patterns, whether individual dimensions correspond to specific psychological indicators such as arousal, valence, or cognitive load remains unverified. Validation using datasets with ground-truth psychological labels (e.g., physiological arousal ratings) is necessary to establish the interpretability of ψ.Second, frame-level CNN encoding with temporal averaging discards sequential dynamics, directly causing low accuracy on VCR classes requiring motion cues (LaneChange: F1 = 0 .217 , Turning: F1 
+
+= 0 .695 ). Introducing spatiotemporal approaches such as State Space Models or Temporal Attention is a natural next step. 9Third, label smoothing and class weighting are insufficient for severely underrepresented classes (DozingOff: 12 samples, F1 = 0 .727 ; Anger: 45 samples, F1 = 0 .518 ). Oversampling, stronger data augmentation, or few-shot learning frameworks warrant investigation. 
+
+## 6 Conclusion 
+
+We proposed CauPsi, a cognitive science-grounded causal MTL framework for jointly addressing DER, DBR, TCR, and VCR. The Causal Task Chain implements inter-task causal structure as differentiable soft-label propagation via prototype embeddings, and CTPC estimates the psychological state signal ψ from driver facial expressions and body posture and injects it into all tasks. On the AIDE dataset, CauPsi achieves 82.71% mean accuracy with 5.05M parameters, surpassing prior work by 1.0 percentage point with notable gains on DER (+3.65%) and DBR (+7.53%). This work provides the first empirical demonstration that driver internal states can be incorporated as a modulatory signal in MTL for ADAS, suggesting that inter-task causal dependencies and psychological state conditioning are important design principles for future ADAS-oriented multi-task learning. 
+
+## Acknowledgments and Disclosure of Funding 
+
+The authors would like to express their sincere gratitude to Isuzu Motors Limited, Isuzu Advanced Engineering Center Limited, and NineSigma Holdings, Inc. for their valuable advice and insightful feedback throughout this study. The authors also thank Dr. Hirotaka Hara for his technical advice and constructive suggestions. 
+
+## References 
+
+S. Y. Alaba, A. C. Gurbuz, and J. E. Ball. Emerging trends in autonomous vehicle perception: Multimodal fusion for 3D object detection. World Electric Vehicle Journal , 15(1):20, 2024. doi: 10.3390/wevj15010020. M. Baumann and J. F. Krems. Situation awareness and driving: A cognitive model. In Modelling Driver Behaviour in Automotive Environments , pages 253–265. Springer London, London, 2007. doi: 10.1007/978-1-84628-618-6_14. G. Bertasius, H. Wang, and L. Torresani. Is space-time attention all you need for video understanding? In Proceedings of the 38th International Conference on Machine Learning , pages 813–824, 2021. URL http://arxiv.org/abs/2102.05095 .K. Cao, J. You, and J. Leskovec. Relational multi-task learning: Modeling relations between data and tasks. In Proceedings of the 10th International Conference on Learning Representations , pages 1–14, 2023. doi: 10.48550/ARXIV.2303.07666. J. Carreira and A. Zisserman. Quo vadis, action recognition? a new model and the kinetics dataset. In Proceedings of the 2017 IEEE Conference on Computer Vision and Pattern Recognition , 2017. doi: 10.1109/cvpr.2017.502. T. Chen, X. Chen, X. Du, A. Rashwan, F. Yang, H. Chen, et al. AdaMV-MoE: Adaptive multi-task vision mixture-of-experts. In Proceedings of the 2023 IEEE/CVF International Conference on Computer Vision , pages 17300–17311, 2023. doi: 10.1109/iccv51070.2023.01591. W. Choi, M. Shin, H. Lee, J. Cho, J. Park, and S. Im. Multi-task learning for real-time autonomous driving leveraging task-adaptive attention generator. In Proceedings of the 2024 IEEE International Conference on Robotics and Automation , volume 2, pages 14732–14739, 2024. doi: 10.1109/ icra57147.2024.10610716. S. Chowdhuri, T. Pankaj, and K. Zipser. MultiNet: Multi-modal multi-task learning for autonomous driving. In 2019 IEEE Winter Conference on Applications of Computer Vision , pages 1496–1504. IEEE, 2019. doi: 10.1109/wacv.2019.00164. 10 J. Cui, J. Du, W. Liu, and Z. Lian. TextNeRF: A novel scene-text image synthesis method based on neural radiance fields. In Proceedings of the 2024 IEEE/CVF Conference on Computer Vision and Pattern Recognition , volume 34, pages 22272–22281. IEEE, 2024. doi: 10.1109/cvpr52733.2024. 02102. M. R. Endsley. Toward a theory of situation awareness in dynamic systems. Human Factors , 37(1): 32–64, 1995. doi: 10.1518/001872095779049543. C. Feichtenhofer, H. Fan, J. Malik, and K. He. SlowFast networks for video recognition. In 
+
+Proceedings of the 2019 IEEE/CVF International Conference on Computer Vision , 2019. doi: 10.1109/iccv.2019.00630. N. H. Frijda. Emotion, cognitive structure, and action tendency. Cognition & Emotion , 1(2):115–143, 1987. doi: 10.1080/02699938708408043. M. Gao, J.-Y. Li, C.-H. Chen, Y. Li, J. Zhang, and Z.-H. Zhan. Enhanced multi-task learning and knowledge graph-based recommender system. IEEE Transactions on Knowledge and Data Engineering , 35(10):10281–10294, 2023. doi: 10.1109/tkde.2023.3251897. Y. Gong, J. Lu, W. Liu, Z. Li, X. Jiang, X. Gao, et al. SIFDriveNet: Speed and image fusion for driving behavior classification network. IEEE Transactions on Computational Social Systems , 11 (1):1244–1259, 2024. doi: 10.1109/tcss.2023.3303334. C. Guo, H. Liu, J. Chen, and H. Ma. Temporal information fusion network for driving behavior prediction. IEEE Transactions on Intelligent Transportation Systems , 24(9):9415–9424, 2023. doi: 10.1109/tits.2023.3267150. J. Guo, K. Han, H. Wu, Y. Tang, X. Chen, Y. Wang, et al. CMT: Convolutional neural networks meet vision transformers. In Proceedings of the 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 12165–12175, 2022. doi: 10.1109/cvpr52688.2022.01186. F. Hadi, J. Y. Lee, W. L. Yeoh, N. Bu, and O. Fukuda. Driving fatigue detection based on behavioral with cognitive task scenario. In Proceedings of the 2025 10th International Conference on Intelligent Informatics and Biomedical Sciences , volume 10, pages 264–269, 2025. doi: 10.1109/ iciibms66230.2025.11316713. K. Hara, H. Kataoka, and Y. Satoh. Can spatiotemporal 3D CNNs retrace the history of 2D CNNs and ImageNet? In Proceedings of the 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 6546–6555, 2018. doi: 10.1109/cvpr.2018.00685. K. He, X. Zhang, S. Ren, and J. Sun. Deep residual learning for image recognition. In Proceedings of the 2016 IEEE Conference on Computer Vision and Pattern Recognition , pages 770–778, 2016. URL 10.1109/cvpr.2016.90 .A. Howard, M. Sandler, B. Chen, W. Wang, L.-C. Chen, M. Tan, et al. Searching for MobileNetV3. In Proceedings of the 2019 IEEE/CVF International Conference on Computer Vision , pages 1314–1324, 2019. doi: 10.1109/iccv.2019.00140. K. Ishihara, A. Kanervisto, J. Miura, and V. Hautamaki. Multi-task learning with attention for end-to-end autonomous driving. In Proceedings of the 2021 IEEE/CVF Conference on Computer Vision and Pattern Recognition Workshops , pages 2896–2905, 2021. doi: 10.1109/cvprw53098. 2021.00325. R. S. Lazarus. Emotion and Adaptation . Oxford University Press, New York, NY, 1991. doi: 10.1093/oso/9780195069945.001.0001. Z. Li, T. Zhang, M. Zhou, D. Tang, P. Zhang, W. Liu, et al. MIPD: A multi-sensory interactive per-ception dataset for embodied intelligent driving. IEEE Transactions on Intelligent Transportation Systems , 26(11):21320–21334, 2025. doi: 10.1109/tits.2025.3593298. S. Liu, Y. Liang, and A. Gitter. Loss-balanced task weighting to reduce negative transfer in multi-task learning. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 33, pages 9977–9978, 2019. doi: 10.1609/aaai.v33i01.33019977. 11 W. Liu, Y. Gong, G. Zhang, J. Lu, Y. Zhou, and J. Liao. GLMDriveNet: Global–local multimodal fusion driving behavior classification network. Engineering Applications of Artificial Intelligence ,129:107575, 2024. doi: 10.1016/j.engappai.2023.107575. W. Liu, Y. Qiao, Z. Wang, Q. Guo, Z. Chen, M. Zhou, et al. TEMˆ3-learning: Time-efficient multimodal multi-task learning for advanced assistive driving, 2025. W. Liu, W. Wang, Y. Qiao, Q. Guo, J. Zhu, P. Li, et al. MMTL-UniAD: A unified framework for multimodal and multi-task learning in assistive driving perception, 2026. Y.-C. Liu and T.-J. Wu. Fatigued driver’s driving behavior and cognitive task performance: Effects of road environments and road environment changes. Safety Science , 47(8):1083–1089, 2009. doi: 10.1016/j.ssci.2008.11.009. Z. Liu, J. Ning, Y. Cao, Y. Wei, Z. Zhang, S. Lin, et al. Video swin transformer. In Proceedings of the 2022 IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 3192–3201, 2021. URL 10.1109/CVPR52688.2022.00320 .N. Ma, X. Zhang, H.-T. Zheng, and J. Sun. ShuffleNet V2: Practical guidelines for efficient CNN architecture design. In Computer Vision – ECCV 2018 , Lecture Notes in Computer Science, pages 122–138, 2018. doi: 10.1007/978-3-030-01264-9_8. A. Moors. On the causal role of appraisal in emotion. Emotion Review , 5(2):132–140, 2013. doi: 10.1177/1754073912463601. L. Mou, Y. Zhao, C. Zhou, B. Nakisa, M. N. Rastgoo, L. Ma, et al. Driver emotion recognition with a hybrid attentional multimodal fusion framework. IEEE Transactions on Affective Computing , 14 (4):2970–2981, 2023. doi: 10.1109/taffc.2023.3250460. J. A. Russell. A circumplex model of affect. Journal of Personality and Social Psychology , 39(6): 1161–1178, 1980. doi: 10.1037/h0077714. M. Sandler, A. Howard, M. Zhu, A. Zhmoginov, and L.-C. Chen. MobileNetV2: Inverted residuals and linear bottlenecks. In Proceedings of the 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 4510–4520, 2018. doi: 10.1109/cvpr.2018.00474. K. Simonyan and A. Zisserman. Very deep convolutional networks for large-scale image recognition, 2014. D. Tran, L. Bourdev, R. Fergus, L. Torresani, and M. Paluri. Learning spatiotemporal features with 3D convolutional networks. In Proceedings of the 2015 IEEE International Conference on Computer Vision , 2015. doi: 10.1109/iccv.2015.510. D. Wu, M.-W. Liao, W.-T. Zhang, X.-G. Wang, X. Bai, W.-Q. Cheng, et al. YOLOP: You only look once for panoptic driving perception. Machine Intelligence Research , 19(6):550–562, 2022. doi: 10.1007/s11633-022-1339-y. Y. Xing, C. Lv, D. Cao, and E. Velenis. Multi-scale driver behavior modeling based on deep spatial-temporal representation for intelligent vehicles. Transportation Research Part C: Emerging Technologies , 130:103288, 2021. doi: 10.1016/j.trc.2021.103288. D. Yang, S. Huang, Z. Xu, Z. Li, S. Wang, M. Li, et al. AIDE: A vision-driven multi-view, multi-modal, multi-tasking dataset for assistive driving perception. In Proceedings of the IEEE/CVF International Conference on Computer Vision , pages 20459–20470, October 2023. URL http: //arxiv.org/abs/2307.13933 .R. M. Yerkes and J. D. Dodson. The relation of strength of stimulus to rapidity of habit-formation. 
+
+Journal of Comparative Neurology and Psychology , 18(5):459–482, 1908. doi: 10.1002/cne. 920180503. J. Zhan, Y. Luo, C. Guo, Y. Wu, J. Meng, and J. Liu. YOLOPX: Anchor-free multi-task learning network for panoptic driving perception. Pattern Recognition , 148:110152, 2024. doi: 10.1016/j. patcog.2023.110152. 12 X. Zhang, X. Zhou, M. Lin, and J. Sun. ShuffleNet: An extremely efficient convolutional neural network for mobile devices. In Proceedings of the 2018 IEEE/CVF Conference on Computer Vision and Pattern Recognition , pages 6848–6856, 2018. doi: 10.1109/cvpr.2018.00716. X. Zhang, Y. Gong, J. Lu, Z. Li, S. Li, S. Wang, et al. Oblique convolution: A novel convolution idea for redefining lane detection. IEEE Transactions on Intelligent Vehicles , 9(2):4025–4039, 2024. doi: 10.1109/tiv.2023.3319547. D. Zhou, H. Liu, H. Ma, X. Wang, X. Zhang, and Y. Dong. Driving behavior prediction considering cognitive prior and driving context. IEEE Transactions on Intelligent Transportation Systems , 22 (5):2669–2678, 2021. doi: 10.1109/tits.2020.2973751. 
+
+## A Overall Algorithm of CauPsi 
+
+Algorithm 1 summarizes the complete processing procedure of CauPsi. 
+
+Algorithm 1: Overall Algorithm of CauPsi 
+
+Input: Multi-view video {Xv }, face/body video Xface , Xbody 
+
+Output: Four-task predictions ˆy1, ˆy2, ˆy3, ˆy4
+
+// Feature Extraction (Section 3.2) 
+
+1: For each view v: ¯hv ← 1
+
+> T
+
+P 
+
+> t
+
+Wgap  
+
+> v
+
+· GAP( ϕv (X(t) 
+
+> v
+
+)) 
+
+2: fface , fbody ← face/body encoders + projection 3: ¯hscene ← P 
+
+> i
+
+αi ¯hsc ,i (scene integration) 4: fin , fscene ← two-layer MLP projection 5: ˜fin , ˜fscene ← CrossViewAttention 
+
+// Psychological State Conditioning (Section 3.3) 
+
+6: aaffect ← MLP( fface )
+
+7: aaction ← MLP( fbody )
+
+8: ψ ← tanh(LN( Wψ [aaffect ; aaction ])) 
+
+// Task-Shared Representation (Section 3.4) 
+
+9: z ← Wz [˜fin ; ˜fscene ]
+
+10: zr ← Wπr z (r = 1 , 2, 3, 4)
+
+// Causal Task Chain (Section 3.4) 
+
+11: ˆy1 ← Head 1([ z1; ˜fscene ; ψ]) , e1 ← ˆy1 · P1
+
+12: ˆy2 ← Head 2([ z2; ˜fin ; ˜fscene ; ψ]) , e2 ← ˆy2 · P2
+
+13: ˆy3 ← Head 3([ z3; e1; e2; fface ; ψ]) , e3 ← ˆy3 · P3
+
+14: ˆy4 ← Head 4([ z4; e3; e1; e2; ˜fscene ; ˜fin ; fbody ; ψ]) 
+
+// Adversarial Training (Section 3.5) 
+
+15: ˆd ← MLP(GRL λ(z)) 
+
+16: return ˆy1, ˆy2, ˆy3, ˆy4
+
+## B Training Details 
+
+Model parameters are updated with EMA at decay rate β:
+
+θ(t+1) EMA = β θ(t)EMA + (1 − β) θ(t) (15) The EMA parameters are used at evaluation time. The learning rate follows linear warm-up over the first Ew epochs, then decays via cosine annealing to ηmin :
+
+η(e) = 
+
+
+
+ηmax · e + 1 
+
+Ew
+
+if e < E w
+
+ηmin + ηmax − ηmin 
+
+2
+
+
+
+1 + cos 
+
+ π(e − Ew)
+
+E − Ew
+
+ 
+
+otherwise (16) Gradients are accumulated over A = 4 steps before each parameter update, with gradient norm clipping applied at each step. Early stopping is triggered when validation accuracy fails to improve for P consecutive epochs, and the best EMA model is used for test evaluation. 13 C Implementation Details 
+
+The backbone encoder is MobileNetV3-Small [Howard et al., 2019] pre-trained on ImageNet, with all parameters frozen during training. Optimization uses AdamW (lr 3 × 10 −4, weight decay 1 × 10 −4)with Warmup Cosine Annealing (5 warm-up epochs, ηmin = 1 × 10 −6). Batch size is 16 with gradient accumulation over A = 4 steps (effective batch size 64). EMA decay β = 0 .999 , Mixup 
+
+αmix = 0 .2, gradient clipping max norm 5.0, early stopping patience 20, maximum 100 epochs. The label smoothing parameter is ϵ = 0 .1 and the adversarial loss weight is γadv = 0 .5. Domain labels are generated via K-means clustering with optimal K selected by the Silhouette Score. Model hyperparameters: df = 128 , dz = 256 , dt = 64 , de = 32 , dψ = 16 , Cross-View Attention heads 
+
+= 4 .
+
+## D Per-Class Analysis 
+
+Figure. 4 presents normalized confusion matrices for all four tasks, and Table 3 reports per-class Precision, Recall, and F1 scores. For TCR, Waiting attains the highest F1 (0.923) and Smooth is stable at 0.951. TrafficJam (0.766) is degraded by misclassification as Smooth (14%), due to the ambiguous boundary between mild congestion and normal traffic flow. For VCR, LaneChange yields a notably low F1 of 0.217, with 78% misclassified as Forward, as frame-level static processing is insufficient to capture gradual lateral movement. Turning also shows 18% misclassification as Forward, reflecting the same temporal constraint. For DER, Anger (0.518) is the lowest-performing class due to limited samples (45) and suppressed facial expression during driving; Happiness (0.744) is degraded by misclassification as Peace (32%). For DBR, Phone achieves the highest F1 (0.941) owing to visual distinctiveness, while Talking (0.594) and LookAround (0.654) suffer from subtle postural similarity to NormalDrive. Table 3: Per-class performance.                                                                                      
+
+> Task Class Prec. Rec. F1 NTCR TrafficJam 0.766 0.766 0.766 77 Waiting 0.900 0.947 0.923 133 Smooth 0.959 0.942 0.951 399 VCR Parking 0.899 0.922 0.910 154 Turning 0.661 0.732 0.695 56 Backward 0.769 0.769 0.769 39 LaneChange 0.357 0.156 0.217 32 Forward 0.860 0.881 0.870 328 DER Anxiety 0.610 0.726 0.663 84 Peace 0.842 0.848 0.845 363 Weariness 0.836 0.836 0.836 67 Happiness 0.889 0.640 0.744 50 Anger 0.550 0.489 0.518 45 DBR Smoking 0.792 0.679 0.731 28 Phone 0.956 0.926 0.941 94 LookAround 0.656 0.651 0.654 129 DozingOff 0.800 0.667 0.727 12 NormalDrive 0.792 0.831 0.811 248 Talking 0.559 0.633 0.594 30 BodyMove 0.726 0.662 0.692 68
+
+## E Detailed Analysis of the Psychological State Signal 
+
+For TCR, the patterns of d4, d5, d6, d8, and d10 are reversed between TrafficJam and Waiting, consistent with cognitive science findings [Baumann and Krems, 2007] that driver internal states vary in response to qualitatively different stressors. For DER, Weariness shows the most extreme negative value on d16 among all classes, acquiring a uniquely distinct representation. Happiness shares a negative d7 with Anxiety but exhibits a distinct profile on d1, d2, and d15, suggesting that 14 Figure 4: Normalized confusion matrices for all four tasks. liveliness and anxiety share an arousal direction while being separated in valence. Anxiety and Anger both show positive values on d6, but Anger uniquely exhibits a high value on d4, consistent with the cognitive science insight that anxiety and anger differ in action tendency, avoidance for anxiety, approach for anger [Frijda, 1987]. For DBR, LookAround and Talking both exhibit strong negative values on d7 similarly to Anxiety, consistent with the shared characteristic of outward attention allocation. For VCR, Backward exhibits extreme negative values on d7 and d11, suggesting that the high attentional demands of reversing maneuvers are captured in ψ.Dimension d6 takes positive values for nearly all classes except Phone in DBR, suggesting it segre-gates the distinctive attentional state of smartphone use from all other states. Dimension d16 shows strong negative values for Weariness in DER and DozingOff in DBR, functioning complementarily to d7 in representing decreased arousal. These dimensional interpretations are post-hoc hypotheses and do not guarantee direct correspondence to specific psychological indicators; the meaning of each dimension is dynamically determined by the data and task structure. Nevertheless, the systematic task-label-dependent patterns, some consistent with cognitive science theory, provide evidence that CTPC acquires meaningful conditioning signals about driver internal states in a self-supervised manner. 15

@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07193v1/fig-001.webp",
+      "caption": "Table 3. Aff-Wild2 accuracy of the LaScA framework across modalities, window sizes, thresholds and backbones. “Features” and “Sentence Transformers” denote feature-only and textonly models, respectively. The (F) suffix indicates multimodal fusion of text embeddings and features. Bold values represent the highest accuracy; underlined values are statistically on par with the best-performing models.",
+      "page": 6,
+      "index": 1,
+      "width": 496,
+      "height": 694
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07193v1/fig-002.webp",
+      "caption": "Table 8. Affect-aware semantic labels for MFCC acoustic features generated offline.",
+      "page": 11,
+      "index": 2,
+      "width": 479,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07193v1/fig-003.webp",
+      "caption": "Table 9. Affect-aware semantic lexicon for facial blendshape features.",
+      "page": 11,
+      "index": 3,
+      "width": 496,
+      "height": 771
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07193v1/fig-004.webp",
+      "caption": "Table 4. SEWA DB accuracy of the LaScA framework across modalities, window sizes, thresholds and backbones.“Features” and “Sentence Transformers” denote feature-only and text-only models, respectively. The (F) suffix indicates multimodal fusion of text embeddings and features. Bold values represent the highest accuracy; underlined values are statistically on par with the bestperforming models.",
+      "page": 7,
+      "index": 4,
+      "width": 498,
+      "height": 694
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07193v1/fig-005.webp",
+      "caption": "Table 5. Quantitative comparison of our method with state-of-theart approaches for Aff-Wild2 prediction. Bold values indicate the best-performing model, while underlined values indicate models performing statistically on par.",
+      "page": 7,
+      "index": 5,
+      "width": 492,
+      "height": 293
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07193v1/fig-006.webp",
+      "caption": "Figure 1. Overview of the LaScA framework. Handcrafted facial and acoustic features are first extracted and filtered via data-driven salience estimation (Otsu’s threshold). Each feature is associated with a fixed affect-aware semantic description generated offline by a large language model, forming a deterministic semantic lexicon. Active feature descriptions are composed into structured templates and encoded using a frozen sentence transformer to produce semantic embeddings. These embeddings are fused with the original feature representations and used to construct preference pairs between temporal windows. A trainable MLP operates on the transformed pairwise representations to predict directional affect change (increase or decrease).",
+      "page": 3,
+      "index": 6,
+      "width": 850,
+      "height": 408
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07193v1/fig-007.webp",
+      "caption": "Figure 2. Histogram of unique multimodal prompts",
+      "page": 12,
+      "index": 7,
+      "width": 462,
+      "height": 343
+    }
+  ]
+}

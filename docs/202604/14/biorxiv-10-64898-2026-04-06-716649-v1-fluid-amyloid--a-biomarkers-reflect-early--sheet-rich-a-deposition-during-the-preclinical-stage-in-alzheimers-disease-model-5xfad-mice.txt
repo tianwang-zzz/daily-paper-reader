@@ -1,0 +1,1270 @@
+Title: Fluid amyloid-β (Aβ) biomarkers reflect early β-sheet-rich Aβ deposition during the preclinical stage in Alzheimer’s disease model 5XFAD mice
+
+URL Source: https://www.biorxiv.org/content/10.64898/2026.04.06.716649v1.full.pdf
+
+Number of Pages: 38
+
+Markdown Content:
+1
+
+Article Title 
+
+Fluid amyloid-β (A β) biomarkers reflect early β-sheet-rich A β deposition during the preclinical stage in Alzheimer’s disease model 5XFAD mice 
+
+Author names 
+
+Hiroko Yagihara a) , Yuko Saito b) , Toshihide Takeuchi c) , Kazuhiko Seki a) , Eiko N. Minakawa a) 
+
+Affiliations 
+
+a. Department of Neurophysiology, National Institute of Neuroscience, National Center of Neurology and Psychiatry. Postal address: 4-1-1 Ogawa-Higashi, Kodaira, Tokyo, 187-8502, Japan Email address: bonkobara@ncnp.go.jp (Hiroko Yagihara), seki@ncnp.go.jp (Kazuhiko Seki), minakawa@ncnp.go.jp (Eiko N. Minakawa) b. Department of Neuropathology, Tokyo Metropolitan Institute for Geriatrics and Gerontology. Postal address: 35-2 Sakae-cho, Itabashi, Tokyo, 173-0015, Japan Email address: yukosm@bbarjp.net c. Life Science Research Institute, Kindai University Postal address: 1-14-1 Miharadai, Minami-ku, Sakai, Osaka 590-0197, Japan Email address: takeuchi@med.kindai.ac.jp 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+2
+
+Correspondence Author Eiko N. Minakawa, M.D., Ph.D. 
+
+4-1-1 Ogawa-Higashi, Kodaira, Tokyo, 187-8502, Japan Tel: +81-42-346-1724 Email: minakawa@ncnp.go.jp 
+
+(which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint 3
+
+Abstract 
+
+Early detection of disease progression using clinically-relevant biomarkers in animal models is important for mechanistic studies and for developing therapeutics in neurodegenerative diseases including Alzheimer’s disease (AD). The preclinical stage of AD, when amyloid-β (A β) starts to accumulate before cognitive decline, provides a critical window for disease modification. In humans, decreases in cerebrospinal fluid (CSF) A β42 and the A β42 /A β40 ratio in preclinical AD are considered to reflect the preferential sequestration of aggregation-prone A β42 into β-sheet-rich deposition in the brain, with corresponding changes being detectable in plasma. However, the extent to which these biomarker-pathology relationships are recapitulated in AD model mice remains incompletely defined. Here we show that CSF and plasma A β42 and the A β42 /A β40 ratio decline with age in parallel with the progression of β-sheet-rich A β deposition in preclinical 5XFAD mice, one of the most widely used AD mouse models, as assessed through monthly profiling of these biomarkers. Notably, the CSF A β42 /A β40 ratio showed a negative correlation with β-sheet-rich A β deposition in the brain, whereas CSF A β40 did not show a comparable association. In addition, the plasma A β42 /A β40 ratio showed a positive correlation with the CSF A β42 /A β40 ratio, suggesting that the plasma A β42 /A β40 ratio may also reflect brain A β deposition in this model. The strength of these correlations differed by sex, suggesting that sex-dependent differences in the A β kinetics in this model may influence how closely fluid biomarkers reflect pathological progression. These findings support the potential utility of fluid A β as a pathology-linked, translatable biomarker in preclinical 5XFAD mice. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+4
+
+Keywords 
+
+Alzheimer’s disease, 5XFAD mice, amyloid-β, fluid biomarker, preclinical 
+
+Highlights 
+
+- Fluid A β biomarkers are associated with early A β deposition in preclinical 5XFAD mice. - The CSF A β42 /A β40 ratio negatively correlates with β-sheet-rich brain A β deposition. - The plasma A β42 /A β40 ratio positively correlates with the CSF A β42 /A β40 ratio. 
+
+- Monthly profiling defines fluid A β biomarker dynamics in preclinical 5XFAD mice. - Sex differences may affect biomarker-pathology relationships in these mice. 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+5
+
+Introduction 1
+
+The preclinical stage of Alzheimer’s disease (AD) begins more than a decade before the onset 2
+
+of cognitive decline (Therriault et al., 2022). The initial AD pathology during the preclinical stage is the 3
+
+amyloid-β (A β) deposition in the senile plaques followed by hyperphosphorylated tau (p-tau) 4
+
+accumulation in the neurofibrillary tangles, eventually leading to neuronal dysfunction (Jack Jr. et al., 5
+
+2024). Therapeutic interventions during the preclinical stage or early symptomatic stage offer an optimal 6
+
+opportunity to slow or halt disease progression before overt neuronal cell death, as recently confirmed 7
+
+by the efficacy of passive anti-A β immunotherapies in patients with early-phase AD (Heneka et al., 8
+
+2024; Rafii and Aisen, 2023). Utilizing experimental animal models that recapitulate A β deposition in 9
+
+the preclinical stage could thus accelerate further development of therapeutic strategies against early AD 10 
+
+to prevent or slow down the onset of cognitive decline (Drummond and Wisniewski, 2017). 11 
+
+A large number of mouse models of AD have been developed to recapitulate the preclinical 12 
+
+stage of AD (Hashimoto and Saido, 2023). Age-dependent A β deposition before the onset of cognitive 13 
+
+decline has been recapitulated in most of the transgenic mice expressing mutant APP , occasionally 14 
+
+combined with mutant PSEN1 , both of which are causative genes for familial AD (FAD) (Yokoyama et 15 
+
+al., 2022). Early A β pathology before cognitive deficit has also been recapitulated in App knock-in mice 16 
+
+with multiple causative gene mutations of FAD (Hashimoto and Saido, 2023; Saito et al., 2014). 17 
+
+To identify translatable therapeutic candidates using these preclinical AD model mice, precise 18 
+
+detection of early A β deposition in mouse brains using methods applicable in clinical settings is essential 19 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+6
+
+(Jankowsky and Zheng, 2017). In patients with AD, positron emission tomography (PET) imaging with 20 
+
+amyloid tracers provides a quantitative topographical assessment of brain A β plaque deposition. 21 
+
+However, its widespread application in clinical settings is limited by specialized facility requirements 22 
+
+and high cost for PET imaging and data analyses (Belder et al., 2023). Additionally, PET imaging of 23 
+
+small mouse brains is limited by low spatial resolution, making it difficult to reliably detect A β plaque 24 
+
+deposition (Frost et al., 2020). 25 
+
+Instead, recent technological advances in the detection of A β peptides in biofluids have 26 
+
+established CSF and plasma biomarkers, including A β42 and the A β42 /A β40 ratio, as practical alternatives 27 
+
+that correlate with brain A β accumulation levels detected by amyloid PET (Jack Jr. et al., 2024). A β28 
+
+peptides are cleaved from amyloid beta precursor protein (APP) by the β- and γ-secretases into peptides 29 
+
+of slightly varying length around 40 amino acids with different characteristics; A β42 is the most 30 
+
+aggregation-prone species and the main constituent of brain A β plaque (DeTure and Dickson, 2019; 31 
+
+Masters et al., 2015) The levels of CSF A β42 and the A β42 /A β40 ratio were demonstrated to have high 32 
+
+concordance with brain A β accumulation detected by amyloid PET or neuropathological analyses in 33 
+
+humans (Hansson et al., 2018; Mattsson-Carlgren et al., 2022), and thus have been used in clinical 34 
+
+practice in many countries (Hansson, 2021; Shaw et al., 2018). In addition, blood-based assays to detect 35 
+
+these changes have been intensively developed considering the invasiveness of the CSF collection 36 
+
+procedure (Hansson, 2021). The accuracy of plasma A β measurement has recently increased 37 
+
+significantly, approaching that of CSF-based biomarkers with the development of automated 38 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+7
+
+ultrasensitive immunoassays (Jack Jr. et al., 2024). Therefore, validation of CSF and plasma A β39 
+
+biomarkers in mouse models of preclinical AD could facilitate therapeutic development by providing 40 
+
+indicators of A β deposition in mouse brains during the preclinical stage that are translatable to human 41 
+
+AD pathology. 42 
+
+Here, we investigated whether A β42 and the A β42 /A β40 ratio in CSF could serve as indicators of 43 
+
+preclinical brain A β deposition in 5XFAD mice, one of the most widely used AD models. 5XFAD mice 44 
+
+express human APP carrying three mutations and human PSEN1 carrying two mutations, all of which 45 
+
+are causative for FAD, under the Thy1 promoter (Oakley et al., 2006). 5XFAD mice recapitulate the 46 
+
+early and progressive A β deposition in the preclinical phase; A β plaques appear at two months of age in 47 
+
+the brain and increase in an age-dependent manner, followed by neuronal loss beginning at four months 48 
+
+and hippocampus-dependent cognitive deficits developing at six months of age (Oakley et al., 2006; 49 
+
+Ohno et al., 2006). These findings suggest that the period corresponding to preclinical AD in 5XFAD 50 
+
+mice is under six months of age. We therefore evaluated monthly changes in CSF biomarkers and 51 
+
+assessed whether they correlated with brain A β deposition levels in these young preclinical 5XFAD mice. 52 
+
+We also analyzed whether plasma A β levels correlate with CSF A β levels in preclinical 5XFAD mice to 53 
+
+assess the utility of blood-based A β biomarkers during the preclinical stage. 54 
+
+55 
+
+Results 56 
+
+Aβ deposition progresses in an age-dependent manner in preclinical 5XFAD mouse brains 57 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+8
+
+We first assessed A β deposition in the brains of 5XFAD mice at preclinical (1, 2, 3, 4, and 5 months of 58 
+
+age) and advanced clinical (14 months of age) stages using immunohistochemistry with an anti-A β59 
+
+antibody. Consistent with previous studies (Oakley et al., 2006; Oblak et al., 2021), A β plaques were 60 
+
+absent in the brains of 5XFAD mice at 1 month of age (data not shown), appeared at 2 months of age in 61 
+
+both males and females, and showed an age-dependent increase during the preclinical stage 62 
+
+(Supplementary Figures 1A and B). Consistent with previous findings, A β plaques developed earlier and 63 
+
+faster in females than in males (Supplementary Figures 1A and B), a phenomenon attributed in previous 64 
+
+studies to the estrogen response element (ERE) located upstream of the Thy-1 promoter in these mice 65 
+
+(Javonillo et al., 2022; Sadleir et al., 2015). 66 
+
+We then performed thioflavin-S (thio-S) staining on the brain sections to investigate the deposition 67 
+
+of A β with β-sheet-rich structure in 5XFAD mouse brains (Figures 1A and B). Thio-S selectively binds 68 
+
+to β-sheet-rich structures and detects β-sheet-rich A β plaques that are also detectable with amyloid PET 69 
+
+tracers (Ikonomovic et al., 2008; Jack Jr. et al., 2024). Thio-S-positive plaques were absent in the brains 70 
+
+of 5XFAD mice at 1 month of age (data not shown), appeared at 2 and 3 months of age in female and 71 
+
+male mice, respectively, and showed a significant age-dependent increase (Figures 1C and D). 72 
+
+These findings confirm the age-dependent progression of A β deposition in the brains of preclinical 73 
+
+5XFAD mice. 74 
+
+75 
+
+CSF A β42 and the A β42 /A β40 ratio decrease in parallel with the progression of brain A β deposition 76 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+9
+
+in preclinical 5XFAD mice 77 
+
+A decrease in CSF A β42 levels and the resulting decline in the A β42 /A β40 ratio have been established as 78 
+
+one of the core biomarkers of AD, reflecting the accumulation of β-sheet-rich A β plaques in the brain in 79 
+
+both preclinical and symptomatic phases of AD (Jack Jr. et al., 2024). Therefore, we next measured CSF 80 
+
+Aβ40 and A β42 in 1- to 5-month-old 5XFAD mice to test whether the early decreases in CSF A β42 and 81 
+
+the A β42 /A β40 ratio during preclinical AD are recapitulated in preclinical 5XFAD mice. In both female 82 
+
+and male mice, CSF A β40 remained unchanged with age (Figures 2A and 2B), which is consistent with 83 
+
+observations in patients with preclinical AD (Hansson et al., 2019). In female mice, CSF A β42 and the 84 
+
+CSF A β42 /A β40 ratio decreased significantly with age (Figures 2C and E). In male mice, CSF A β42 and 85 
+
+the CSF A β42 /A β40 ratio displayed a tendency to decline in an age-dependent manner without reaching 86 
+
+statistical significance (Figures 2D and F), which may be attributed to milder progression of A β87 
+
+accumulation in the brains of male 5XFAD mice than female mice (Figures 1C and D). 88 
+
+We then analyzed the relationship between CSF A β and brain A β deposition in 5XFAD mice. In 89 
+
+both male and female mice, CSF A β40 did not show a strong correlation with the thio-S-positive A β90 
+
+deposition in the brain (Figures 3A and B; r = − 0.174, p = 0.553 in females; r = − 0.432, p = 0.246 in 91 
+
+males), as expected from the aforementioned age-dependent analyses (Figures 2A and B). In contrast, 92 
+
+both CSF A β42 and the A β42 /A β40 ratio showed stronger negative correlations than CSF A β40 with the 93 
+
+thio-S-positive A β deposition in mouse brains (Figures 3C–F; for A β42, r = − 0.453, p = 0.104 in females, 94 
+
+r = − 0.587, p = 0.0963 in males; for A β42 /A β40, r = − 0.484, p = 0.0795 in females, r = − 0.878, p = 95 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+10 
+
+0.0018 in males). These results indicate that both CSF A β42 and the A β42 /A β40 ratio reflect the β-sheet-96 
+
+rich A β deposition in the brains of preclinical 5XFAD mice better than CSF A β40 , as in humans. 97 
+
+Intriguingly, stronger correlations between the CSF A β42 /A β40 ratio or A β42 and brain A β deposition 98 
+
+were observed in males than in females (Figures 3C–F). In addition, the correlation between the CSF 99 
+
+Aβ42 /A β40 ratio and brain A β deposition was stronger than that between CSF A β42 and brain A β100 
+
+deposition, which reached statistical significance in males (Figures 3C–F). These results suggest that, 101 
+
+even when disease progression is relatively mild, such as in preclinical male 5XFAD mice, the CSF 102 
+
+Aβ42 /A β40 ratio may reflect changes in brain A β deposition more precisely than CSF A β42 alone in 103 
+
+5XFAD mice. 104 
+
+105 
+
+Plasma A β42 and the A β42 /A β40 ratio decrease with age in preclinical 5XFAD mice 106 
+
+Plasma biomarkers are increasingly being used to detect early AD-related changes because plasma can 107 
+
+be collected more easily and less invasively than CSF. Previous studies have demonstrated decreased 108 
+
+plasma A β42 levels and the A β42 /A β40 ratio in patients with AD including those in the preclinical phase 109 
+
+(Cheng et al., 2022; Salvadó et al., 2023; Trelle et al., 2025). We therefore quantified plasma A β40 and 110 
+
+Aβ42 in 5XFAD mice aged 1 – 5 months to determine whether plasma A β biomarkers reflect the age-111 
+
+dependent brain A β deposition in preclinical 5XFAD mice. In both females and males, plasma A β40 112 
+
+showed no age-dependent change (Figures 4A and B), as expected from the aforementioned CSF 113 
+
+measurement (Figures 2A and B). In contrast, both plasma A β42 and the A β42 /A β40 ratio decreased with 114 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+11 
+
+age (Figure 4C–F). Notably, in females, the decrease in plasma A β42 from the baseline (1 month of age) 115 
+
+reached statistical significance at an earlier timepoint than CSF A β42 (Figures 2C and 4C; 3 months of 116 
+
+age in plasma; 4 months of age in CSF). In addition, in males, the decrease in plasma A β42 and the 117 
+
+Aβ42 /A β40 ratio from the baseline (1 – 2 months of age) reached statistical significance at 4 or 5 months 118 
+
+of age (Figures 4D and F). This was in contrast with the changes in CSF A β42 and the A β42 /A β40 ratio, 119 
+
+both of which did not reach statistical significance in males (Figures 2D and F). These observations 120 
+
+suggest that the plasma A β42 and the A β42 /A β40 ratio may detect brain A β deposition with higher 121 
+
+sensitivity than CSF A β42 or the A β42 /A β40 ratio in preclinical 5XFAD mice. 122 
+
+123 
+
+Relationships between plasma and CSF support the plasma A β42 /A β40 ratio as a potential indicator 124 
+
+of brain A β deposition in preclinical 5XFAD mice 125 
+
+We further examined whether plasma A β42 and the A β42 /A β40 ratio correlated with their CSF counterparts 126 
+
+in preclinical 5XFAD mice. In both females and males, A β40 showed no correlation between CSF and 127 
+
+plasma (Figures 5A and B; r = − 0.150, p = 0.529 in females; r = − 0.218, p = 0.357 in males). In females, 128 
+
+plasma and CSF showed positive correlations in both A β42 and the A β42 /A β40 ratio, with a stronger 129 
+
+correlation for the A β42 /A β40 ratio that reached statistical significance (Figures 5C and E; for A β42, r = 130 
+
+0.348, p = 0.132; for A β42 /A β40, r = 0.548, p = 0.0123). In males, plasma and CSF A β42 did not correlate, 131 
+
+whereas the plasma and CSF A β42 /A β40 ratio showed a modest positive correlation (Figures 5D and F; 132 
+
+for A β42, r = 0.0654, p = 0.784; for A β42 /A β40, r = 0.399, p = 0.0817). Considering that the CSF A β42 /A β40 133 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+12 
+
+ratio negatively correlated with thio-S–positive brain A β with statistical significance in both female and 134 
+
+male preclinical 5XFAD mice (Figure 3C–F), these findings suggest that the plasma A β42 /A β40 ratio may 135 
+
+provide an estimate of early brain A β deposition that aligns with CSF changes in preclinical 5XFAD 136 
+
+mice. 137 
+
+138 
+
+Discussion 139 
+
+AD is characterized by a long preclinical phase during which A β pathology accumulates before the onset 140 
+
+of overt cognitive decline. In the present study, we investigated whether fluid A β biomarkers reflect 141 
+
+early β-sheet-rich A β deposition in the brain during the preclinical stage in 5XFAD mice. We found that 142 
+
+CSF A β42 and the CSF A β42 /A β40 ratio showed negative correlations with thio-S–positive A β deposition 143 
+
+in the brain, whereas CSF A β40 remained unchanged. Plasma A β42 and the plasma A β42 /A β40 ratio 144 
+
+decreased in an age-dependent manner during the preclinical stage, and the plasma A β42 /A β40 ratio 145 
+
+correlated positively with its CSF counterpart. Together, these findings indicate that young 5XFAD mice 146 
+
+reproduce key changes in A β-related fluid biomarkers observed in human preclinical AD, and suggest 147 
+
+that this model may serve as an animal model of preclinical AD for evaluating candidate therapeutics 148 
+
+targeting A β pathology by using fluid A β biomarkers as translational indicators of therapeutic efficacy. 149 
+
+A major strength of the present study is that it characterizes biofluid A β dynamics across the 150 
+
+early preclinical window in 5XFAD mice with monthly resolution and relates these changes directly to 151 
+
+histologically detected β-sheet-rich A β deposition. Although 5XFAD mice are widely used in AD 152 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+13 
+
+research, relatively few studies have focused specifically on fluid biomarker changes during the 153 
+
+preclinical phase, when disease-modifying interventions are expected to be most effective. Andersson 154 
+
+et al. reported a decline in the CSF A β42 /A β40 ratio during the preclinical stage of 5XFAD mice and 155 
+
+identified soluble brain protofibril composition as a key predictor of CSF biomarker changes (Andersson 156 
+
+et al., 2025), while Kwak et al. demonstrated decreases in CSF and plasma A β42 at a more advanced 157 
+
+stage (Kwak et al., 2020). Similar preclinical reductions in CSF and/or blood A β42 -related measures 158 
+
+have been reported in several other widely used mouse models of AD, including App knock-in and 159 
+
+APP /PSEN1 -related lines (Andersson et al., 2025, 2023; Izco et al., 2014; Kawarabayashi et al., 2001; 160 
+
+Maia et al., 2013). However, studies that assess the early preclinical phase with monthly resolution, 161 
+
+analyze both CSF and plasma/serum A β measures in parallel, and directly compare these fluid biomarker 162 
+
+changes with brain A β deposition appear to be limited in AD model mice, including 5XFAD mice. While 163 
+
+previous studies support the general concept that early fluid biomarker changes are reproducible across 164 
+
+multiple AD model mice, these studies also indicate that the timing and magnitude of fluid A β biomarker 165 
+
+changes and their relationships with brain A β deposition in these AD model mice depend largely on the 166 
+
+phenotypic characteristics of each mouse model, including the progression rate of brain A β deposition, 167 
+
+and also on the assay platform used for A β detection. In the present study, we detected significant 168 
+
+declines in CSF and plasma A β42 levels and the CSF A β42 /A β40 ratio from baseline at 3 months of age 169 
+
+in female 5XFAD mice, which, to the best of our knowledge, represents the earliest timepoint reported 170 
+
+to date. These changes were detectable with conventional ELISA, which is more cost-effective than the 171 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+14 
+
+recently developed ultrasensitive immunoassays. Our study therefore extends prior work and highlights 172 
+
+the utility of 5XFAD model mice as a preclinical AD model by providing a more temporally refined 173 
+
+characterization of the preclinical stage, assessing both CSF and plasma A β in parallel, and relating these 174 
+
+changes to thio-S–positive β-sheet-rich A β deposition in the brain. Since thio-S-positive plaques are 175 
+
+closely related to the species detected by amyloid PET in humans (Ikonomovic et al., 2008), our findings 176 
+
+also enhance the translational relevance of fluid A β biomarkers in 5XFAD mice. 177 
+
+The observed decline in CSF A β42 and the CSF A β42 /A β40 ratio in correlation with thio-S-178 
+
+positive A β deposition (Figures 3C–F) and the absence of change in CSF A β40 alone are consistent with 179 
+
+the general interpretation of these biomarkers in human AD. Because A β42 is more aggregation-prone 180 
+
+than A β40 and is preferentially incorporated into insoluble amyloid deposits, the reduction in these CSF 181 
+
+measures likely reflects sequestration of soluble A β42 into progressively accumulating brain aggregates 182 
+
+(Gravina et al., 1995; Iwatsubo et al., 1994; Jarrett et al., 1993; Strozyk et al., 2003). The stronger 183 
+
+association of the CSF A β42 /A β40 ratio with brain A β deposition, compared with CSF A β42 alone, also 184 
+
+mirrors clinical findings showing the utility of the A β42 /A β40 ratio rather than A β42 alone (Frisoni et al., 185 
+
+2025). 186 
+
+An additional important finding is that plasma A β42 and the plasma A β42 /A β40 ratio decreased 187 
+
+in an age-dependent manner during the preclinical stage in 5XFAD mice and appeared to show clearer 188 
+
+changes than their CSF counterparts, particularly in males (Figure 4C–F). In humans, CSF A β42 or 189 
+
+Aβ42 /A β40 ratio has traditionally been considered more tightly linked to brain amyloid pathology than 190 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+15 
+
+plasma A β42 or A β42 /A β40 ratio, especially when assessed by conventional ELISA (Hansson, 2021). 191 
+
+Several factors may account for this apparent difference in the mouse model. First, 5XFAD mice are an 192 
+
+overexpression model with high production of human A β (Oakley et al., 2006), potentially generating a 193 
+
+stronger peripheral signal in the plasma than is observed in sporadic human AD. Second, the rapid 194 
+
+progression of A β plaque formation in 5XFAD mice may produce steep biomarker changes, allowing 195 
+
+plasma changes to become detectable within a narrow time window, especially due to the smaller total 196 
+
+plasma volume in mice. Third, since CSF samples are more technically challenging to collect than blood 197 
+
+and have much smaller sample volumes, CSF A β measurement may result in greater variability due to 198 
+
+pre-analytical factors, including collection efficiency, A β adsorption to collection tube walls, or blood 199 
+
+contamination (Bjerke et al., 2010). These considerations suggest that the apparent sensitivity of plasma 200 
+
+in this study does not indicate that plasma is superior to CSF for reflecting AD pathology in general. 201 
+
+Rather, our data suggest that, in this specific model and assay condition, plasma A β42 and the plasma 202 
+
+Aβ42 /A β40 ratio may serve as practical surrogate indicators of early A β deposition. 203 
+
+The sex-related differences observed in this study also merit consideration. As reported 204 
+
+previously, female 5XFAD mice developed A β pathology earlier and more rapidly than males (Figures 205 
+
+1C and D), likely due at least in part to the estrogen response element within the Thy1 promoter driving 206 
+
+transgene expression (Oakley et al., 2006; Sadleir et al., 2015). Interestingly, however, correlations 207 
+
+between CSF A β42 -related measures and brain A β deposition were stronger in males despite their milder 208 
+
+pathology (Figure 3C–F). The slower progression of amyloid deposition in males may create a broader 209 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+16 
+
+detection window, enabling biofluid biomarkers to reflect a milder increase in brain A β deposition in a 210 
+
+more gradual and linear manner. In contrast, the more rapid accumulation of brain A β in females may 211 
+
+narrow this detection window, making cross-sectional correlations weaker. These findings suggest that 212 
+
+sex influences not only the extent of amyloid deposition but also the temporal detectability of fluid 213 
+
+biomarker changes in 5XFAD mice. 214 
+
+This study has several limitations. First, 5XFAD mice are a transgenic model harboring 215 
+
+multiple mutations in APP and PSEN1 and do not fully recapitulate the pathomechanisms of sporadic 216 
+
+AD. Second, brain Aβ deposition was quantified using thio-S alone, without parallel Aβ217 
+
+immunohistochemistry or biochemical measurement of soluble and insoluble A β in the brain 218 
+
+homogenates. Third, all analyses were performed cross-sectionally rather than longitudinally within the 219 
+
+same animals. Fourth, as mentioned above, pre-analytical variability may influence absolute A β220 
+
+measurements, particularly in the CSF. Finally, this study focused on early A β-related changes and did 221 
+
+not assess downstream events in the disease course of AD such as p-tau accumulation, 222 
+
+neuroinflammation, or neurodegeneration. 223 
+
+Despite these limitations, the present study provides a temporally refined characterization of 224 
+
+fluid A β biomarker dynamics during the preclinical stage of 5XFAD mice and demonstrates that these 225 
+
+changes are linked to early β-sheet-rich brain A β deposition. Among the A β-related biomarkers 226 
+
+examined, the A β42 /A β40 ratio appeared to be the most consistent indicator of brain A β deposition, and 227 
+
+plasma biomarkers may offer a practical complement to CSF biomarkers in this model. These findings, 228 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+17 
+
+together with prior evidence that 5XFAD mice lack insertional mutagenesis and that their brain 229 
+
+transcriptome overlaps with that of human AD (Goodwin et al., 2019; Preuss et al., 2020; Zhong et al., 230 
+
+2024), support the use of young 5XFAD mice as a model of preclinical AD for evaluating the efficacy 231 
+
+of therapeutic interventions targeting early A β pathology. Future studies are warranted to determine 232 
+
+whether longitudinal changes in fluid A β biomarkers can be tracked within the same animals, especially 233 
+
+using plasma-based ultrasensitive immunoassays, and also whether these biomarkers respond to 234 
+
+therapeutic interventions that slow or halt A β deposition. By enabling therapeutic effects to be assessed 235 
+
+before overt cognitive decline, this mouse model may help accelerate the development of disease-236 
+
+modifying therapies that delay or prevent dementia. 237 
+
+238 
+
+Materials and Methods 239 
+
+Animals 240 
+
+All animal experiments were approved by the Animal Ethics Committee of the National Institute of 241 
+
+Neuroscience, National Center of Neurology and Psychiatry (NCNP), Japan. 5XFAD mice (B6SJL-242 
+
+Tg(APPSwFlLon,PSEN1*M146L*L286V)6799Vas/Mmjax) were obtained from the Jackson 243 
+
+Laboratory (Bar Harbor, ME, USA) and maintained by mating on a C57BL/6J background under a 12-244 
+
+hour light/dark cycle with food and water provided ad libitum .245 
+
+246 
+
+CSF, plasma, and brain collection 247 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+18 
+
+1, 2, 3, 4, 5, and 14-month-old 5xFAD mice were anesthetized by intraperitoneal administration of 248 
+
+ketamine/xylazine mixture. CSF was collected between 9 a.m. and 12 p.m. from the cisterna magna 249 
+
+using a glass capillary tube (1B150F-4; World Precision Instruments, Sarasota, FL, USA) as described 250 
+
+previously (Liu and Duff, 2008). The collected CSF was centrifuged at 6,200  g for 5 minutes at 4°C, 251 
+
+and the supernatant was stored at −80°C until use. The pellet was used to assess blood contamination as 252 
+
+described previously (Barten et al., 2011), and blood-contaminated CSF was excluded from further 253 
+
+analyses. Whole blood was collected through cardiac puncture from the left ventricle into tubes 254 
+
+containing ethylenediaminetetraacetic acid dipotassium salt (EDTA-2K) and centrifuged at 2,000  g255 
+
+for 5 minutes at room temperature. The supernatant was collected and stored at −80°C until the time of 256 
+
+assay. 257 
+
+For pathological evaluation, mice were deeply anesthetized and transcardially perfused with phosphate-258 
+
+buffered saline (PBS) followed by 10% neutral-buffered formalin (NBF). Brains were dissected out, 259 
+
+post-fixed with 10% NBF for 48 hours at 4°C, transferred to PBS, and incubated at 4°C for a minimum 260 
+
+of 24 hours before being embedded in paraffin and coronally sectioned at a thickness of 5 μm for further 261 
+
+analysis. 262 
+
+263 
+
+Thioflavin-S staining and immunohistochemistry 264 
+
+Deparaffinized sections were incubated with 1% (wt/vol.) thioflavin S (T1892, Sigma Aldrich St. Louis, 265 
+
+MO, USA) in distilled water for 8 minutes at room temperature in the dark and rinsed in 80% ethanol, 266 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+19 
+
+95% ethanol, and distilled water as described previously (Yan et al., 2020). The sections were examined 267 
+
+with a fluorescence microscope (BZ-X710, Keyence, Osaka, Japan), and the thio-S-positive plaques in 268 
+
+the whole brain section were quantitatively analyzed as described previously using dedicated software 269 
+
+(Hybrid Cell Count, Keyence, Osaka, Japan) (Danhash et al., 2025; Minakawa et al., 2017). 270 
+
+Immunohistochemistry for A β plaques was performed as described previously (Minakawa et al., 2017) 271 
+
+with slight modification. Deparaffinized sections were autoclaved in citrate buffer (pH 6.8) at 105°C for 272 
+
+10 min followed by 100% formic acid treatment at room temperature for 10 min for antigen retrieval. 273 
+
+After endogenous peroxidase deactivation and blocking, sections were incubated with mouse 274 
+
+monoclonal anti-β-amyloid antibody (clone 4G8; 800703; BioLegend, San Diego, CA, USA) at 4°C 275 
+
+overnight. Then the sections were incubated with Histofine Simple Stain MAX PO (MULTI) (424152; 276 
+
+Nichirei Biosciences Inc., Tokyo, Japan) for 30 min at room temperature, colorized with 3,3’-277 
+
+diaminobenzidinetetrahydrochloride (DAB) solution containing 0.03% hydrogen peroxide, and 278 
+
+counterstained with hematoxylin. The sections were examined with bright-field microscopy (BZ-X710, 279 
+
+Keyence, Osaka, Japan). 280 
+
+281 
+
+Aβ enzyme-linked immunosorbent assay (ELISA) 282 
+
+CSF and plasma were thawed on ice and centrifuged at 6,200  g for 5 minutes at 4 °C. The supernatant 283 
+
+was collected and used immediately for ELISA. A β40 and A β42 concentrations were measured using a 284 
+
+human β-Amyloid ELISA kit (298–64601 and 296–64401; Fujifilm Wako Pure Chemical Corporation, 285 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+20 
+
+Osaka, Japan) according to the manufacturer's instructions. Sample dilution fold for each analyte was 286 
+
+as follows: for A β40 , 33 to 50-fold for CSF and 4-fold for plasma; for A β42 , 100-fold for CSF and 20-287 
+
+fold for plasma. 288 
+
+289 
+
+Statistical analysis 290 
+
+Monthly changes in the thio-S-positive plaques and CSF and plasma A β were analyzed by one-way 291 
+
+analysis of variance (ANOVA) followed by Tukey's multiple comparisons test. Correlations between 292 
+
+thio-S accumulation in the brain and CSF A β biomarkers, as well as CSF and plasma A β biomarkers, 293 
+
+were examined using Pearson’s correlation analysis. All statistical analyses were performed using 294 
+
+GraphPad Prism 9 (Dotmatics, Boston, MA, USA). P < 0.05 was considered to indicate a statistically 295 
+
+significant difference. 296 
+
+297 
+
+Author Contributions 298 
+
+Conceptualization: E.N.M., T.T.; Investigation and Formal analysis: H.Y., E.N.M.; Funding acquisition: 299 
+
+Y.S., T.T., K.S., E.N.M.; Visualization: H.Y., E.N.M.; Supervision: Y.S., K.S., E.N.M.; Writing – original 300 
+
+draft: H.Y., E.N.M.; Writing – review and editing: H.Y., Y.S., T.T., K.S., E.N.M. 301 
+
+302 
+
+Acknowledgements 303 
+
+The authors are grateful to Ms. Hiromi Fujita, Yoshiko Hara, and Hisae Kikuchi for their technical 304 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+21 
+
+support. 305 
+
+306 
+
+Declaration of conflicting interest 307 
+
+The authors declare no potential conflicts of interest with respect to the research, authorship, and/or 308 
+
+publication of this article 309 
+
+310 
+
+Funding Sources 311 
+
+This work was supported by a grant from Brain Mapping by Integrated Neurotechnologies for Disease 312 
+
+Studies (Brain/MINDS) program of the Japan Agency for Medical Research and Development (AMED; 313 
+
+JP19dm0207092 to Y.S., T.T., K.S., and E.N.M.); Intramural Research Grants for Neurological and 314 
+
+Psychiatric Disorders from the National Center of Neurology and Psychiatry (2-8 to Y.S., K.S., and 315 
+
+E.N.M; 5-8 to K.S. and E.N.M.; 3-3 to E.N.M.); a grant from Fusion Oriented Research for disruptive 316 
+
+Science and Technology (FOREST) program of the Japan Science and Technology Agency (JST; 317 
+
+JPMJFR2214 to E.N.M.); Grant-in-Aid for Scientific Research (B) from the Japan Society for the 318 
+
+Promotion of Science (JSPS; 22H03034 and 24K02895 to E.N.M.). None of these funding sources was 319 
+
+involved in the study design, collection, analysis and interpretation of data, writing of the report, and 320 
+
+decision to submit the article for publication. 321 
+
+322 
+
+Data Availability 323 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+22 
+
+The data that support the findings of this study are available from the corresponding author, upon 324 
+
+reasonable request. 325 
+
+326 
+
+References 327 
+
+Andersson, E., Lindblom, N., Janelidze, S., Salvadó, G., Gkanatsiou, E., Söderberg, L., Möller, C., 328 
+
+Lannfelt, L., Ge, J., Hanrieder, J., Blennow, K., Deierborg, T., Mattsson-Carlgren, N., Zetterberg, 329 
+
+H., Gouras, G., Hansson, O., 2025. Soluble cerebral A β protofibrils link A β plaque pathology 330 
+
+to changes in CSF A β42/A β40 ratios, neurofilament light and tau in Alzheimer’s disease model 331 
+
+mice. Nat Aging 5, 366–375. https://doi.org/10.1038/s43587-025-00810-8 332 
+
+Andersson, E., Schultz, N., Saito, T., Saido, T.C., Blennow, K., Gouras, G.K., Zetterberg, H., Hansson, 333 
+
+O., 2023. Cerebral A β deposition precedes reduced cerebrospinal fluid and serum A β42/A β40 334 
+
+ratios in the AppNL −F/NL −F knock-in mouse model of Alzheimer’s disease. Alz Res Therapy 335 
+
+15, 64. https://doi.org/10.1186/s13195-023-01196-8 336 
+
+Barten, D.M., Cadelina, G.W., Hoque, N., DeCarr, L.B., Guss, V.L., Yang, L., Sankaranarayanan, S., 337 
+
+Wes, P.D., Flynn, M.E., Meredith, J.E., Ahlijanian, M.K., Albright, C.F., 2011. Tau Transgenic 338 
+
+Mice as Models for Cerebrospinal Fluid Tau Biomarkers. Journal of Alzheimer’s Disease 24, 339 
+
+127–141. https://doi.org/10.3233/JAD-2011-110161 340 
+
+Belder, C.R.S., Schott, J.M., Fox, N.C., 2023. Preparing for disease-modifying therapies in Alzheimer’s 341 
+
+disease. The Lancet Neurology 22, 782–783. https://doi.org/10.1016/S1474-4422(23)00274-0 342 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+23 
+
+Bjerke, M., Portelius, E., Minthon, L., Wallin, A., Anckarsäter, H., Anckarsäter, R., Andreasen, N., 343 
+
+Zetterberg, H., Andreasson, U., Blennow, K., 2010. Confounding Factors Influencing Amyloid 344 
+
+Beta Concentration in Cerebrospinal Fluid. International Journal of Alzheimer’s Disease 2010, 345 
+
+986310. https://doi.org/10.4061/2010/986310 346 
+
+Cheng, L., Li, W., Chen, Y., Lin, Y., Wang, B., Guo, Q., Miao, Y., 2022. Plasma A β as a biomarker for 347 
+
+predicting A β-PET status in Alzheimer’s disease ：a systematic review with meta-analysis. J 348 
+
+Neurol Neurosurg Psychiatry 93, 513–520. https://doi.org/10.1136/jnnp-2021-327864 349 
+
+Danhash, E.P., Verbeck, A.C., Western, D., Díaz ‐Pacheco, A.S., Galasso, G., You, S., Huang, G., Starr, 350 
+
+E., Miller, N., Nadarajah, C.J., Tiemann Powles, S., Musiek, E.S., Herz, J., Iyer, A.K., Cirrito, 351 
+
+J., Cruchaga, C., Karch, C.M., 2025. Ms4a4a deficiency ameliorates plaque pathology in a 352 
+
+mouse model of amyloid accumulation. Alzheimers Dement 21, e70580. 353 
+
+https://doi.org/10.1002/alz.70580 354 
+
+DeTure, M.A., Dickson, D.W., 2019. The neuropathological diagnosis of Alzheimer’s disease. 355 
+
+Molecular Neurodegeneration 14, 32. https://doi.org/10.1186/s13024-019-0333-5 356 
+
+Drummond, E., Wisniewski, T., 2017. Alzheimer’s disease: experimental models and reality. Acta 357 
+
+Neuropathol 133, 155–175. https://doi.org/10.1007/s00401-016-1662-x 358 
+
+Frisoni, G.B., Hansson, O., Nichols, E., Garibotto, V., Schindler, S.E., Flier, W.M. van der, Jessen, F., 359 
+
+Villain, N., Arenaza-Urquijo, E.M., Crivelli, L., Fortea, J., Grinberg, L.T., Ismail, Z., Minoshima, 360 
+
+S., Ossenkoppele, R., Zetterberg, H., Petersen, R.C., Dubois, B., 2025. New landscape of the 361 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+24 
+
+diagnosis of Alzheimer’s disease. The Lancet 406, 1389–1407. https://doi.org/10.1016/S0140-362 
+
+6736(25)01294-2 363 
+
+Frost, G.R., Longo, V., Li, T., Jonas, L.A., Judenhofer, M., Cherry, S., Koutcher, J., Lekaye, C., 364 
+
+Zanzonico, P., Li, Y.-M., 2020. Hybrid PET/MRI enables high-spatial resolution, quantitative 365 
+
+imaging of amyloid plaques in an Alzheimer’s disease mouse model. Sci Rep 10, 10379. 366 
+
+https://doi.org/10.1038/s41598-020-67284-z 367 
+
+Goodwin, L.O., Splinter, E., Davis, T.L., Urban, R., He, H., Braun, R.E., Chesler, E.J., Kumar, V., Min, 368 
+
+M. van, Ndukum, J., Philip, V.M., Reinholdt, L.G., Svenson, K., White, J.K., Sasner, M., Lutz, 369 
+
+C., Murray, S.A., 2019. Large-scale discovery of mouse transgenic integration sites reveals 370 
+
+frequent structural variation and insertional mutagenesis. Genome Res. 29, 494–505. 371 
+
+https://doi.org/10.1101/gr.233866.117 372 
+
+Gravina, S.A., Ho, L., Eckman, C.B., Long, K.E., Otvos, L., Younkin, L.H., Suzuki, N., Younkin, S.G., 373 
+
+1995. Amyloid β Protein (A β) in Alzheimer’s Disease Brain: Biochemical and 374 
+
+immunocytochemical analysis with antibodies specific for forms ending at A beta 40 or A beta 375 
+
+42(43). Journal of Biological Chemistry 270, 7013 ‒ 7016. 376 
+
+https://doi.org/10.1074/jbc.270.13.7013 377 
+
+Hansson, O., 2021. Biomarkers for neurodegenerative diseases. Nat Med 27, 954–963. 378 
+
+https://doi.org/10.1038/s41591-021-01382-x 379 
+
+Hansson, O., Lehmann, S., Otto, M., Zetterberg, H., Lewczuk, P., 2019. Advantages and disadvantages 380 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+25 
+
+of the use of the CSF Amyloid β (A β) 42/40 ratio in the diagnosis of Alzheimer’s Disease. Alz 381 
+
+Res Therapy 11, 34. https://doi.org/10.1186/s13195-019-0485-0 382 
+
+Hansson, O., Seibyl, J., Stomrud, E., Zetterberg, H., Trojanowski, J.Q., Bittner, T., Lifke, V., Corradini, 383 
+
+V., Eichenlaub, U., Batrla, R., Buck, K., Zink, K., Rabe, C., Blennow, K., Shaw, L.M., 2018. 384 
+
+CSF biomarkers of Alzheimer’s disease concord with amyloid-β PET and predict clinical 385 
+
+progression: A study of fully automated immunoassays in BioFINDER and ADNI cohorts. 386 
+
+Alzheimer’s & Dementia 14, 1470–1481. https://doi.org/10.1016/j.jalz.2018.01.010 387 
+
+Hashimoto, S., Saido, T.C., 2023. Generation of sophisticated Alzheimer’s disease mouse models and 388 
+
+research advances utilizing them. Translational and Regulatory Sciences 5, 40–52. 389 
+
+https://doi.org/10.33611/trs.2023-003 390 
+
+Heneka, M.T., Morgan, D., Jessen, F., 2024. Passive anti-amyloid β immunotherapy in Alzheimer’s 391 
+
+disease—opportunities and challenges. The Lancet 404, 2198–2208. 392 
+
+https://doi.org/10.1016/S0140-6736(24)01883-X 393 
+
+Ikonomovic, M.D., Klunk, W.E., Abrahamson, E.E., Mathis, C.A., Price, J.C., Tsopelas, N.D., Lopresti, 394 
+
+B.J., Ziolko, S., Bi, W., Paljug, W.R., Debnath, M.L., Hope, C.E., Isanski, B.A., Hamilton, R.L., 395 
+
+DeKosky, S.T., 2008. Post-mortem correlates of in vivo PiB-PET amyloid imaging in a typical 396 
+
+case of Alzheimer’s disease. Brain 131, 1630–1645. https://doi.org/10.1093/brain/awn016 397 
+
+Iwatsubo, T., Odaka, A., Suzuki, N., Mizusawa, H., Nukina, N., Ihara, Y., 1994. Visualization of 398 
+
+Aβ42(43) and A β40 in senile plaques with end-specific A β monoclonals: Evidence that an 399 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+26 
+
+initially deposited species is A β42(43). Neuron 13, 45–53. https://doi.org/10.1016/0896-400 
+
+6273(94)90458-8 401 
+
+Izco, M., Martínez, P., Corrales, A., Fandos, N., García, S., Insua, D., Montañes, M., Pérez-Grijalba, V., 402 
+
+Rueda, N., Vidal, V., Martínez-Cué, C., Pesini, P., Sarasa, M., 2014. Changes in the brain and 403 
+
+plasma A β peptide levels with age and its relationship with cognitive impairment in the 404 
+
+APPswe/PS1dE9 mouse model of Alzheimer’s disease. Neuroscience 263, 269–279. 405 
+
+https://doi.org/10.1016/j.neuroscience.2014.01.003 406 
+
+Jack Jr., C.R., Andrews, J.S., Beach, T.G., Buracchio, T., Dunn, B., Graf, A., Hansson, O., Ho, C., Jagust, 407 
+
+W., McDade, E., Molinuevo, J.L., Okonkwo, O.C., Pani, L., Rafii, M.S., Scheltens, P., Siemers, 408 
+
+E., Snyder, H.M., Sperling, R., Teunissen, C.E., Carrillo, M.C., 2024. Revised criteria for 409 
+
+diagnosis and staging of Alzheimer’s disease: Alzheimer’s Association Workgroup. Alzheimer’s 410 
+
+& Dementia 20, 5143–5169. https://doi.org/10.1002/alz.13859 411 
+
+Jankowsky, J.L., Zheng, H., 2017. Practical considerations for choosing a mouse model of Alzheimer’s 412 
+
+disease. Mol Neurodegener 12, 89. https://doi.org/10.1186/s13024-017-0231-7 413 
+
+Jarrett, J.T., Berger, E.P., Lansbury, P.T.Jr., 1993. The carboxy terminus of the .beta. amyloid protein is 414 
+
+critical for the seeding of amyloid formation: Implications for the pathogenesis of Alzheimer’s 415 
+
+disease. Biochemistry 32, 4693–4697. https://doi.org/10.1021/bi00069a001 416 
+
+Javonillo, D.I., Tran, K.M., Phan, J., Hingco, E., Kramár, E.A., da Cunha, C., Forner, S., Kawauchi, S., 417 
+
+Milinkeviciute, G., Gomez-Arboledas, A., Neumann, J., Banh, C.E., Huynh, M., Matheos, D.P., 418 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+27 
+
+Rezaie, N., Alcantara, J.A., Mortazavi, A., Wood, M.A., Tenner, A.J., MacGregor, G.R., Green, 419 
+
+K.N., LaFerla, F.M., 2022. Systematic Phenotyping and Characterization of the 3xTg-AD 420 
+
+Mouse Model of Alzheimer’s Disease. Front Neurosci 15, 785276. 421 
+
+https://doi.org/10.3389/fnins.2021.785276 422 
+
+Kawarabayashi, T., Younkin, L.H., Saido, T.C., Shoji, M., Ashe, K.H., Younkin, S.G., 2001. Age-423 
+
+Dependent Changes in Brain, CSF, and Plasma Amyloid β Protein in the Tg2576 Transgenic 424 
+
+Mouse Model of Alzheimer’s Disease. J. Neurosci. 21, 372–381. 425 
+
+https://doi.org/10.1523/JNEUROSCI.21-02-00372.2001 426 
+
+Kwak, D.E., Ko, T., Koh, H.S., Ji, Y.W., Shin, J., Kim, K., Kim, H.Y., Lee, H.-K., Kim, Y., 2020. 427 
+
+Alterations of aqueous humor A β levels in A β-infused and transgenic mouse models of 428 
+
+Alzheimer disease. PLoS ONE 15, e0227618. https://doi.org/10.1371/journal.pone.0227618 429 
+
+Liu, L., Duff, K., 2008. A Technique for Serial Collection of Cerebrospinal Fluid from the Cisterna 430 
+
+Magna in Mouse. J Vis Exp 960. https://doi.org/10.3791/960 431 
+
+Maia, L.F., Kaeser, S.A., Reichwald, J., Hruscha, M., Martus, P., Staufenbiel, M., Jucker, M., 2013. 432 
+
+Changes in amyloid-β and Tau in the cerebrospinal fluid of transgenic mice overexpressing 433 
+
+amyloid precursor protein. Sci Transl Med 5, 194re2. 434 
+
+https://doi.org/10.1126/scitranslmed.3006446 435 
+
+Masters, C.L., Bateman, R., Blennow, K., Rowe, C.C., Sperling, R.A., Cummings, J.L., 2015. 436 
+
+Alzheimer’s disease. Nat Rev Dis Primers 1, 15056. https://doi.org/10.1038/nrdp.2015.56 437 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+28 
+
+Mattsson-Carlgren, N., Grinberg, L.T., Boxer, A., Ossenkoppele, R., Jonsson, M., Seeley, W., Ehrenberg, 438 
+
+A., Spina, S., Janelidze, S., Rojas-Martinex, J., Rosen, H., La Joie, R., Lesman-Segev, O., 439 
+
+Iaccarino, L., Kollmorgen, G., Ljubenkov, P., Eichenlaub, U., Gorno-Tempini, M.L., Miller, B., 440 
+
+Hansson, O., Rabinovici, G.D., 2022. Cerebrospinal Fluid Biomarkers in Autopsy-Confirmed 441 
+
+Alzheimer Disease and Frontotemporal Lobar Degeneration. Neurology 98, e1137–e1150. 442 
+
+https://doi.org/10.1212/WNL.0000000000200040 443 
+
+Minakawa, E.N., Miyazaki, K., Maruo, K., Yagihara, H., Fujita, H., Wada, K., Nagai, Y., 2017. Chronic 444 
+
+sleep fragmentation exacerbates amyloid β deposition in Alzheimer’s disease model mice. 445 
+
+Neuroscience Letters 653, 362–369. https://doi.org/10.1016/j.neulet.2017.05.054 446 
+
+Oakley, H., Cole, S.L., Logan, S., Maus, E., Shao, P., Craft, J., Guillozet-Bongaarts, A., Ohno, M., 447 
+
+Disterhoft, J., Eldik, L.V., Berry, R., Vassar, R., 2006. Intraneuronal β-Amyloid Aggregates, 448 
+
+Neurodegeneration, and Neuron Loss in Transgenic Mice with Five Familial Alzheimer’s 449 
+
+Disease Mutations: Potential Factors in Amyloid Plaque Formation. J. Neurosci. 26, 10129– 450 
+
+10140. https://doi.org/10.1523/JNEUROSCI.1202-06.2006 451 
+
+Oblak, A.L., Lin, P.B., Kotredes, K.P., Pandey, R.S., Garceau, D., Williams, H.M., Uyar, A., O’Rourke, 452 
+
+R., O’Rourke, S., Ingraham, C., Bednarczyk, D., Belanger, M., Cope, Z.A., Little, G.J., Williams, 453 
+
+S.-P.G., Ash, C., Bleckert, A., Ragan, T., Logsdon, B.A., Mangravite, L.M., Sukoff Rizzo, S.J., 454 
+
+Territo, P.R., Carter, G.W., Howell, G.R., Sasner, M., Lamb, B.T., 2021. Comprehensive 455 
+
+Evaluation of the 5XFAD Mouse Model for Preclinical Testing Applications: A MODEL-AD 456 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+29 
+
+Study. Frontiers in Aging Neuroscience 13. 457 
+
+Ohno, M., Chang, L., Tseng, W., Oakley, H., Citron, M., Klein, W.L., Vassar, R., Disterhoft, J.F., 2006. 458 
+
+Temporal memory deficits in Alzheimer’s mouse models: rescue by genetic deletion of BACE1. 459 
+
+European Journal of Neuroscience 23, 251–260. https://doi.org/10.1111/j.1460-460 
+
+9568.2005.04551.x 461 
+
+Preuss, C., Pandey, R., Piazza, E., Fine, A., Uyar, A., Perumal, T., Garceau, D., Kotredes, K.P., Williams, 462 
+
+H., Mangravite, L.M., Lamb, B.T., Oblak, A.L., Howell, G.R., Sasner, M., Logsdon, B.A., 463 
+
+Carter, G.W., the MODEL-AD Consortium, 2020. A novel systems biology approach to evaluate 464 
+
+mouse models of late-onset Alzheimer’s disease. Mol Neurodegeneration 15, 67. 465 
+
+https://doi.org/10.1186/s13024-020-00412-5 466 
+
+Rafii, M.S., Aisen, P.S., 2023. Detection and treatment of Alzheimer’s disease in its preclinical stage. 467 
+
+Nat Aging 3, 520–531. https://doi.org/10.1038/s43587-023-00410-4 468 
+
+Sadleir, K.R., Eimer, W.A., Cole, S.L., Vassar, R., 2015. A β reduction in BACE1 heterozygous null 469 
+
+5XFAD mice is associated with transgenic APP level. Mol Neurodegener 10, 1. 470 
+
+https://doi.org/10.1186/1750-1326-10-1 471 
+
+Saito, T., Matsuba, Y., Mihira, N., Takano, J., Nilsson, P., Itohara, S., Iwata, N., Saido, T.C., 2014. Single 472 
+
+App knock-in mouse models of Alzheimer’s disease. Nat Neurosci 17, 661–663. 473 
+
+https://doi.org/10.1038/nn.3697 474 
+
+Salvadó, G., Ossenkoppele, R., Ashton, N.J., Beach, T.G., Serrano, G.E., Reiman, E.M., Zetterberg, H., 475 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+30 
+
+Mattsson ‐Carlgren, N., Janelidze, S., Blennow, K., Hansson, O., 2023. Specific associations 476 
+
+between plasma biomarkers and postmortem amyloid plaque and tau tangle loads. EMBO Mol 477 
+
+Med 15, EMMM202217123. https://doi.org/10.15252/emmm.202217123 478 
+
+Shaw, L.M., Arias, J., Blennow, K., Galasko, D., Molinuevo, J.L., Salloway, S., Schindler, S., Carrillo, 479 
+
+M.C., Hendrix, J.A., Ross, A., Illes, J., Ramus, C., Fifer, S., 2018. Appropriate use criteria for 480 
+
+lumbar puncture and cerebrospinal fluid testing in the diagnosis of Alzheimer’s disease. 481 
+
+Alzheimers Dement 14, 1505–1521. https://doi.org/10.1016/j.jalz.2018.07.220 482 
+
+Strozyk, D., Blennow, K., White, L.R., Launer, L.J., 2003. CSF A β 42 levels correlate with amyloid-483 
+
+neuropathology in a population-based autopsy study. Neurology 60, 652–656. 484 
+
+https://doi.org/10.1212/01.WNL.0000046581.81650.D0 485 
+
+Therriault, J., Zimmer, E.R., Benedet, A.L., Pascoal, T.A., Gauthier, S., Rosa-Neto, P., 2022. Staging of 486 
+
+Alzheimer’s disease: past, present, and future perspectives. Trends in Molecular Medicine 28, 487 
+
+726–741. https://doi.org/10.1016/j.molmed.2022.05.008 488 
+
+Trelle, A.N., Young, C.B., Vossler, H., Ramos Benitez, J., Cody, K.A., Mendiola, J.H., Swarovski, M.S., 489 
+
+Guen, Y.L., Feinstein, I., Butler III, R.R., Channappa, D., Romero, A., Park, J., Shahid-Besanti, 490 
+
+M., Corso, N.K., Chau, K., Smith, A.N., Skylar-Scott, I., Yutsis, M.V., Fredericks, C.A., Tian, 491 
+
+L., Younes, K., Kerchner, G.A., Deutsch, G.K., Davidzon, G.A., Sha, S.J., Henderson, V.W., 492 
+
+Longo, F.M., Greicius, M.D., Wyss-Coray, T., Andreasson, K.I., Poston, K.L., Wagner, A.D., 493 
+
+Mormino, E.C., Wilson, E.N., 2025. Plasma A β42/A β40 is sensitive to early cerebral amyloid 494 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+31 
+
+accumulation and predicts risk of cognitive decline across the Alzheimer’s disease spectrum. 495 
+
+Alzheimer’s & Dementia 21, e14442. https://doi.org/10.1002/alz.14442 496 
+
+Yan, T., Liang, J., Gao, J., Wang, L., Fujioka, H., Zhu, X., Wang, X., 2020. FAM222A encodes a protein 497 
+
+which accumulates in plaques in Alzheimer’s disease. Nat Commun 11, 411. 498 
+
+https://doi.org/10.1038/s41467-019-13962-0 499 
+
+Yokoyama, M., Kobayashi, H., Tatsumi, L., Tomita, T., 2022. Mouse Models of Alzheimer’s Disease. 500 
+
+Front. Mol. Neurosci. 15. https://doi.org/10.3389/fnmol.2022.912995 501 
+
+Zhong, M.Z., Peng, T., Duarte, M.L., Wang, M., Cai, D., 2024. Updates on mouse models of Alzheimer’s 502 
+
+disease. Mol Neurodegeneration 19, 23. https://doi.org/10.1186/s13024-024-00712-0 503 
+
+504 
+
+505 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+32 
+
+Figures and Figure Captions 506 
+
+Figure 1. Monthly progression of β-sheet-rich A β deposition in preclinical 5XFAD mice. 507 
+
+(A and B) Representative images of thioflavin-S staining in coronal brain sections of female (A) and 508 
+
+male (B) 5XFAD mice in the preclinical (2–5 months old) and advanced clinical (14 months old) stages. 509 
+
+The lower panels are magnified images of the insets in the upper panels. Scale bars, 1 mm (upper panels), 510 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+33 
+
+250 μm (lower panels). (C and D) Thioflavin-S-positive plaque load (total plaque area/total whole-brain 511 
+
+surface area) in preclinical female (C) and male (D) 5XFAD mice. n = 3–4 mice for each group. Data 512 
+
+are shown as mean ± S.E.M.; *p ≤ 0.05, **p ≤ 0.01, ***p ≤ 0.001, ****p ≤ 0.0001 in one-way ANOVA 513 
+
+followed by Tukey’s multiple comparison test. 514 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+34 
+
+Figure 2. Age-dependent changes in CSF A β biomarkers align with progression of β-sheet-rich A β515 
+
+deposition in preclinical 5XFAD mice. 516 
+
+CSF A β40 (A and B) and A β42 (C and D) levels and the A β42 /A β40 ratio (E and F) in female (A, C, E) and 517 
+
+male (B, D, F) preclinical 5XFAD mice (1–5 months old). n = 4–12 mice for each group. Data are shown 518 
+
+as mean ± S.E.M; *p ≤ 0.05, **p ≤ 0.01, ***p ≤ 0.001 in one-way ANOVA followed by Tukey’s multiple 519 
+
+comparison test. 520 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+35 
+
+Figure 3. CSF A β42 and the CSF A β42 /A β40 ratio correlates with β-sheet-rich A β deposition in 521 
+
+preclinical 5XFAD mice. 522 
+
+Scatter plots of thioflavin-S-positive plaque load and CSF A β40 (A and B) or A β42 (C and D) levels or 523 
+
+the A β42 /A β40 ratio (E and F) in female (A, C, E) and male (B, D, F) preclinical 5XFAD mice (1–5 524 
+
+months old). Females aged 2–5 months, n=14; males aged 3–5 months, n=10. Pearson's correlation 525 
+
+analysis was used to calculate r and p values for all scatter plots. 526 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+36 
+
+Figure 4. Age-dependent changes in plasma A β biomarkers align with progression of β-sheet-rich 527 
+
+Aβ deposition in preclinical 5XFAD mice. 528 
+
+Plasma A β40 (A and B) and A β42 (C and D) levels and the A β42 /A β40 ratio (E and F) in female (A, C, E) 529 
+
+and male (B, D, F) preclinical 5XFAD mice (1–5 months old). n = 4 mice for each group. Data are 530 
+
+shown as mean ± S.E.M.; *p ≤ 0.05, **p ≤ 0.01, ***p ≤ 0.001 in one-way ANOVA followed by Tukey’s 531 
+
+multiple comparison test. 532 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+37 
+
+Figure 5: The plasma A β42 /A β40 ratio correlates with the CSF A β42 /A β40 ratio in preclinical 5XFAD 533 
+
+mice. 534 
+
+Scatter plot of plasma A β40 (A and B), A β42 (C and D), and the A β42 /A β40 ratio (E and F) with their CSF 535 
+
+counterparts in female (A, C, and E) or male (B, D, and F) preclinical 5XFAD mice (1–5 months old). 536 
+
+n=20 for females and males, respectively. Pearson's correlation was used to calculate r and p values for 537 
+
+all scatter plots. 538 
+
+> (which was not certified by peer review) is the author/funder. All rights reserved. No reuse allowed without permission. The copyright holder for this preprint this version posted April 8, 2026. ;https://doi.org/10.64898/2026.04.06.716649 doi: bioRxiv preprint
+
+38 
+
+Supplementary Figure 1. Monthly progression of A β deposition in preclinical 5XFAD mice. 539 
+
+(A and B) Representative images of A β immunostaining using 4G8 antibody in coronal brain sections 540 
+
+of female (A) and male (B) 5XFAD mice in the preclinical (2–5 months old) and advanced clinical (14 541 
+
+months old) stages. The lower panels are magnified images of the insets in the upper panels. Scale bars, 542 
+
+1 mm (upper panels), 250 μm (lower panels). 543

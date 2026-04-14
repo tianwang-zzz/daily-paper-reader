@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-06-716649-v1/fig-001.webp",
+      "caption": "Figure 2. Age-dependent changes in CSF Aβ biomarkers align with progression of β-sheet-rich Aβ 515 deposition in preclinical 5XFAD mice. 516 CSF Aβ40 (A and B) and Aβ42 (C and D) levels and the Aβ42/Aβ40 ratio (E and F) in female (A, C, E) and 517 male (B, D, F) preclinical 5XFAD mice (1–5 months old). n = 4–12 mice for each group. Data are shown 518 as mean ± S.E.M; *p ≤ 0.05, **p ≤ 0.01, ***p ≤ 0.001 in one-way ANOVA followed by Tukey’s multiple 519 comparison test. 520",
+      "page": 34,
+      "index": 1,
+      "width": 752,
+      "height": 938
+    },
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-06-716649-v1/fig-002.webp",
+      "caption": "Figure 3. CSF Aβ42 and the CSF Aβ42/Aβ40 ratio correlates with β-sheet-rich Aβ deposition in 521 preclinical 5XFAD mice. 522 Scatter plots of thioflavin-S-positive plaque load and CSF Aβ40 (A and B) or Aβ42 (C and D) levels or 523 the Aβ42/Aβ40 ratio (E and F) in female (A, C, E) and male (B, D, F) preclinical 5XFAD mice (1–5 524 months old). Females aged 2–5 months, n=14; males aged 3–5 months, n=10. Pearson's correlation 525 analysis was used to calculate r and p values for all scatter plots. 526",
+      "page": 35,
+      "index": 2,
+      "width": 763,
+      "height": 912
+    },
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-06-716649-v1/fig-003.webp",
+      "caption": "Figure 4. Age-dependent changes in plasma Aβ biomarkers align with progression of β-sheet-rich 527 Aβ deposition in preclinical 5XFAD mice. 528 Plasma Aβ40 (A and B) and Aβ42 (C and D) levels and the Aβ42/Aβ40 ratio (E and F) in female (A, C, E) 529 and male (B, D, F) preclinical 5XFAD mice (1–5 months old). n = 4 mice for each group. Data are 530 shown as mean ± S.E.M.; *p ≤ 0.05, **p ≤ 0.01, ***p ≤ 0.001 in one-way ANOVA followed by Tukey’s 531 multiple comparison test. 532",
+      "page": 36,
+      "index": 3,
+      "width": 737,
+      "height": 964
+    },
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-06-716649-v1/fig-004.webp",
+      "caption": "Figure 1. Monthly progression of β-sheet-rich Aβ deposition in preclinical 5XFAD mice. 507 (A and B) Representative images of thioflavin-S staining in coronal brain sections of female (A) and 508 male (B) 5XFAD mice in the preclinical (2–5 months old) and advanced clinical (14 months old) stages. 509 The lower panels are magnified images of the insets in the upper panels. Scale bars, 1 mm (upper panels), 510",
+      "page": 32,
+      "index": 4,
+      "width": 938,
+      "height": 1061
+    },
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-06-716649-v1/fig-005.webp",
+      "caption": "Figure 5: The plasma Aβ42/Aβ40 ratio correlates with the CSF Aβ42/Aβ40 ratio in preclinical 5XFAD 533 mice. 534 Scatter plot of plasma Aβ40 (A and B), Aβ42 (C and D), and the Aβ42/Aβ40 ratio (E and F) with their CSF 535 counterparts in female (A, C, and E) or male (B, D, and F) preclinical 5XFAD mice (1–5 months old). 536 n=20 for females and males, respectively. Pearson's correlation was used to calculate r and p values for 537 all scatter plots. 538",
+      "page": 37,
+      "index": 5,
+      "width": 767,
+      "height": 925
+    }
+  ]
+}

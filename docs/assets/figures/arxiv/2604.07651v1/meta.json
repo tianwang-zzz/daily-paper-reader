@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07651v1/fig-001.webp",
+      "caption": "Figure 2: Detailed architecture of the Causal Task Chain.",
+      "page": 6,
+      "index": 1,
+      "width": 456,
+      "height": 447
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07651v1/fig-002.webp",
+      "caption": "Figure 4: Normalized confusion matrices for all four tasks.",
+      "page": 15,
+      "index": 2,
+      "width": 829,
+      "height": 773
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07651v1/fig-003.webp",
+      "caption": "Table 1: Comparison with existing methods.",
+      "page": 7,
+      "index": 3,
+      "width": 825,
+      "height": 348
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07651v1/fig-004.webp",
+      "caption": "Table 3: Per-class performance.",
+      "page": 14,
+      "index": 4,
+      "width": 444,
+      "height": 495
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07651v1/fig-005.webp",
+      "caption": "Figure 1: Overall architecture of CauPsi.",
+      "page": 4,
+      "index": 5,
+      "width": 826,
+      "height": 481
+    }
+  ]
+}

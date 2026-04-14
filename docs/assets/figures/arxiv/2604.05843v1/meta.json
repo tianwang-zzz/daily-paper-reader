@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.05843v1/fig-001.webp",
+      "caption": "Fig. 3: Topographic contribution maps (Gradient × Input) averaged over all correctly classified trials belonging to a specific class (left or right motor representation) for Subject 6, Session 4. Warm colors indicate greater channel importance.",
+      "page": 5,
+      "index": 1,
+      "width": 529,
+      "height": 237
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05843v1/fig-002.webp",
+      "caption": "Fig. 2: Subject-wise classification accuracy of EEG-MFTNet across the four testing sessions. Each cluster of bars represents a single subject, with each bar indicating the model’s accuracy during a specific testing session.",
+      "page": 4,
+      "index": 2,
+      "width": 529,
+      "height": 344
+    },
+    {
+      "url": "assets/figures/arxiv/2604.05843v1/fig-003.webp",
+      "caption": "Fig. 1: EEG-MFTNet’s architecture.The numbers displayed above the input and each component’s output (purple boxes) denote the corresponding output dimensions.",
+      "page": 3,
+      "index": 3,
+      "width": 1074,
+      "height": 429
+    }
+  ]
+}

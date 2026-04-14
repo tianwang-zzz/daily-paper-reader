@@ -1,0 +1,1348 @@
+Title: An EEG-fMRI Jointly Constrained Digital Twin Brain and Its Application in Alzheime's Disease
+
+URL Source: https://www.biorxiv.org/content/10.64898/2026.04.10.717365v1.full.pdf
+
+Number of Pages: 36
+
+Markdown Content:
+1
+
+# An EEG-fMRI Jointly Constrained Digital Twin Brain and Its Application in 1
+
+# Alzheimer’s Disease 2
+
+Yue Xiong 1, 2, # , Daqing Guo 1, 2, #, * , Yuanhang Xu 1, 2 , Yutao Chen 1, 2 , Rongxin Zhang 1, 2 , Yiqian Luo 1, 2 , Feiyan 3Wang 1, 2 , Xin Zeng 1, 2 , Yi Guo 3, 4, * , Dezhong Yao 1, 2, * 
+
+4 
+
+> 1
+
+Clinical Hospital of Chengdu Brain Science Institute, MOE-K Lab for NeuroInformation, Brain-Apparatus 5Communication Institute, University of Electronic Science and Technology of China, Chengdu, China 6 
+
+> 2
+
+School of Life Science and Technology, University of Electronic Science and Technology of China, 7Chengdu, China 8 
+
+> 3
+
+Department of Neurology, Shenzhen People’s Hospital, The Second Clinical Medical College, Jinan 9University, The First Affiliated Hospital, Southern University of Science and Technology, Shenzhen, China 10  
+
+> 4
+
+Institute of Neurological and Psychiatric Disorders, Shenzhen Bay Laboratory, Shenzhen, Guangdong, 11 China 12 # These authors contributed equally to this work 13 * Corresponding authors: dqguo@uestc.edu.cn (DG); xuanyi_guo@163.com (YG); dyao@uestc.edu.cn 14 (DY); 15 16 
+
+# Abstract 17 
+
+Current digital twin brain (DTB) models are typically optimized using single-modality functional 18 neuroimaging data, which restricts their ability to simulate brain dynamics across multiple spatiotemporal 19 scales. Here, we bridged this gap by developing a two-stage DTB (TS-DTB) modeling framework jointly 20 constrained by functional magnetic resonance imaging (fMRI) and electroencephalography (EEG) data. 21 Validation in both the healthy young and Alzheimer’s disease (AD) cohorts demonstrated that the TS-DTB 22 model simultaneously captures subject-specific features of multi-scale brain dynamics. In particular, the TS-23 DTB models of AD patients successfully recapitulated spectral-temporal signatures of cognitive decline, 24 mechanistically linking these deficits to excitation-inhibition (E-I) imbalances. By simulating responses to 25 repetitive transcranial magnetic stimulation (rTMS), we further revealed that cognitive recovery in AD 26 patients can be driven by E-I rebalancing via synaptic reconfiguration and background suppression. Overall, 27 these findings underscore the potential of the TS-DTB to advance the mechanistic understanding of the brain 28 and inform personalized digital therapeutics. 29 
+
+Keywords: Digital twin brain, multimodal integration, spatiotemporal dynamics, translational application 30 31 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+2
+
+## 1. Introduction 32 
+
+The digital twin brain (DTB) has emerged as a transformative modeling framework for investigating 33 brain dynamics, offering a unique research perspective on brain function, cognitive behaviors, disease 34 mechanisms, and neuromodulation strategies 1–3 . By coupling structure connectivity with biologically 35 grounded dynamical descriptions, the DTB model reproduces rich macroscopic nonlinear dynamics, 36 including oscillations, synchronization, bifurcations, and critical transitions 4,5 . Driven by the clinical demand 37 for precision medicine, recent advances have increasingly prioritized integrating multiscale architectures and 38 multimodal constraints, evolving from static network fitting toward the reconstruction of dynamic brain 39 states 6–8 . To support this evolution, researchers have systematically incorporated biological priors, such as 40 intrinsic hierarchy and structure–function relationships, into these models to constrain the optimization of 41 high-dimensional parameter spaces 8–11 . The ultimate goal is to elucidate the underlying mechanisms of brain 42 function and disease, predict brain responses, and design personalized, model-driven interventions 12–14 .43 Despite these advances, effectively integrating the complementary insights of multimodal neuroimaging 44 remains a fundamental challenge 15 . The fMRI delineates the hemodynamic network topology with superior 45 spatial resolution, whereas EEG reproduces the rapid spatiotemporal dynamics of neuronal activity 16,17 .46 However, existing DTB modeling strategies often rely on single-modality information constraints, forcing a 47 compromise between spatial topology and temporal characteristics fidelity. For instance, models optimized 48 solely for fMRI functional connectivity frequently fail to generate realistic fast oscillations 9,10,18 . Conversely, 49 those tuned exclusively for EEG or magnetoencephalography (MEG) spectral-temporal often compromise 50 the underlying spatial network architecture 6,19 . This spatiotemporal disconnect creates a fundamental blind 51 spot, preventing current models from reproducing the subtle interplay between network and fast oscillatory 52 dynamics 20 . Resolving this multi-scale interaction is a critical prerequisite for realizing the clinical potential 53 of DTB, particularly for deciphering complex pathologies such as Alzheimer’s disease (AD) 21,22 .54 Consequently, while progress has been made in multimodal integration 6,9,23,24 , achieving a unified, 55 individualized DTB modeling framework that reproduces brain dynamics across multiple spatiotemporal 56 scales remains a critical bottleneck. 57 Overcoming this bottleneck requires the rational parameterization of spatially heterogeneous intra-58 regional dynamics and inter-regional coupling. The human brain exhibits profound regional heterogeneity in 59 synaptic architecture and local dynamics, the complexity often oversimplified by homogeneous parameter 60 assumptions in early DTB models 19,23,25 . Capturing this heterogeneity is indispensable for studying 61 neurodegenerative diseases, which are characterized by spatially specific disruptions in local excitation-62 inhibition (E-I) balance 11,26,27 . However, region-specific parameter estimates that deviate from biological 63 realism inevitably lead to severe overfitting and computational intractability. To break this impasse, a robust 64 strategy must biologically constrain local circuit heterogeneity using spatiotemporal priors, while 65 simultaneously employing precise forward modeling to project simulated source activities onto observable 66 hemodynamics and sensor-space EEG signals 28,29 . Such an approach is essential for developing biologically 67 interpretable models that can serve as testbeds for brain research and the theoretical reference for clinical 68 diagnosis and treatment. 69 To address these challenges, we developed a two-stage DTB (TS-DTB) modeling framework jointly 70 constrained by fMRI and EEG data. To systematically evaluate this framework, we conducted comprehensive 71 validations across healthy young and AD cohorts. In the healthy cohort, the individualized TS-DTB models 72 demonstrated superiority over conventional single-modality and homogeneous models by simultaneously 73 reproducing subject-specific, multi-scale brain dynamics. Extending this validation to a pathological regime, 74 the TS-DTB models of AD patients successfully recapitulated the macroscopic spectral-temporal signatures 75 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+3of cognitive decline, mechanistically linking these clinical deficits to regional E-I imbalances. Building upon 76 this pathological insight, we further deployed the TS-DTB models as an in-silico clinical testbed to simulate 77 responses to repetitive transcranial magnetic stimulation (rTMS). The simulation revealed that cognitive 78 recovery in AD is driven by E-I rebalancing, specifically mediated via synaptic reconfiguration and 79 background suppression. Ultimately, the TS-DTB establishes a mechanistically interpretable bridge linking 80 macroscopic neuroimaging to microcircuit dynamics, advancing personalized digital therapeutics. 81 
+
+## 2. Results 82 
+
+2.1 System overview 83 
+
+The foundation of the TS-DTB modeling framework is a biophysically grounded generative model 84 designed to simultaneously simulate macroscopic neuroimaging and fast electrophysiological signals (Fig. 85 1a, Section 4.2). Whole-brain dynamics were simulated using structurally coupled Wilson-Cowan oscillators. 86 These local neural populations generated excitatory firing rates, serving as a biophysical proxy for local field 87 potentials 22 , which were subsequently transformed into observable signals via modality-specific forward 88 models. Specifically, the simulated neural activity was projected into BOLD signals using the Balloon-89 Windkessel model. Concurrently, to capture sensor-space EEG signatures, the source-level electrical activity 90 was mapped to the scalp using individualized leadfields derived from subject-specific EEG forward models, 91 thereby ensuring spatial fidelity. 92 To accurately parameterize this high-dimensional dynamic system, we implemented a two-stage 93 optimization strategy utilizing empirical resting-state multimodal features as benchmarks (Fig. 1b, Section 94 4.3, Tables S1-S3). Recognizing that structural connectivity derived from white matter tractography often 95 imperfectly captures inter-hemispheric communication 8,9 , the first stage refined the source-space effective 96 connectivity (EC) constrained by empirical fMRI functional connectivity (FC) 8. Building upon this optimized 97 network backbone, the second stage focused on reproducing fast sensor-space dynamics by tuning 98 heterogeneous local kinetic parameters. Crucially, this stage leveraged macroscopic fMRI-based gradients as 99 spatial priors. This approach biologically constrains the distribution of regional synaptic strengths, 100 background inputs, and noise to a low-dimensional manifold governed by global gradient weights 11,26 .101 Subsequently, we employed Bayesian optimization to identify the optimal configuration of these weights, 102 minimizing the relative error (RE) against a comprehensive suite of individualized empirical EEG spectral-103 temporal features. By synergizing large-scale network calibration with precise local electrophysiological 104 tuning, the TS-DTB ensures that simulated neural activity authentically reconstructs multiscale brain states. 105 Guided by this system architecture, we systematically evaluated the TS-DTB through comprehensive 106 validation across healthy and AD cohorts (Fig. 1c). In the healthy cohort, we established its methodological 107 robustness by demonstrating that the individualized TS-DTB models exhibit superiority over conventional 108 single-modality models, homogeneous and null baselines (Section 2.2), as well as models lacking 109 individualized EEG forward mapping (Section 2.3), in accurately reproducing subject-specific 110 spatiotemporal dynamics. Transitioning to the AD cohort, we utilized these models to map macroscopic 111 spectral-temporal abnormalities to underlying disruptions in local circuit parameters (Section 2.4). Finally, 112 we deployed the TS-DTB models as an in-silico testbed to simulate rTMS interventions, aiming to track the 113 spatiotemporal responses and decipher the plasticity mechanisms driving cognitive restoration (Section 2.5). 114 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+4115 
+
+Fig. 1. Overview of the TS-DTB modeling framework. (a) Construction of individualized DTB models. Whole-116 
+
+brain dynamics were simulated via structural connectivity (SC) coupled Wilson‒Cowan oscillators (WCOs). Local 117 
+
+circuit parameterization incorporated both homogeneous (control) and heterogeneous schemes, with the latter 118 
+
+derived from fMRI-based functional gradients. The simulated local excitatory firing rates were converted into 119 
+
+EEG and BOLD signals via the individualized EEG forward model and Balloon‒Windkessel model, respectively. 120 
+
+(b) Schematic of two-stage parameter optimization strategy. The first stage refines the effective coupling (EC) 121 
+
+matrix using the fMRI-based loss function combining the Pearson correlation and the Kolmogorov‒Smirnov 122 
+
+distance (KSD) of functional connectivity (FC). Subsequently, the second stage accomplishes individualized 123 
+
+kinetic parameterization via Bayesian optimization constrained by a joint loss function derived from the median 124 
+
+relative errors (REs) of EEG temporal and spectral features. (c) Validation across healthy control (HC) and 125 
+
+Alzheimer's disease (AD) cohorts. The TS-DTB was applied to investigate the neurophysiological mechanisms of 126 
+
+cognitive decline (left, HC vs. AD RECpre ) and cognitive restoration induced by repetitive transcranial magnetic 127 
+
+stimulation (rTMS) (right, AD RECpre vs. AD RECpost ). 128 
+
+2.2 Reconstructing spatiotemporal dynamics with multimodal constraints 129 
+
+As outlined in the system overview, a fundamental premise of TS-DTB is its ability to integrate EEG– 130 fMRI information for constraining parameter optimization. To evaluate the effectiveness of the multimodal 131 constraint strategy, we compared the TS-DTB models against the unconstrained baseline (noOpt), the EEG-132 specific (EEGOpt) model, and the fMRI-specific (fMRIOpt) model. As illustrated in Fig. 2a, single-modality 133 constrained optimization strategies successfully captured features within their respective domains but failed 134 to generalize across scales. For instance, while the fMRIOpt models achieved the lowest mean squared error 135 (MSE) for FC (0.012 ± 0.004), they exhibited substantial deviations in EEG spectral reconstruction (RE = 136 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+50.766 ± 0.294). Conversely, the EEGOpt models significantly reduced spectral errors but compromised the 137 underlying spatial connectivity structure, resulting in a high FC MSE comparable to the unoptimized baseline. 138 The TS-DTB models effectively reconciled this domain-specific trade-off, maintaining a low FC MSE (0.040 139 ± 0.044) while simultaneously achieving the lowest RE for EEG spectral features (0.199 ± 0.154). These 140 quantitative comparisons confirm that multimodal constraints prevent the optimization of one modality at the 141 expense of another. 142 143 
+
+Fig. 2. Performance comparison of TS-DTB models against single-modality and unconstrained. Quantitative 144 
+
+evaluation across four parameterization schemes: the proposed models (He TS-DTB ), the unconstrained baseline 145 
+
+(noOpt), the EEG-constrained models optimizing only heterogeneous local parameters (EEGOpt), and the fMRI-146 
+
+constrained models optimizing only EC coupling (fMRIOpt). (a) Global fitting performance. Comparison of the 147 
+
+mean squared error (MSE) for fMRI FC and the median REs for EEG temporal and spectral features. Boxplots 148 
+
+indicate the interquartile range and median, whiskers show 10th–90th percentiles, and dots denote individuals. 149 
+
+Significance was assessed via paired t-tests (* p < 0.05, ** p < 0.01, *** p < 0.001). (b) Spectral reconstruction. 150 
+
+Channel-averaged relative power spectral density (PSD) across five frequency bands. Shaded regions represent 151 
+
+the standard error (SE) across subjects. (c) Feature-wise REs. Detailed breakdown of RE for catch22 time-series 152 
+
+features and PSD metrics. Circle centers indicate the mean RE, and diameters are proportional to the SE. 153 
+
+The necessity of regional heterogeneity was further highlighted by the reconstruction of the relative 154 power spectral density (PSD). Models incorporating parameterized heterogeneity (EEGOpt and He TS-DTB )155 successfully aligned with the dominant alpha peak observed in the resting-state brain. In contrast, structurally 156 homogeneous models produced unrealistic broadband oscillatory patterns with high 1/f noise floors (Fig. 2b). 157 Comprehensive evaluation across diverse time-series and spectral feature sets (Tables S2, S3) confirmed that 158 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+6the He TS-DTB models consistently minimized deviations specifically for PSD and temporal autocorrelation 159 metrics, effectively capturing the complex, non-linear dynamical signatures of the brain (Fig. 2c). 160 161 
+
+Fig. 3. Evaluation of gradient-informed heterogeneity against homogeneous and null models. Model 162 
+
+performance under three spatial parameterization schemes, using the identical optimal EC matrix derived from the 163 
+
+first stage optimization: the proposed models (He TS-DTB ), the spatially randomized preserving autocorrelation 164 
+
+(He moran ), and the homogeneous baseline (Ho). (a) Optimization performance. Minimal loss function values and 165 
+
+the median RE for EEG features. (b) Spectral reconstruction. Channel-averaged relative PSD for empirical data 166 
+
+and simulations. (c) Feature-wise REs for EEG temporal, spectral, and microstate properties (detailed in Tables 167 
+
+S2–S4). (d) Mechanistic validation of E-I balance. Scatter plots illustrating the relationship between the simulated 168 
+
+E-I ratio and the 1/f aperiodic exponent. 169 
+
+To determine whether this performance improvement relies on biological organization rather than mere 170 parameter expansion, we compared the He TS-DTB models against the null models employing homogeneous 171 (Ho) parameters and the spatially randomized gradients (He Moran )30 . The inclusion of authentic functional 172 gradient priors significantly enhanced optimization, with the He TS-DTB models achieving the lowest minimum 173 loss function values (0.699 ± 0.187) and yielding significantly lower spectral errors (0.199 ± 0.154) compared 174 to both null models (Fig. 3a). Crucially, the inability of the He Moran models to consistently outperform the 175 homogeneous underscores that the enhanced fitting of He TS-DTB models are not a trivial consequence of 176 increased parameter degrees of freedom. Instead, accurate reconstruction of brain dynamics fundamentally 177 depends on constraining local circuit heterogeneity with the intrinsic hierarchical priors of the brain. This 178 biologically grounded parameterization enabled the He TS-DTB models to reconstruct fine-grained details of 179 EEG PSD, including center frequency, spectral energy, and aperiodic components (Fig. 3b). Extending this 180 evaluation across a broader feature set confirmed that authentic spatial hierarchical priors are essential for 181 reproducing complex temporal correlations, signal complexity, and microstate transition properties (Fig. 3c). 182 Beyond fitting accuracy, we validated the biophysical plausibility of these models by examining the 183 mechanistic link between the simulated E-I ratio and the 1/f aperiodic spectral exponent. Empirical and 184 theoretical studies posit that the aperiodic slope reflects the local E-I balance, with stronger inhibition 185 resulting in steeper 1/f slopes and consequently lower E-I ratios 31,32 . While both the Ho and He Moran models 186 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+7failed to capture this physiological relationship ( p > 0.05), the He TS-DTB models demonstrated a significant 187 negative correlation ( r=−0.475, p < 0.05) consistent with empirical expectations (Fig. 3d). Further analysis 188 revealed that these local E-I characteristics were primarily driven by the interplay between background input 189 and inhibitory-excitatory synaptic strength (Fig. S1). This result represents a pivotal validation, indicating 190 that gradient-informed heterogeneity allows the model to authentically simulate the physiological constraints 191 where local E-I interactions shape the global aperiodic landscape of brain activity. Ultimately, the TS-DTB 192 transcends mere data fitting to offer a biophysically interpretative platform linking microscale circuit 193 parameters to macroscale signal properties. 194 
+
+2.3 The fidelity of brain dynamics across atlases and EEG forward models 195 
+
+While the synergistic benefits of multimodal constraints were evident, it is imperative to ensure that 196 these improvements are robust against the choice of brain atlases. To verify that the efficacy of the TS-DTB, 197 we assessed its generalization capability using the fine-grained Brainnetome 246 atlas (incorporating 198 subcortical structures) and the high-resolution Schaefer 500 cortical parcellation. Under the Brainnetome 199 parcellation, the He TS-DTB models demonstrated superior optimization performance, achieving significantly 200 lower minimum loss function values (0.705 ± 0.199 vs. 0.789 ± 0.184, p < 0.001; Fig. 4a) and a substantial 201 reduction in REs for spectral features (0.167 ± 0.050 vs. 0.340 ± 0.212, p < 0.001) compared to the Ho models. 202 This superior fidelity in reconstructing empirical spectral and complex time-series features was consistently 203 replicated under the finer-grained Schaefer 500 scheme (Fig. 4e, f, h). Most importantly, the mechanistic 204 negative correlation between the simulated E-I ratio and the 1/f aperiodic exponent remained highly robust 205 across both the Brainnetome 246 ( r=−0.323) and Schaefer 500 ( r=−0.296) atlases (Fig. 4c, g). In contrast, 206 the Ho models showed negligible associations in both spatial resolutions. These findings confirm that 207 gradient-informed heterogeneity captures invariant biological principles of circuit organization that are 208 completely independent of parcellation granularity or anatomical definitions. 209 Beyond brain parcellation, accurate mapping from source-level neural activity to sensor-level signals is 210 a prerequisite for reliable EEG dynamic reconstruction. We quantified this by comparing models utilizing 211 individualized leadfields derived from subject-specific structural MRI against a control scheme using a 212 standardized MNI template. While global optimization losses appeared comparable, individualized forward 213 modeling substantially reduced the RE in the spectral domain (0.199 ± 0.154 vs. 0.290 ± 0.267; Fig. 5a). A 214 more granular analysis revealed that the personalized approach provided a significantly more refined 215 reconstruction of the spectral profile, particularly in capturing the alpha peak and high-frequency energy 216 distributions (Fig. 5b). This spatial fidelity was further corroborated by feature-wise analyses, where 217 individualized modeling consistently minimized REs across spectral-temporal metrics (Fig. 5c). 218 In terms of global network complexity, the standardized model frequently failed to match empirical 219 levels of metastability and synchrony, exhibiting significant statistical deviations across multiple frequency 220 bands (Fig. 5d). Conversely, the individualized models accurately reproduced these nonlinear dynamic 221 markers, indicating that accurate geometric constraints are essential for simulating coordinated network 222 fluctuations. Finally, we examined the reconstruction of large-scale temporal dynamics through EEG 223 microstate analysis. While both models maintained comparable correlations in the transition probability 224 matrix (0.786 ± 0.135 vs. 0.715 ± 0.198; Fig. 5e), regression analyses revealed that the individualized 225 approach yielded vastly superior predictive validity for the specific properties of brain states (Fig. 5f). 226 Specifically, the coefficient of determination ( R2) and Pearson correlation ( r) improved dramatically across 227 all core microstate metrics: global explained variance ( R2 from 0.098 to 0.275; r from 0.313 to 0.525, p <228 0.001), occurrence (R 2 from 0.087 to 0.310; r from 0.295 to 0.557, p < 0.001), duration ( R2 from 0.136 to 229 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+80.258, r from 0.369 to 0.508, p < 0.001), and coverage ( R2 from 0.186 to 0.282, r from 0.432 to 0.531, p <230 0.001). These quantitative improvements robustly confirm that individualized forward modeling is 231 indispensable for precisely recapitulating both the spatial topography and the temporal structure of EEG 232 dynamics, effectively transforming the model from a generic simulation into a subject-specific digital twin. 233 234 
+
+Fig. 4. Cross-parcellation stability of the TS-DTB models. Evaluation of optimization performance and 235 
+
+mechanistic fidelity across the Brainnetome 246 and the Schaefer 500 atlas. (a, e) Optimization performance. 236 
+
+Comparison of loss and median RE between the homogeneous (Ho) and heterogeneous (He TS-DTB ) models. (b, f) 237 
+
+Spectral reconstruction. Channel-averaged relative PSD for empirical data and simulations. (c, g) Mechanistic 238 
+
+validation. Scatter plots showing the robust negative correlation between the simulated E-I ratio and the 1/f 239 
+
+aperiodic exponent across both atlases for the He TS-DTB models. (d, h) Feature-wise REs. 240 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+9241 
+
+Fig. 5. Impact of individualized versus standardized EEG forward modeling on simulation fidelity. 242 
+
+Quantitative comparison using leadfields derived from subject-specific MRI (individualized LFs) versus a 243 
+
+template MNI head model (standardized LFs). (a) Optimization performance. Comparison of loss and median RE. 244 
+
+(b) Spectral reconstruction. Channel-averaged relative PSD. (c) Feature-wise REs for EEG temporal, spectral, and 245 
+
+microstate properties. (d) Global network complexity. Violin plots showing the distribution of metastability (top) 246 
+
+and synchrony (bottom) across filter frequency bands for empirical data (grey) and simulations (blue/orange). (e) 247 
+
+Microstate transition dynamics. Correlation of the transition probability matrix (TPM) between empirical and 248 
+
+simulated data. (f) Predictive validity of microstate metrics. Scatter plots relating empirical and simulated values 249 
+
+for global explained variance, occurrence, duration, and coverage. Linear fits with 95% confidence intervals. 250 
+
+2.4 Applied to the AD cohort for deciphering E-I imbalance and spectral slowing 251 
+
+Having established an optimal pipeline devoid of age-related physiological drift, we further validated 252 the TS-DTB to an independent AD cohort (Tables S5-S6) to assess its translational capacity (Fig. 6). The 253 models exhibited high fitting accuracy across all groups, including healthy controls, pre-treatment, and post-254 treatment AD patients, maintaining consistently low REs across a comprehensive suite of temporal statistics, 255 entropy, and spectral features (Fig. 6b, e). Crucially, the TS-DTB models successfully recapitulated 256 macroscopic signatures of cognitive states. It accurately replicated the global explained variance and 257 transition probabilities of empirical EEG microstates (Fig. 6c), and closely matched the empirical 258 characteristics of Lempel-Ziv complexity (LZC). Linear fits for LZC yielded highly significant correlations 259 (r=0.837, R² =0.701; r=0.789, R² =0.622; and r=0.882, R² =0.777; all p < 0.001), successfully reproducing the 260 abnormally elevated LZC observed in pre-treatment AD patients compared to controls, as well as the trend 261 of complexity restoration following neuromodulation (Fig. 6d). Spectral analysis revealed that the TS-DTB 262 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+10 models accurately captured the pathological slowing characteristic of AD, specifically an increase in low-263 frequency theta and a decrease in alpha power (Fig. 6f, g) 33,34 . Furthermore, the simulated aperiodic exponents 264 and offsets accurately mirrored the profound empirical downward trends observed in AD patients (e.g., 265 empirical exponent decreased from 1.271 ± 0.015 to 1.207 ± 0.017, p < 0.001; simulated exponent decreased 266 from 1.397 ± 0.004 to 1.320 ± 0.004, p < 0.001, Fig. 6h) 35 . These precisely captured aperiodic features serve 267 as reliable macroscopic markers for underlying E-I balance shifts associated with cognitive decline and 268 restoration. 269 270 
+
+Fig. 6. Application of the TS-DTB in studying the cognitive mechanisms of AD. (a) Schematic of AD data 271 
+
+acquisition undergoing rTMS. (b) Global fitting performance. Minimized loss function values demonstrate good 272 
+
+and consistent fitting accuracy across HC, pre-treatment AD (AD RECpre ), and post-treatment AD (AD RECpost ). (c) 273 
+
+Microstate dynamics. Total global explained variance (left) and transition probability matrix correlations (right) 274 
+
+between empirical and simulated data. (d) Restoration of neural complexity. Scatter plots correlating empirical 275 
+
+and simulated Lempel-Ziv complexity (LZC), reproducing the elevated complexity in AD and its subsequent 276 
+
+normalization post-rTMS. (e) Feature-wise REs. Detailed RE for the comprehensive EEG feature set. (f) Spectral 277 
+
+reconstruction. Empirical (top) and simulated (bottom) PSD, capturing the pathological slowing in AD and spectral 278 
+
+recovery post-rTMS. (g) Periodic component analysis. Restoration of alpha peak power post-stimulation. (h) 279 
+
+Aperiodic component analysis. 280 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+11 281 
+
+Fig. 7. Neurophysiological mechanisms of cognitive decline in AD. (a) Microstate temporal characteristics. 282 
+
+Comparison of duration, coverage, and spatial correlation of the four canonical microstates between HC and pre-283 
+
+treatment AD (AD RECpre ). (b) EEG FC fitting. Boxplots of correlations between empirical and simulated FC 284 
+
+matrices (Coherence, PLV, and AEC) across filter frequency bands. (c) Topographic maps of pathological features. 285 
+
+Cohen’s d maps illustrating frequency-specific connectivity disruptions and PSD energy alterations in AD. (d) 286 
+
+Local circuit dysfunction. Region-wise reductions in simulated firing rates and E-I ratios across functional 287 
+
+subnetworks in AD. (e) Principal component analysis (PCA). Dynamics axis separation between HC (grey) and 288 
+
+AD (blue) derived from model parameters space ( 𝑐 !! , 𝑐 "! , 𝐼𝑏 , 𝜎 ). (f) Functional gradient distribution in HC. 289 
+
+Boxplot of the first principal gradient across subnetworks. (g) Mechanistic drivers of cognitive decline. Scatter 290 
+
+plots correlating parameter shifts (ΔParameter) with E-I ratio alterations. The correlation with changes in 291 
+
+background input ( ∆𝐼𝑏 ) and noise ( ∆𝜎 ), particularly in low-gradient regions (blue points) indicates a background-292 
+
+driven pathological regime. 293 
+
+To dissect the circuit-level mechanisms driving this cognitive decline, we compared the model 294 parameters and local dynamics between healthy controls and pre-treatment AD patients (AD RECpre ) (Fig. 7). 295 The TS-DTB models effectively captured the alterations in microstate temporal characteristics, notably, the 296 deviant duration and coverage of specific microstate classes in the simulated AD brain indicated abnormal 297 frontoparietal activity caused by cognitive decline (Fig. 7a). Functional connectivity analysis demonstrated 298 that the model captured frequency-specific network disruptions, particularly the pathological enhancement 299 of delta-band connectivity and the breakdown of alpha-band connectivity within frontoparietal networks (Fig. 300 7b, c). At the local circuit level, AD patients exhibited a widespread neural slowing phenomenon, 301 characterized by significantly reduced firing rates and E-I ratios across the majority of functional subnetworks 302 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+12 (Fig. 7d) 36,37 . Mechanistically, principal component analysis (PCA) of the parameter space revealed a distinct 303 separation between the healthy and AD dynamic states (Fig. 7e). The primary dynamic axis (PC1, explaining 304 62.7% of the variance) highlighted marked differences primarily influenced by synaptic parameters. However, 305 further mapping of parameter shifts to the E-I ratio indicated that the transition from health to disease was 306 primarily driven by alterations in background input ( 𝐼𝑏 ) and stochastic noise levels ( 𝜎 ), rather than structured 307 synaptic coupling alone ( 𝑐 !! and 𝑐 "! ) (Fig. 7g). Interestingly, this pathological sensitivity to noise and 308 background input was most pronounced in low-gradient networks (blue points in Fig. 7g). This finding aligns 309 with the synaptic failure hypothesis, suggesting that as amyloid pathology compromises intrinsic connectivity, 310 the AD brain becomes increasingly susceptible to random fluctuations, resulting in the observed spectral 311 slowing and functional fragmentation. 312 In additional simulations, we observed similar phenomena of E-I imbalance and spectral slowing in an 313 independent mild cognitive impairment (MCI) cohort (Tables S7-S8, Figs. S2-S3). Consistent with previous 314 experimental findings 31,32,38,39 , these results underscore the cross-dataset robustness of the TS-DTB, 315 demonstrating its generalizable capacity to capture key spatiotemporal signatures of cognitive decline. 316 
+
+2.5 Gradient-dependent synaptic plasticity and E-I rebalancing drives rTMS-induced 317 
+
+cognitive recovery 318 
+
+Beyond deciphering the dynamic mechanisms of AD pathological signatures, the ultimate value of the 319 TS-DTB lies in its capacity to serve as a predictive in-silico testbed. Therefore, we further utilized the TS-320 DTB to elucidate the mechanisms of cognitive restoration induced by rTMS (Fig. 8). Macroscopically, rTMS 321 induced a systemic normalization of pathological metastability and synchrony in AD patients 40 . This global 322 realignment toward healthy levels was anchored by a significant, band-specific restoration in alpha dynamics, 323 accompanied by broader compensatory trends across other frequency bands (Fig. 8a). This stabilization was 324 underpinned by a recovery in local neural activity, with firing rates and E-I ratios increasing overall, 325 particularly in temporoparietal and occipital regions (Fig. 8b, orange vs. blue). The restoration of E-I balance 326 exhibited a spatially heterogeneous pattern, characterized by a disinhibition effect in stimulated frontoparietal 327 areas (increased E-I ratio) and a compensatory dynamic balance in contralateral regions (Fig. 8b, maps). 328 This restoration was further evidenced by the recovery of functional connectivity, marked by the 329 suppression of pathological delta links and the re-establishment of theta and alpha connectivity in 330 frontoparietal circuits (Fig. 8d) 41 . Additionally, the excitatory time constant 𝜏 ! significantly decreased post-331 stimulation ( p < 0.001, Fig. 8e), reflecting faster neural processing. Critically, parameter space analysis 332 revealed that, unlike the background-driven differences between HC and AD RECpre , the rTMS-induced 333 restoration was fundamentally driven by synaptic plasticity. The PCA trajectories showed a state shift 334 dominated by changes in excitatory and inhibitory synaptic coupling (Fig. 8f). Correlating these parameter 335 shifts with E-I restoration unveiled a sophisticated, hierarchical mechanism of plasticity (Fig. 8h) 42,43 .336 Specifically, in low-gradient regions (e.g., sensorimotor and visual networks), the restoration of the E-I ratio 337 was strongly positively correlated with increased excitatory coupling ( ∆𝑐 !! >0). These regions, being 338 relatively spared from AD pathology, exhibited a robust plastic response, acting as a bottom-up compensatory 339 energy source for cortical reactivation. In contrast, high-gradient transmodal regions showed a weaker 340 coupling between ∆𝑐 !! and E-I restoration, frequently accompanied by compensatory adjustments in 341 inhibition ( ∆𝑐 "! >0). This suggests a homeostatic mechanism where vulnerable core hubs prioritize stability 342 by balancing excitation with inhibition, thereby preventing runaway excitation while integrating the 343 compensatory drive from the periphery (the correlating between parameters shifts and firing rate restoration 344 are shown in Fig. S4). Collectively, these findings demonstrate that rTMS ameliorates cognitive decline by 345 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+13 triggering a gradient-dependent synaptic reorganization 42,43 , recruiting intact lower-order networks to drive 346 the functional recovery of the global system. 347 348 
+
+Fig. 8. Dynamic reconfiguration and synaptic plasticity induced by rTMS. (a) Band-specific restoration of 349 
+
+network stability. Normalization of pathological in metastability and synchrony post-rTMS (AD RECpost ). (b) 350 
+
+Recovery of local neural activity. Region-wise increases in firing rates and E-I ratios (top), alongside Cohen’s d 351 
+
+maps depicting heterogeneous spatial patterns of disinhibition and compensatory balance (bottom). (c) 352 
+
+Topographic maps. Widespread reductions in aperiodic exponent and offset post-rTMS. (d) Network 353 
+
+reorganization. Coherence difference maps highlighting the suppression of delta links and re-establishment of 354 
+
+frontoparietal theta/alpha connectivity. (e) Shift in neural time constants. Significant reduction in the excitatory 355 
+
+time constant post-stimulation. (f) PCA trajectory of therapeutic plasticity. State shift in parameter space from pre-356 
+
+TMS to post-TMS, dominated by synaptic coupling changes. (g) Functional gradient distribution in AD patients. 357 
+
+(h) Gradient-dependent synaptic plasticity. Scatter plots correlating synaptic parameter shifts ( ∆𝑐 !! , ∆𝑐 "! ) with E-358 
+
+I restoration. Strong positive correlations with ∆𝑐 !! in low-gradient regions (blue) indicate a bottom-up 359 
+
+compensatory drive, whereas high-gradient regions (red) exhibit increased inhibition ( ∆𝑐 "! ), reflecting 360 
+
+homeostatic constraint in the pathological core. 361 
+
+## 3. Discussion 362 
+
+In this study, we developed the TS-DTB modeling framework to address the fundamental challenge of 363 reconciling disparate spatiotemporal scales in individualized brain dynamics modeling. By implementing a 364 source-to-sensor optimization strategy, the TS-DTB effectively integrates individualized hemodynamic and 365 electrophysiological constraints, resolving the parameter coordination inherent in single-modality 366 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+14 approaches 19,23 . Our validation across both healthy and AD cohorts demonstrated that the generated TS-DTB 367 models surpass conventional optimization schemes by simultaneously reconstructing large-scale network 368 topologies and reproducing fast spatiotemporal dynamics 6,22,23 . Specifically, evaluating the framework in a 369 healthy cohort established its general modeling superiority. More importantly, applying it to the AD cohort 370 allowed us to successfully dissect the microscopic neurophysiological mechanisms underlying macroscopic 371 cognitive decline and to in-silico track therapeutic restoration. 372 The capability to dissect these nuanced spatiotemporal mechanisms relies fundamentally on the holistic 373 integration of multimodal data feature constraints, combining fMRI-derived topology, gradient-informed 374 heterogeneity, and individualized EEG forward modeling. Without these constraints, traditional 375 homogeneous models fail to capture the hierarchical complexity of brain plasticity, erroneously collapsing 376 region-specific dynamic responses into a uniform profile 11,27,44,45 . By constraining local circuit heterogeneity, 377 our approach effectively resolves parameter coordination, enabling the precise estimation of region-specific 378 synaptic strengths and background-related parameters. This biophysically grounded fusion leverages the high 379 spatial resolution of fMRI to disentangle the underlying source-level interactions that drive observable 380 sensor-space oscillations. Furthermore, the incorporation of individualized FEM-based leadfields proved 381 indispensable for resolving the spatial ambiguity of EEG sources, ensuring that modeled cortical dynamics 382 accurately project to real-world sensor observations 28 . This multimodal information jointly constrained 383 strategy differs from previous approaches, offering an effective pipeline for reconciling hemodynamic 384 topology with electrophysiological kinetics. 385 Applying this unified framework to the AD cohort, our model elucidates that the macroscopic spectral 386 slowing and abnormal complexity characteristic of the disease are rooted in a profound microscopic 387 disruption of the local E-I balance 20,40 . Specifically, parameter space analysis in pre-treatment AD patients 388 revealed a gradient-dependent E-I imbalance dominated by aberrant background suppression, which most 389 severely afflicts low-gradient regions. This aligns robustly with the synaptic failure hypothesis, suggesting 390 that as amyloid pathology compromises intrinsic connectivity, neural circuits become increasingly 391 susceptible to random fluctuations, leading to functional network fragmentation and the dissolution of 392 metastable microstates 32,38 . Similarly, consistent E-I imbalance patterns were also observed in an independent 393 MCI cohort, reinforcing the generalizability of our framework 46 . By directly mapping and linking 394 macroscopic EEG abnormalities to specific microcircuit parameters, the TS-DTB models establish the E-I 395 ratio as a mechanistic biomarker that correlates with cognitive performance. This capacity to inversely map 396 sensor-level phenotypes to source-level dysfunction provides a critical theoretical platform for dissecting the 397 neural basis of cognitive decline and restoration and the design of future neuromodulation strategies. 398 Another contribution of this work lies in leveraging the TS-DTB as an in-silico testbed to 399 mechanistically dissect rTMS-induced cognitive restoration. Challenging the conventional assumption that 400 therapeutic plasticity is strictly confined to the stimulation target, our analysis revealed a sophisticated, 401 gradient-dependent strategy of E-I rebalancing characterized by a global synergy of peripheral drive and core 402 homeostasis 42,43 . Specifically, we observed that simulated cognitive recovery is driven by massive synaptic 403 reconfiguration within low-gradient sensorimotor networks. This actively recruits structurally intact lower-404 order regions as an energy reservoir to drive global cortical re-awakening, effectively compensating for the 405 inertia of damaged higher-order hubs (e.g., the default mode network) 11,26 . Concurrently, to maintain 406 homeostatic stability within the pathological transmodal core, high-gradient regions exhibited a distinct 407 mechanistic profile that profound background suppression alongside a compensatory increase in inhibition. 408 Ultimately, this hierarchical reorganization provides a novel theoretical framework for understanding how 409 focal stimulation induces global functional recovery, highlighting that effective neuromodulation relies on 410 the coordinated rebalancing of E-I ratios across the entire cortical hierarchy 47,48 .411 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+15 Looking forward, the TS-DTB presents several promising avenues to further enhance biophysical 412 plausibility and computational efficiency 13 . First, future studies could extend the complexity of the underlying 413 physics by incorporating transmission delays and directed effective connectivity 25,49 . In addition, the 414 biological grounding of parameter heterogeneity could be enriched by integrating a broader spectrum of 415 multiscale priors. Beyond functional gradients, incorporating intrinsic timescales, myelin maps, or 416 transcriptomic profiles could provide multidimensional constraints, yielding a more comprehensive mapping 417 of cortical organization 10,50,51 . Finally, while the current study modeled rTMS effects as parameter shifts 418 between pre- and post-states, future work should aim to simulate dynamic plasticity rules directly within the 419 model. Such advancements would enable fully predictive in-silico trials to optimize patient-specific protocols 420 before intervention 52,53 .421 In summary, the TS-DTB establishes a generalizable computational platform that effectively bridges the 422 spatiotemporal gap inherent in conventional brain modeling. By synergizing spatial heterogeneity with 423 individualized EEG forward mapping, this approach successfully reconciles the macroscopic topology of 424 hemodynamics with the fast electrophysiological signatures of local microcircuits. Crucially, the capacity of 425 TS-DTB to inversely map non-invasive sensor-level features to underlying mechanistic parameters (such as 426 E-I balance and synaptic coupling) offers a transformative lens for dissecting neuropathology. While 427 demonstrated here in the context of AD and rTMS, this biologically grounded methodology provides a 428 universal foundation for decoding multiscale circuit disruptions across a broad spectrum of neuropsychiatric 429 disorders. Ultimately, the TS-DTB transcends data-driven descriptive neuroimaging, paving the way for in-430 silico clinical trials and the realization of precision, model-guided digital therapeutics 13,14 .431 
+
+## 4. Methods 432 
+
+4.1 Multimodal neuroimaging datasets and preprocessing 433 
+
+Participants 434 
+
+This study utilized three independent cohorts, with all protocols approved by institutional ethics 435 committees and informed consent obtained. The healthy cohort consisted of 25 healthy young adults (13 436 females, age 24.2 ± 1.2) from the University of Electronic Science and Technology of China. The Alzheimer's 437 disease (AD) clinical cohort, sourced from Shenzhen People's Hospital, included 17 patients (14 females, age 438 65.5 ± 9.5) and 14 age-matched healthy controls (HCs, 12 females, age 56.4 ± 5.3; Tables S5-S6). Finally, 439 the mild cognitive impairment (MCI) clinical cohort, recruited from the Fourth People’s Hospital of Chengdu, 440 comprised 15 patients (8 females, age 64.7 ± 5.2) and 16 age-matched HCs (12 females, age 62.6 ± 5.5; 441 Tables S7-S8). 442 
+
+MRI acquisition 443 
+
+Structural (T1w), diffusion-weighted imaging (DWI), and resting-state functional MRI (rs-fMRI) data 444 were acquired using 3T scanners (GE Discovery MR750 for the healthy cohort; Siemens Skyra for both 445 clinical cohorts). High-resolution T1w images were acquired using standard 3D MPRAGE or IR-GRE 446 sequences (voxel size=1×1×1 mm³). DWI data were collected using single-shot EPI sequences with 64 447 diffusion directions (voxel size =2×2×4 mm³). The rs-fMRI data were acquired using gradient-echo EPI 448 sequences with a temporal resolution (TR) of approximately 2000 ms, capturing over 255 volumes for the 449 healthy cohort and 238 volumes for the clinical cohorts per participant. 450 
+
+EEG acquisition 451 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+16 Eyes-closed resting-state EEG signals were recorded using 64-channel caps conforming to the 452 international 10-20 system. Recordings utilized ASA-Lab amplifiers (ANT Neuro, Netherlands) for the 453 healthy cohort and LiveAmp 64 systems (Brain Products, Germany) for the clinical cohorts. The sampling 454 rates were 1000 Hz or 5000 Hz, which were subsequently downsampled during preprocessing. Uniquely, the 455 AD group underwent a 30-min session of repetitive transcranial magnetic stimulation (rTMS) targeting the 456 left dorsolateral prefrontal cortex (DLPFC), and then the EEG data were acquired immediately before 457 (RECpre) and after (RECpost) the intervention. 458 
+
+Data Preprocessing 459 
+
+We utilized three distinct brain atlases at 1 mm voxel resolution, including the Schaefer 200 and 500 460 cortical parcellations 54 , and the Brainnetome 246 atlas 55 , to define regions of interest (ROIs) for multimodal 461 network and leadfields construction. 462 
+
+Structural connectivity (SC) 463 
+
+SC matrices were derived from DWI data using the MRtrix3 toolbox 56 . Following standard denoising 464 and motion/bias field correction, images were registered to the MNI152 template using ANTs. Tissue 465 segmentation was performed using FSL 5ttgen for anatomically constrained tractography (ACT). Fiber 466 orientation distributions were estimated via constrained spherical deconvolution. Whole-brain probabilistic 467 tractography (iFOD2 with ACT) generated 200,000 streamlines per participant. SC matrices were constructed 468 by quantifying the normalized streamline counts connecting each pair of ROIs. 469 
+
+fMRI BOLD signals 470 
+
+The rs-fMRI data preprocessing was conducted using DPABI 57 . The fMRI images were slice-time 471 corrected, spatially realigned, normalized to MNI space (3×3×3 mm 3), and smoothed with a 6 mm full-width 472 half maximum (FWHM) Gaussian kernel. The nuisance signals, including 24 motion parameters and mean 473 white matter and cerebrospinal fluid (CSF) signals, were regressed out. The resulting BOLD time series were 474 bandpass filtered (0.01–0.1 Hz) and z-score normalized for each ROI. 475 
+
+Functional connectivity (FC) 476 
+
+For fMRI, FC matrices were constructed by computing Pearson correlation coefficients between all pairs 477 of regional BOLD time series, followed by Fisher's z-transformation to improve normality. For EEG, sensor-478 level FC was quantified across filter frequency bands (delta to gamma) using three complementary metrics 479 to capture diverse interaction mechanisms: (1) Amplitude envelope correlation (AEC) measures the 480 correlation of orthogonalized amplitude envelopes; (2) Magnitude-squared coherence quantifies the linear 481 dependence between two signals in the frequency domain; and (3) Phase-locking value (PLV) assesses the 482 consistency of instantaneous phase differences independent of signal amplitude. 483 
+
+EEG signals 484 
+
+EEG data were preprocessed using EEGLAB toolbox 58 . Following the removal of non-scalp channels 485 and the rejection of bad segments, signals were bandpass filtered (0.5–45 Hz) using a standard finite impulse 486 response (FIR) filter with zero-phase delay. The data were re-referenced to the Cz electrode, downsampled 487 to 250 Hz for computational efficiency. Independent component analysis (ICA) was applied to identify and 488 eliminate ocular, muscular, and cardiac artifacts and then z-score normalized for each channel. 489 
+
+Individualized FEM-based forward modeling 490 
+
+Individualized EEG forward modeling used the SimNIBS 4.1.0 to generate the realistic volume 491 conductor model 59 . High-quality individualized head meshes were reconstructed from T1w of each 492 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+17 participant, segmenting the head into multiple tissue compartments (white matter, gray matter, CSF, skull, 493 and scalp) with distinct conductivities. By solving the potential distributions across tetrahedral elements of 494 meshes, we computed individualized leadfield matrices. For the standardized control model, the identical 495 pipeline was applied to the MNI152 standard template. 496 
+
+4.2 Large-scale brain dynamics model 497 
+
+Neural mass model 498 
+
+We simulated macroscopic brain activity using a network of coupled Wilson-Cowan oscillators, which 499 provides a biologically grounded, non-linear description of regional population dynamics 60 .500 
+
+𝜏 !
+
+𝑑 𝐸 "
+
+𝑑𝑡 = −𝐸 " (𝑡) + *𝑆 #_%&' − 𝐸 "(𝑡), 𝑆 # -𝑐 !! 𝐸 "(𝑡) − 𝑐 (! 𝐼 "(𝑡) + 𝐺 # 1
+
+> )
+
+𝑆𝐶 ") 𝐸 )(𝑡) + 𝐼𝑏 "5 + 𝜎𝑤 "(𝑡) (1) 501 
+
+𝜏 (
+
+𝑑 𝐼 "
+
+𝑑𝑡 = −𝐼 "(𝑡) + *𝑆 *_%&' − 𝐼 " (𝑡), 𝑆 *9𝑐 !( 𝐸 "(𝑡) − 𝑐 (( 𝐼 " (𝑡) + 𝐼𝑏 ": + 𝜎𝑣 "(𝑡) (2) 502 
+
+𝑆 #,*(𝑥) = 11 + 𝑒 ,&!,#-',. !,#/ − 1
+
+1 + 𝑒 &!,#.!,# (3) 503 
+
+Specifically, the state of the 𝑗 -th brain region at time 𝑡 is defined by the normalized firing rates of its 504 excitatory (𝐸 #(𝑡)) and inhibitory (𝐼 #(𝑡)) populations. The temporal evolution of these populations is 505 governed by their respective time constants 𝜏 ! and 𝜏 " . The input-output relationship 𝑆 $,&(𝑥) for each 506 population is modeled via a sigmoidal transfer function, characterized by a maximum activity 𝑆 $,&_()* = 1 −507 
+
+1/(1 + 𝑒 )",$+",$ ), a mean firing threshold 𝜃 $,& and variation slope 𝑎 $,&. The dynamics of the excitatory pool 508 ensemble are driven by local synaptic connection strength interactions within the excitatory and inhibitory 509 population, long-range excitatory inputs coupling the structural connectivity matrix 𝑆𝐶 #, from different 510 populations with global coupling strength 𝐺 $, and the background input 𝐼𝑏 #. Additive noise represents the 511 stochastic perturbation input to the system with the functions 𝑤 #(𝑡) and 𝑣 # (𝑡) , which are derived from a 512 normal Gaussian distribution with a standard deviation 𝜎 . Other constants in the model were biologically 513 derived as described in previous work 25,60 . Numerical simulations were performed using the Euler method 514 with an integration step of 0.1 ms, initializing values 𝐸 #(0) = 𝐼 #(0) = 0.1 . Following the exclusion of a 20 s 515 transient period to ensure dynamic stabilization, the 𝐸 (𝑡 ) were downsampled for subsequent multimodal 516 forward projections. 517 
+
+Multimodal forward modeling 518 
+
+Simulated BOLD signals were derived from the excitatory firing rate signals using the standard Balloon-519 Windkessel hemodynamic model, which mathematically couples neural firing rate ( 𝐸 ) to changes in blood 520 flow, volume, and deoxyhemoglobin content 61 . The hemodynamic changes at node 𝑗 were as follows: 521 
+
+𝑑 𝑠 "
+
+𝑑𝑡 = 𝐸 − 𝑘 𝑠 " − 𝛾 9𝑓 " − 1: (4) 522 
+
+𝑑 𝑓 "
+
+𝑑𝑡 = 𝑠 " (5) 523 
+
+𝜏 𝑑 𝑣 "
+
+𝑑𝑡 = 𝑓 " − 𝑣 " 
+
+> 0
+> 1
+
+(6) 524 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+18 
+
+𝜏 𝑑 𝑞 "
+
+𝑑𝑡 =
+
+𝑓 " H1 − (1 − 𝜌)  
+
+> 0
+> 2$
+
+J𝜌 − 𝑞 "𝑣 "
+
+> 0
+> 1
+
+𝑣 "
+
+(7) 
+
+525 
+
+𝐵 " = 𝑉 3 N-𝑘 091 − 𝑞 ": + 𝑘 4 H1 − 𝑞 "
+
+𝑣 "
+
+J5 + 𝑘 591 − 𝑣 ":O (8) 526 
+
+where 𝐵 # represents the simulated BOLD signal from node 𝑗 . The resting blood volume fraction 𝑉 - = 0.02 ,527 
+
+𝑘 . = 7𝜌 , 𝑘 / = 2, and 𝑘 0 = 2𝜌 − 0.2, other parameters were taken from 29 .528 Concurrently, to reconstruct sensor-level electrophysiology, the 𝐸 (𝑡 ), representing source-space current 529 dipoles, were projected to the scalp utilizing the LF computed via the FEM-based head models 59 . This precise 530 spatial mapping explicitly accounts for realistic volume conduction effects across distinct tissue 531 compartments, yielding the simulated scalp EEG signals ( 𝑆 !!12 ): 532 
+
+𝑆 !!67 (𝑡 ) = 𝐿𝐹 𝐸 (𝑡 ) (9) 533 
+
+4.3 Model optimization 534 
+
+Inter-regional coupling calibration in the first stage 535 
+
+We aimed to refine the source-space effective coupling (EC) matrix to accurately reflect macroscopic 536 hemodynamic interactions. Adopting established structural-functional iterative schemes 8, we employed an 537 fMRI-based optimization procedure (fMRIOpt) that quantified the discrepancy between the empirical and 538 simulated FC. The loss function minimized both the Pearson correlation and the Kolmogorov-Smirnov 539 distance (KSD) between the respective FC distributions. 540 
+
+𝐿𝑜𝑠𝑠 289( = 1 − 𝐹𝐶 :;<< + 𝐹𝐶 =>? (10) 541 
+
+To achieve convergence, the EC matrix was iteratively updated by adjusting an adaptive learning rate 𝐿𝑟 *542 with decay 8. The globally optimized EC matrix was subsequently fixed for the second stage. 543 
+
+𝐸𝐶 (𝑥) = 𝐸𝐶(𝑥 − 1) + 𝐿𝑟 '9𝐹𝐶 #%@ − 𝐹𝐶 %;A#B : (11) 544 
+
+In this stage, we fix the global coupling strength 𝐺 $ = 1. The direction of change in FC correlation was 545 quantified as ∆𝐶𝑜𝑟𝑟 = 𝐹𝐶 3455 (𝑥 + 1) − 𝐹𝐶 3455 (𝑥 ). The optimization was performed using iterations 𝑋 =546 
+
+30 , with an initial learning rate 𝐿𝑟 - = 0.025 , decay rate 𝐷𝑟 = 0.02 , increase factor 𝐼𝑓 = 0.25 , decrease 547 factor 𝐷𝑓 = −0.1 , and the 𝐿𝑟 * in the 𝑥 67 iteration adjustments were restricted to the range 𝐿𝑟 * ∈548 
+
+[0.001,0.05] . The adaptive learning rate evolved according to 549 
+
+X𝐿𝑟 ' = 𝐿𝑟 3
+
+1 + 𝑥𝐷𝑟 (1 + 𝐼𝑓), ∆𝐶𝑜𝑟𝑟 > 0 𝐿𝑟 ' = 𝐿𝑟 3
+
+1 + 𝑥𝐷𝑟 (1 + 𝐷𝑓), ∆𝐶𝑜𝑟𝑟 ≤ 0 (12) 550 
+
+Intra-regional dynamics optimization in the second stage 551 
+
+Building upon the calibrated network backbone, the second stage optimized region-specific kinetic 552 parameters to reproduce fast, sensor-space EEG dynamics 11,27 . Specifically, the macroscale organizational 553 structure of the brain was characterized using the first two functional connectivity gradients (denoted as 554 
+
+𝐺𝑟𝑎𝑑 .and 𝐺𝑟𝑎𝑑 /) derived via the BrainSpace toolbox 62,63 . These gradients provided fMRI-based priors that 555 capture fundamental hierarchical patterns of regional integration and segregation. We modeled regional 556 heterogeneity by parameterizing the inhibitory to excitatory synaptic strength ( 𝑐 "! ,#), background input ( 𝐼𝑏 #), 557 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+19 and noise amplitude ( 𝜎 #) as linear combinations of these two empirical macroscale gradients. Consequently, 558 each variable was governed by a distinct gradient-weighting profile, defined by linear coefficients ( 𝑎 ,, 𝑏 ,, 𝑐 ,). 559 
+
+𝑌 " 
+
+> ())
+
+= 𝑎 )𝐺𝑟𝑎𝑑 0," + 𝑏 )𝐺𝑟𝑎𝑑 4," + 𝑐 ) (13) 560 
+
+where 𝑌 # 
+
+> (,)
+
+denotes the value of parameter 𝑘 (i.e., 𝑘 ∈ {𝑐 "! , 𝐼𝑏, 𝜎} for region 𝑗 . We constructed two ablation 561 models to verify the necessity of gradient-informed priors. The He Moran models replaced empirical gradients 562 with Moran-randomized surrogates, nullifying authentic spatial topography while retaining spatial 563 autocorrelation. Conversely, the Ho models assumed spatial homogeneity, enforcing uniform local kinetic 564 parameters across all regions. The parameter space consisted of spatially distributed parameters and three 565 globally co-optimized variables, including excitatory time constant ( 𝜏 ! ), inhibitory scaling factor ( 𝑟 :% here 566 
+
+𝜏 " = 𝑟 :% 𝜏 ! ), and global coupling ( 𝐺𝑒 ). In total, the heterogeneous models optimized 12 hyperparameters, 567 while the Ho models optimized 6 (detailed in Table S1). For AD cohort simulations, an additional parameter 568 for excitatory–excitatory synaptic coupling ( 𝑐 !! ) was introduced to model rTMS-induced effects. 569 The EEG-based loss function integrated both temporal and spectral features, which were extracted using 570 the catch22 feature set, FOOOF, and standard signal processing pipelines (Tables S2-S3) 64,65 . The 571 discrepancy between simulated and empirical EEG signals was quantified using the median relative errors 572 (REs, normalized to the range of [0,1]) across these feature sets. The temporal and spectral components were 573 equally weighted to formulate the final joint loss function. 574 
+
+𝐿𝑜𝑠𝑠 !!6 = 𝑙𝑜𝑠𝑠 E#%@;<&B + 𝑙𝑜𝑠𝑠 >@#FG<&B (14) 575 
+
+To minimize the loss function, we performed Bayesian optimization using the expected-improvement-plus 576 (EI +) acquisition function within a 32-core parallelized environment. The process executed 96 total 577 evaluations (initial seed to Gaussian process guided ratio of 1:3), utilizing an exploration ratio of 0.75. 578 
+
+4.4 Data analysis 579 
+
+Excitation-inhibition (E-I) ratio 580 
+
+At the microcircuit level, the E-I balance was quantified from the simulated neural activity. The E-I ratio 581 was defined as the ratio between the temporal average of the excitatory and inhibitory firing rates 27 
+
+582 
+
+𝐸𝐼𝑅𝑎𝑡𝑖𝑜 " =
+
+1
+
+𝑇 ∑ 𝐸 "(𝑡) E
+
+> GH0
+
+1𝑇 ∑ 𝐼 "(𝑡) E
+
+> GH0
+
+(15) 583 
+
+Signal complexity 584 
+
+To characterize the dynamical complexity of the EEG signals, three complementary non-linear time-585 series measures were computed channel-wise, including Lempel–Ziv complexity (LZC), the Hurst exponent, 586 and permutation–fuzzy entropy (PFEn). For LZC, signals were mean-centered, median-binarized, and 587 evaluated using the exhaustive parsing algorithm. Long-range temporal dependence was quantified via the 588 Hurst exponent, estimated using rescaled range analysis across 20 logarithmically spaced scales. Local 589 irregularity was assessed using PFEn, defined as the window-averaged sum of fuzzy and permutation entropy 590 computed over non-overlapping windows. 591 
+
+Network synchrony and metastability 592 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+20 Global dynamical complexity was characterized using two conventional metrics for coupled-oscillator 593 systems: network synchrony and metastability 66 . These quantities derive from the Kuramoto order parameter 594 
+
+𝑅 (𝑡 ), defined as: 595 
+
+𝑅 (𝑡)𝑒 *. (G) = 1
+
+𝑁 1
+
+> I
+> )H0
+
+𝑒 *J%(G) (16) 596 
+
+where 𝜙 ,(𝑡) is the instantaneous phase of the 𝑘 -th regional signal. Phases were obtained from the analytic 597 signal 598 
+
+𝑋 &(𝑡) = 𝑋(𝑡) + 𝑖𝐻(𝑡) (17) 599 
+
+where 𝑋 ) is the analytic signal, 𝑋 is the original signal, and 𝐻 is the Hilbert transform of 𝑋 . The analytic 600 signal was expressed in polar form as 601 
+
+𝑋 &(𝑡) = 𝐴(𝑡)𝑒 *J (G) (18) 602 
+
+where 𝐴 (𝑡 ) is the amplitude envelope, and 𝜙 (𝑡 ) is the instantaneous phase. Network synchrony was 603 quantified as the temporal mean of the 𝑅 (𝑡 ), reflecting the overall degree of phase alignment across the 604 network over time. Metastability was defined as the standard deviation of the 𝑅 (𝑡 ), indexing the temporal 605 variability of this synchronization, thereby capturing the tendency of system to continuously explore diverse 606 coordination states. 607 
+
+Power spectral density 608 
+
+The power spectral density (PSD) of the EEG signals (resampled to 250 Hz) was estimated utilizing 609 Welch’s method. Signals were segmented into 2-second epochs with 50% overlap and tapered with a 610 Hamming window to minimize spectral leakage. The resulting PSDs were averaged across epochs within the 611 0.5–45 Hz range for both empirical and simulated data. 612 
+
+EEG microstates 613 
+
+EEG microstates were extracted to analyze large-scale spatiotemporal dynamics 67 . Following standard 614 preprocessing, aggregated empirical global field power peaks were clustered into four canonical templates 615 using modified K-means. Individual continuous EEG data were then back-fitted to these templates (with 30-616 ms smoothing) to compute standard microstate characteristics (global explained variance, coverage, 617 occurrence, duration, and transition probabilities). For comparison, the identically preprocessed simulated 618 EEG signals were directly back-projected onto the empirically derived templates. 619 
+
+Statistical analysis 620 
+
+All correlations were evaluated using the Pearson correlation coefficient ( r). Differences between 621 empirical and simulated feature distributions, or between distinct clinical groups/conditions, were assessed 622 using paired or two-sample tests as appropriate. Normality was evaluated using the Shapiro-Wilk test. 623 Normally distributed data were analyzed using paired or independent t-tests, whereas non-parametric 624 equivalents (Wilcoxon signed-rank test or Mann-Whitney U test) were applied otherwise. The results were 625 considered significant at * p < 0.05, ** p < 0.01 and *** p < 0.001. Effect sizes were reported by Cohen’s d. 626 
+
+## Data availability 627 
+
+Due to patient privacy and ethical regulations, raw clinical and imaging data are not publicly available. 628 De-identified data may be made available upon reasonable request, provided that appropriate institutional 629 and ethical approvals are obtained. 630 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+21 
+
+## Code availability 631 
+
+Upon acceptance of this manuscript, the custom code and the TS-DTB modeling framework will be 632 made open-source and publicly available on GitHub at https://github.com/GuoLab-UESTC. 633 
+
+## Acknowledgments 634 
+
+This work was supported by the Brain Science and Brain-like Intelligence Technology- National Science 635 and Technology Major Project (No. 2022ZD0208500), the Lingang Laboratory (Grant No. LGL-1987), the 636 National Key Research and Development Program of China (No. 2023YFF1204200), and the Sichuan 637 Science and Technology Program (No. 2024NSFJQ0004, 2024NSFTD0032 and DQ202410) .638 
+
+## Author contributions 639 
+
+Y.X., D.Y., and D.G. conceived the study and developed methodological. Y.X., Y.Xu, and Y.C. 640 developed the software and preprocessed the data. R.Z., Y.L., F.W., and X.Z. performed the statistical 641 analysis and curation. D.G., Y.G. and D.Y. provided resources. Y.X. and D.G. wrote the original draft. D.G. 642 and D.Y. acquired funding, supervised the project, and revised the manuscript. All authors reviewed and 643 approved the final version. 644 
+
+## Competing interests 645 
+
+All authors declare no competing interests. 646 
+
+## Reference 647 
+
+1. Guo, S. et al. Ten years of the digital twin brain: Perspectives and challenges. Europhys. Lett. 149 , 47001 648 
+
+(2025). 649 
+
+2. Zhang, T. et al. A new BCI paradigm based on biological brain – digital twin brain dialogue. Cogn. Neurodyn. 650 
+
+20 , 70 (2026). 651 
+
+3. Patow, G., Martin, I., Sanz Perl, Y., Kringelbach, M. L. & Deco, G. Whole-brain modelling: an essential tool 652 
+
+for understanding brain dynamics. Nat. Rev. Methods Primer 4, 53 (2024). 653 
+
+4. Páscoa Dos Santos, F. & Verschure, P. F. M. J. Excitatory-inhibitory homeostasis and bifurcation control in 654 
+
+the Wilson-Cowan model of cortical dynamics. PLOS Comput. Biol. 21 , e1012723 (2025). 655 
+
+5. Breakspear, M. Dynamic models of large-scale brain activity. Nat. Neurosci. 20 , 340–352 (2017). 656 
+
+6. Castaldo, F. et al. Multi-modal and multi-model interrogation of large-scale functional brain networks. 657 
+
+NeuroImage 277 , 120236 (2023). 658 
+
+7. Páscoa Dos Santos, F., Vohryzek, J. & Verschure, P. F. M. J. Multiscale effects of excitatory-inhibitory 659 
+
+homeostasis in lesioned cortical networks: A computational study. PLOS Comput. Biol. 19 , e1011279 (2023). 660 
+
+8. Deco, G. et al. Awakening: Predicting external stimulation to force transitions between different brain states. 661 
+
+Proc. Natl. Acad. Sci. 116 , 18088–18097 (2019). 662 
+
+9. Deco, G. et al. Identification of Optimal Structural Connectivity Using Functional Connectivity and Neural 663 
+
+Modeling. J. Neurosci. 34 , 7910–7916 (2014). 664 
+
+10. Demirtaş, M. et al. Hierarchical Heterogeneity across Human Cortex Shapes Large-Scale Neural Dynamics. 665 
+
+Neuron 101 , 1181-1194.e13 (2019). 666 
+
+11. Kong, X. et al. Sensory-motor cortices shape functional connectivity dynamics in the human brain. Nat. 667 
+
+Commun. 12 , 6373 (2021). 668 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+22 
+
+12. Kringelbach, M. L. & Deco, G. Brain States and Transitions: Insights from Computational Neuroscience. Cell 669 
+
+Rep. 32 , (2020). 670 
+
+13. Takahashi, Y. et al. Digital twin brain simulator for real-time consciousness monitoring and virtual 671 
+
+intervention using primate electrocorticogram data. Npj Digit. Med. 8, 80 (2025). 672 
+
+14. Ranasinghe, K. G. et al. Altered excitatory and inhibitory neuronal subpopulation parameters are distinctly 673 
+
+associated with tau and amyloid in Alzheimer’s disease. eLife 11 , e77850 (2022). 674 
+
+15. Jorge, J., van der Zwaag, W. & Figueiredo, P. EEG–fMRI integration for the study of human brain function. 675 
+
+NeuroImage 102 , 24–34 (2014). 676 
+
+16. Cichy, R. M. & Oliva, A. A M/EEG-fMRI Fusion Primer: Resolving Human Brain Responses in Space and 677 
+
+Time. Neuron 107 , 772–781 (2020). 678 
+
+17. Wirsich, J. et al. The relationship between EEG and fMRI connectomes is reproducible across simultaneous 679 
+
+EEG-fMRI studies from 1.5T to 7T. NeuroImage 231 , 117864 (2021). 680 
+
+18. Herzog, R. et al. Neural mass modeling for the masses: Democratizing access to whole-brain biophysical 681 
+
+modeling with FastDMF. Netw. Neurosci. 8, 1590–1612 (2024). 682 
+
+19. Abeysuriya, R. G. et al. A biophysical model of dynamic balancing of excitation and inhibition in fast 683 
+
+oscillatory large-scale networks. PLOS Comput. Biol. 14 , e1006007 (2018). 684 
+
+20. Antonioni, A., Martorana, A., Santarnecchi, E., Hampel, H. & Koch, G. The neurobiological foundation of 685 
+
+effective repetitive transcranial magnetic brain stimulation in Alzheimer’s disease. Alzheimers Dement. 21 ,686 
+
+e70337 (2025). 687 
+
+21. Hong, R., Zheng, T., Marra, V., Yang, D. & Liu, J. K. Multi-scale modelling of the epileptic brain: advantages 688 
+
+of computational therapy exploration. J. Neural Eng. 21 , 021002 (2024). 689 
+
+22. Glomb, K. et al. Computational Models in Electroencephalography. Brain Topogr. 35 , 142–161 (2022). 690 
+
+23. Zhang, G. et al. Computational exploration of dynamic mechanisms of steady state visual evoked potentials 691 
+
+at the whole brain level. NeuroImage 237 , 118166 (2021). 692 
+
+24. Schirner, M., McIntosh, A. R., Jirsa, V., Deco, G. & Ritter, P. Inferring multi-scale neural mechanisms with 693 
+
+brain network modelling. eLife 7, e28927 (2018). 694 
+
+25. Muldoon, S. F. et al. Stimulation-Based Control of Dynamic Brain Networks. PLOS Comput. Biol. 12 ,695 
+
+e1005076 (2016). 696 
+
+26. Wang, P. et al. Inversion of a large-scale circuit model reveals a cortical hierarchy in the dynamic resting 697 
+
+human brain. Sci. Adv. 5, eaat7854 (2019). 698 
+
+27. Zhang, S. et al. In vivo whole-cortex marker of excitation-inhibition ratio indexes cortical maturation and 699 
+
+cognitive ability in youth. Proc. Natl. Acad. Sci. 121 , e2318641121 (2024). 700 
+
+28. Maliia, M. D. et al. Localization of the epileptogenic network from scalp EEG using a patient-specific whole-701 
+
+brain model. Netw. Neurosci. 9, 18–37 (2025). 702 
+
+29. Friston, K. J., Harrison, L. & Penny, W. Dynamic causal modelling. NeuroImage 19 , 1273–1302 (2003). 703 
+
+30. Wagner, H. H. & Dray, S. Generating spatially constrained null models for irregularly spaced data using M 704 
+
+oran spectral randomization methods. Methods Ecol. Evol. 6, 1169–1178 (2015). 705 
+
+31. Gil Avila, C. et al. Assessing the balance between excitation and inhibition in chronic pain through the 706 
+
+aperiodic component of EEG. eLife 13 , RP101727 (2025). 707 
+
+32. Wiest, C. et al. The aperiodic exponent of subthalamic field potentials reflects excitation/inhibition balance 708 
+
+in Parkinsonism. eLife 12 , e82467 (2023). 709 
+
+33. Pei, Z. et al. EEG-based stratification in Alzheimer’s disease: Cognitive progression, pathological marker 710 
+
+associations, and therapeutic interventions. Clin. Neurophysiol. 182 , 2111440 (2026). 711 
+
+34. Velioglu, H. A. et al. rTMS reduces delta and increases theta oscillations in Alzheimer’s disease: A visual-712 
+
+evoked and event-related potentials study. CNS Neurosci. Ther. 30 , e14564 (2024). 713 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+23 
+
+35. Zhang, M. et al. Decoding alzheimer’s: The role of EEG rhythms and aperiodic components in cognitive 714 
+
+decline. Clin. Neurophysiol. 181 , 2111437 (2026). 715 
+
+36. Li, G. et al. Revealing excitation-inhibition imbalance in Alzheimer’s disease using multiscale neural model 716 
+
+inversion of resting-state functional MRI. Commun. Med. 5, 17 (2025). 717 
+
+37. van Nifterick, A. M. et al. A multiscale brain network model links Alzheimer’s disease-mediated neuronal 718 
+
+hyperactivity to large-scale oscillatory slowing. Alzheimers Res. Ther. 14 , 101 (2022). 719 
+
+38. Duma, G. M. et al. Excitation/Inhibition balance relates to cognitive function and gene expression in temporal 720 
+
+lobe epilepsy: a high density EEG assessment with aperiodic exponent. Brain Commun. 6, fcae231 (2024). 721 
+
+39. Finley, A. J. et al. Resting EEG Periodic and Aperiodic Components Predict Cognitive Decline Over 10 Years. 722 
+
+J. Neurosci. 44 , e1332232024 (2024). 723 
+
+40. Ji, Y. et al. Repetitive transcranial magnetic stimulation in Alzheimer’s disease: effects on neural and synaptic 724 
+
+rehabilitation. Neural Regen. Res. 20 , 326–342 (2025). 725 
+
+41. Velioglu, H. A. et al. RTMS REDUCES DELTA AND INCREASES THETA OSCILLATIONS IN ALZHEIMER ’s DISEASE :726 
+
+A VISUAL ‐EVOKED AND EVENT ‐RELATED POTENTIALS STUDY . CNS Neurosci. Ther. 30 , e14564 (2024). 727 
+
+42. Jannati, A., Oberman, L. M., Rotenberg, A. & Pascual-Leone, A. Assessing the mechanisms of brain plasticity 728 
+
+by transcranial magnetic stimulation. Neuropsychopharmacology 48 , 191–208 (2023). 729 
+
+43. Lenz, M. et al. Repetitive magnetic stimulation induces plasticity of inhibitory synapses. Nat. Commun. 7,730 
+
+10020 (2016). 731 
+
+44. Havlicek, M. et al. Physiologically informed dynamic causal modeling of fMRI data. NeuroImage 122 , 355– 732 
+
+372 (2015). 733 
+
+45. Stephan, K. E., Weiskopf, N., Drysdale, P. M., Robinson, P. A. & Friston, K. J. Comparing hemodynamic 734 
+
+models with DCM. NeuroImage 38 , 387–401 (2007). 735 
+
+46. Gao, R., Peterson, E. J. & Voytek, B. Inferring synaptic excitation/inhibition balance from field potentials. 736 
+
+NeuroImage 158 , 70–78 (2017). 737 
+
+47. Zavaglia, M., Astolfi, L., Babiloni, F. & Ursino, M. A neural mass model for the simulation of cortical activity 738 
+
+estimated from high resolution EEG during cognitive or motor tasks. J. Neurosci. Methods 157 , 317–329 739 
+
+(2006). 740 
+
+48. Ursino, M., Cona, F. & Zavaglia, M. The generation of rhythms within a cortical region: Analysis of a neural 741 
+
+mass model. NeuroImage 52 , 1080–1094 (2010). 742 
+
+49. Chang, J., Yang, Z. & Zhou, C. Simultaneously determining regional heterogeneity and connection 743 
+
+directionality from neural activity and symmetric connection. PLOS Comput. Biol. 21 , e1013612 (2025). 744 
+
+50. Deco, G. et al. Whole-Brain Multimodal Neuroimaging Model Using Serotonin Receptor Maps Explains 745 
+
+Non-linear Functional Effects of LSD. Curr. Biol. 28 , 3065-3074.e6 (2018). 746 
+
+51. Kringelbach, M. L. et al. Dynamic coupling of whole-brain neuronal and neurotransmitter systems. Proc. 747 
+
+Natl. Acad. Sci. 117 , 9566–9576 (2020). 748 
+
+52. Chetty, C. A. et al. EEG biomarkers in Alzheimer’s and prodromal Alzheimer’s: a comprehensive analysis of 749 
+
+spectral and connectivity features. Alzheimers Res. Ther. 16 , 236 (2024). 750 
+
+53. Sanchez-Rodriguez, L. M. et al. Personalized whole-brain neural mass models reveal combined Aβ and tau 751 
+
+hyperexcitable influences in Alzheimer’s disease. Commun. Biol. 7, 528 (2024). 752 
+
+54. Schaefer, A. et al. Local-Global Parcellation of the Human Cerebral Cortex from Intrinsic Functional 753 
+
+Connectivity MRI. Cereb. Cortex 28 , 3095–3114 (2018). 754 
+
+55. Fan, L. et al. The Human Brainnetome Atlas: A New Brain Atlas Based on Connectional Architecture. Cereb. 755 
+
+Cortex 26 , 3508–3526 (2016). 756 
+
+56. Tournier, J.-D. et al. MRtrix3 : A fast, flexible and open software framework for medical image processing 757 
+
+and visualisation. NeuroImage 202 , 116137 (2019). 758 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+24 
+
+57. Yan, C.-G., Wang, X.-D., Zuo, X.-N. & Zang, Y.-F. DPABI: Data Processing & Analysis for (Resting-State) 759 
+
+Brain Imaging. Neuroinformatics 14 , 339–351 (2016). 760 
+
+58. Delorme, A. & Makeig, S. EEGLAB: an open source toolbox for analysis of single-trial EEG dynamics 761 
+
+including independent component analysis. J. Neurosci. Methods 134 , 9–21 (2004). 762 
+
+59. Thielscher, A., Antunes, A. & Saturnino, G. B. Field modeling for transcranial magnetic stimulation: A useful 763 
+
+tool to understand the physiological effects of TMS? in 2015 37th Annual International Conference of the 764 
+
+IEEE Engineering in Medicine and Biology Society (EMBC) 222–225 (2015). 765 
+
+60. Wilson, H. R. & Cowan, J. D. Excitatory and Inhibitory Interactions in Localized Populations of Model 766 
+
+Neurons. Biophys. J. 12 , 1–24 (1972). 767 
+
+61. Friston, K. J., Mechelli, A., Turner, R. & Price, C. J. Nonlinear Responses in fMRI: The Balloon Model, 768 
+
+Volterra Kernels, and Other Hemodynamics. NeuroImage 12 , 466–477 (2000). 769 
+
+62. Vos de Wael, R. et al. BrainSpace: a toolbox for the analysis of macroscale gradients in neuroimaging and 770 
+
+connectomics datasets. Commun. Biol. 3, 103 (2020). 771 
+
+63. Gong, Z.-Q. & Zuo, X.-N. Connectivity gradients in spontaneous brain activity at multiple frequency bands. 772 
+
+Cereb. Cortex 33 , 9718–9728 (2023). 773 
+
+64. Lubba, C. H. et al. catch22: CAnonical Time-series CHaracteristics: Selected through highly comparative 774 
+
+time-series analysis. Data Min. Knowl. Discov. 33 , 1821–1852 (2019). 775 
+
+65. Donoghue, T. Parameterizing neural power spectra into periodic and aperiodic components. Nat. Neurosci. 776 
+
+23 , (2020). 777 
+
+66. Wildie, M. & Shanahan, M. Metastability and chimera states in modular delay and pulse-coupled oscillator 778 
+
+networks. Chaos Interdiscip. J. Nonlinear Sci. 22 , 043131 (2012). 779 
+
+67. Poulsen, A. T., Pedroni, A., Langer, N. & Hansen, L. K. Microstate EEGlab toolbox: An introductory guide. 780 
+
+Preprint at https://doi.org/10.1101/289850 (2018). 781 
+
+782 
+
+783 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+25 
+
+## Supplementary information 784 
+
+785 
+
+Fig. S1. Comparative analysis of homogeneous and heterogeneous models. (a) EEG microstate metrics (global 786 
+
+explained variance and transition probability correlation). (b) Microstate duration fitting results. (c) Alignment of 787 
+
+parameter space topology with empirical hierarchy in the TS-DTB models (orange) versus the null models (blue). 788 
+
+(d) Parameter contribution analysis for the E-I ratio, including relative weights, sensitivity, and Shapley values. 789 
+
+(e) Three-dimensional individualized parameter landscapes and group-level brain topographies for 𝑐 "! , 𝐼𝑏 and 𝜎 790 
+
+under gradient priors. (f) Time constant distributions and linear fits for all models. (g-i) Regional distributions of 791 
+
+the E-I ratio for all individuals under the three modeling schemes. 792 
+
+793 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+26 794 
+
+Fig. S2. Cross-dataset stability of the TS-DTB in the MCI cohort. (a) Optimization performance (loss and REs) 795 
+
+across parameterization schemes and groups. (b) Channel-averaged PSD for empirical data, homogeneous (Ho), 796 
+
+and heterogeneous (He TS-DTB ) models. (c) Feature-wise REs for EEG temporal, spectral, and microstate properties. 797 
+
+798 
+
+.CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint 27 799 
+
+Fig. S3. Cross-cohort mechanistic results and parameter contrasts. (a) Distributions and linear fits of time 800 
+
+constants in HC and MCI participants. (b) Microstate duration and coverage metrics for empirical and simulated 801 
+
+EEG. (c) Effect sizes for alpha peak frequencies and 1/f aperiodic exponents. (d) Cohen’s d maps of spectral 802 
+
+energy alterations across frequency bands. (e) Spatial correspondence between residual aperiodic exponents (low: 803 
+
+𝛿 to 𝛼 band) effects and local E-I balance. 804 
+
+805 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+28 
+
+806 
+
+Fig. S4. Results of rTMS regulation studies in the AD cohort. (a) The scaled eigenvalues as the function with 807 
+
+the components number of gradient (blue represents HC, orange represents AD). (b) Topographic Cohen's d maps 808 
+
+of PSD energy changes post-rTMS for empirical data (top) and model simulations (bottom). (c) Scatter plots 809 
+
+correlating changes in model parameters (∆ 𝑐 !! , ∆𝑐 "! , ∆𝐼𝑏 and ∆𝜎 ) with firing rate restoration. Points are colored 810 
+
+by functional gradient values (blue indicates low gradient, and red indicates high gradient). 811 
+
+812 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+29 
+
+Parameter sets and feature sets of the loss function 813 
+
+The detailed configuration of the model optimization and the comprehensive feature sets employed to 814 evaluate model performance are shown in Tables S1-S4. To ensure biological plausibility and computational 815 tractability, we defined specific search ranges and prior distributions for the key biophysical parameters 816 governing local circuit dynamics (Table S1). Furthermore, the loss function used to constrain the model was 817 constructed from a diverse array of spectral-temporal signatures. These include the catch22 time-series 818 feature set, which captures linear and non-linear temporal properties (Table S2), a spectral feature set 819 characterizing the power spectral density (PSD) morphology, including periodic and aperiodic components 820 (Table S3), and a set of microstate features quantifying the spatiotemporal syntax of large-scale brain 821 networks (Table S4). 822 
+
+Table S1. Parameter descriptions for Bayesian optimization 60 
+
+823 
+
+Parameter Symbol Prior Nominal 
+
+Excitatory time constant 𝜏 ! U (1, 50) 8 ms 
+
+Ratio factor of the inhibitory time constant 𝑟 K& U (0.5, 3) 8 ms ( 𝜏 ()
+
+Global coupling strength 𝐺 # U (0.5, 1.5) 1.0 
+
+Inhibitory to excitatory synaptic strength 𝑐 (! U (3, 36) 12 
+
+Background input to populations 𝐼𝑏 U (0, 3) 1.15 
+
+Standard deviation of Gaussian noise 𝜎 U (-4, -1) 0.1 
+
+Linear coefficients of 𝑐 (! 𝑎 ) 
+
+> F&'
+
+U (-20, 20) 
+
+Linear coefficients of 𝑐 (! 𝑏 ) 
+
+> F&'
+
+U (-20, 20) 
+
+Linear coefficients of 𝑐 (! 𝑐 ) 
+
+> F&'
+
+U (3, 30) 
+
+Linear coefficients of 𝐼𝑏 𝑎 ) 
+
+> (L
+
+U (-20, 20) 
+
+Linear coefficients of 𝐼𝑏 𝑏 ) 
+
+> (L
+
+U (-20, 20) 
+
+Linear coefficients of 𝐼𝑏 𝑐 ) 
+
+> (L
+
+U (0, 2) 
+
+Linear coefficients of 𝜎 𝑎 ) 
+
+> M
+
+U (-5, 5) 
+
+Linear coefficients of 𝜎 𝑏 ) 
+
+> M
+
+U (-5, 5) 
+
+Linear coefficients of 𝜎 𝑐 ) 
+
+> M
+
+U (-3, -2) 
+
+Linear coefficients of 𝑐 !! 𝑎 ) 
+
+> F''
+
+U (-20, 20) 
+
+Linear coefficients of 𝑐 !! 𝑏 ) 
+
+> F''
+
+U (-20, 20) 
+
+Linear coefficients of 𝑐 !! 𝑐 ) 
+
+> F''
+
+U (1, 48) 
+
+824 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+30 
+
+Table S2. The overview of the catch22 temporal feature sets 64 
+
+825 
+
+Feature short name Category Description 
+
+1 mode_5 Distribution shape 5-bin histogram mode 
+
+2 mode_10 Distribution shape 10-bin histogram mode 
+
+3 outlier_timing_pos Extreme event timing Positive outlier timing 
+
+4 outlier_timing_neg Extreme event timing Negative outlier timing 
+
+5 acf_timescale Linear autocorrelation First 1/𝑒 crossing of the ACF 
+
+6 acf_first_min Linear autocorrelation First minimum of the ACF 
+
+7 low_freq_power Linear autocorrelation Power in lowest 20% frequencies 
+
+8 centroid_freq Linear autocorrelation Centroid frequency 
+
+9 forecast_error Simple forecasting Error of 3-point rolling mean forecast 
+
+10 whiten_timescale Incremental differences Change in autocorrelation timescale after incremental differencing 
+
+11 high_fluctuation Incremental differences Proportion of high incremental changes in the series 
+
+12 stretch_high Symbolic Longest stretch of above-mean values 
+
+13 stretch_decreasing Symbolic Longest stretch of decreasing values 
+
+14 entropy_pairs Symbolic Entropy of successive pairs in symbolized series 
+
+15 ami2 Nonlinear autocorrelation Histogram-based automutual information (lag 2, 5 bins) 
+
+16 trev Nonlinear autocorrelation Time reversibility 
+
+17 ami_timescale Linear autocorrelation structure First minimum of the AMI function 
+
+18 transition_variance Symbolic Transition matrix column variance 
+
+19 periodicity Linear autocorrelation structure Wang's periodicity metric 
+
+20 embedding_dist Other Goodness of exponential fit to embedding distance distribution 
+
+21 rs_range Self-affine scaling Rescaled range fluctuation analysis (low-scale scaling) 
+
+22 dfa Self-affine scaling Detrended fluctuation analysis (low-scale scaling) 
+
+826 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+31 
+
+Table S3. The overview of spectrum feature sets 65 
+
+827 
+
+Feature short name Category Description 
+
+1 PSD_Pearson Broadband similarity Pearson correlation between empirical and simulated PSD 
+
+2 PSD_MeanAbs Broadband deviation Mean absolute deviation between empirical and simulated PSD 
+
+3 PSD_exponent Aperiodic component Exponent of the aperiodic 1/𝑓 derived from spectral parameterization 
+
+4 PSD_offset Aperiodic component Vertical offset of the aperiodic 1/𝑓 derived from spectral parameterization 
+
+5 PSD_peakFreq Oscillatory peak Center frequency of the dominant oscillatory peak 
+
+6 PSD_peakPower Oscillatory peak Absolute power at the dominant peak frequency 
+
+7 PSD_peakRatio Oscillatory peak Ratio of peak power to aperiodic background power 
+
+8 PSD_peakWidth Oscillatory peak Full width at half maximum (FWHM) of the dominant peak 
+
+9 PSD_peakHeight Oscillatory peak Prominence of the dominant peak 
+
+10 PSD_peakQ Oscillatory peak Peak quality factor ( 𝑓 @#&) /𝑝𝑒𝑎𝑘 N*AG O)
+
+11 PSD_peakEnergy Oscillatory peak Integrated spectral energy within the peak-centered window (±1 Hz) 
+
+12 PSD_deltaEnergy Band-limited energy Spectral energy in the delta band (0.5–4 Hz) 
+
+13 PSD_thetaEnergy Band-limited energy Spectral energy in the theta band (4–8 Hz) 
+
+14 PSD_alphaEnergy Band-limited energy Spectral energy in the alpha band (8–13 Hz) 
+
+15 PSD_betaEnergy Band-limited energy Spectral energy in the beta band (13–30 Hz) 
+
+16 PSD_gamaEnergy Band-limited energy Spectral energy in the gamma band (30–45 Hz) 
+
+828 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+32 
+
+Table S4. The overview of EEG microstate feature sets 67 
+
+829 
+
+Feature short name Category Description 
+
+1 MS_TPM Temporal dynamics Transition probabilities between microstate classes 
+
+2 MS_Coverage Temporal stability Proportion of total time spent in each class 
+
+3 MS_Occurrence Temporal dynamics Number of state entries per second 
+
+4 MS_Duration Temporal stability Mean duration of each state segment 
+
+5 MS_GEV Explanatory power Variance of EEG topographies explained by each class 
+
+6 MS_MspatCor Spatial similarity Spatial correlation between templates and assigned maps 
+
+830 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+33 
+
+Table S5. Demographic and clinical profile of healthy controls in the AD cohort 831 
+
+ID Gender Age Education MMSE HAMA HAMD 
+
+1 femal 50 12 28 3 2
+
+2 femal 50 6 29 4 1
+
+3 femal 52 9 30 0 0
+
+4 femal 56 16 30 0 0
+
+5 femal 56 9 29 0 0
+
+6 male 61 15 29 0 0
+
+7 femal 56 0 27 12 11 
+
+8 femal 62 15 30 5 0
+
+9 femal 56 15 30 2 1
+
+10 femal 63 9 30 4 4
+
+11 femal 67 9 28 8 4
+
+12 femal 57 12 28 4 6
+
+13 femal 53 9 30 2 0
+
+14 male 50 15 30 2 0
+
+2/12(Male/Female) 56.36±5.29 10.79 ±4.44 29.14 ±1.03 3.29 ±3.41 2.07 ±3.22 
+
+832 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+34 
+
+Table S6. Demographic and clinical profile of AD in the AD cohort 833 
+
+ID Gender Age Education MOC 
+
+A
+
+MMSE HAMA HAMD Years of illness 
+
+1 female 46 16 30 29 7 4 2
+
+2 female 65 0 10 19 2 2 0.8 
+
+3 female 64 12 22 26 4 8 1
+
+4 male 73 20 16 27 5 6 1
+
+5 female 66 12 17 25 10 10 2
+
+6 male 68 12 23 26 11 9 2
+
+7 female 73 12 26 30 10 14 2
+
+8 female 50 9 23 30 21 18 1
+
+9 female 57 9 23 29 9 9 2.5 
+
+10 female 71 0 10 17 10 14 3
+
+11 female 71 6 18 25 3 7 4
+
+12 female 67 6 18 25 6 2 2
+
+13 female 83 6 7 13 7 7 2
+
+14 female 53 20 27 29 4 7 1
+
+15 female 75 9 12 17 4 3 3.5 
+
+16 male 65 9 13 24 0 2 1
+
+17 female 67 0 25 21 11 8 0.5 
+
+3/14 (Male/Female) 
+
+65.53± 9.46 
+
+9.88 ±
+
+5.80 
+
+18.8 ±
+
+6.77 
+
+24.24 ±
+
+5.12 
+
+7.29 ±
+
+4.87 
+
+7.65 ±
+
+4.55 
+
+1.84 ±
+
+0.99 
+
+834 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+35 
+
+Table S7. Demographic and clinical profile of healthy controls in the MCI cohort 835 
+
+ID Gender Age Education MoCA-B ADAS-cog 
+
+1 Female 65 13 29 7.333 
+
+2 Female 59 17 28 4.330 
+
+3 Female 57 12 24 4.667 
+
+4 Male 69 7 23 8.300 
+
+5 Female 67 9 28 11.300 
+
+6 Male 63 15 27 4.000 
+
+7 Female 59 14 27 5.667 
+
+8 Male 60 13 25 3.667 
+
+9 Female 70 12 26 6.333 
+
+10 Female 70 18 29 2.333 
+
+11 Female 51 15 28 2.333 
+
+12 Female 63 18 28 1.667 
+
+13 Female 69 13 28 4.333 
+
+14 Female 64 16 28 6.667 
+
+15 Female 58 14 26 6.000 
+
+16 Male 58 10 25 5.333 
+
+4/12(Male/Female) 62.63±5.54 13.50±3.10 26.81±1.80 5.27±2.45 
+
+836 
+
+> .CC-BY-NC-ND 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717365 doi: bioRxiv preprint
+
+36 
+
+Table S8. Demographic and clinical profile of MCI in the MCI cohort 837 
+
+ID Gender Age Education MoCA-B ADAS-cog ADAS-10 
+
+1 Female 59 12 26 8.000 5.333 
+
+2 Male 68 15 21 7.367 2.700 
+
+3 Female 58 7 21 13.333 4.667 
+
+4 Male 65 12 23 7.333 4.333 
+
+5 Female 70 11 25 12.333 5.000 
+
+6 Female 70 13 27 12.000 5.000 
+
+7 Female 68 7 22 13.667 4.333 
+
+8 Male 66 12 18 12.000 6.667 
+
+9 Male 54 15 24 7.333 4.667 
+
+10 Female 62 16 25 8.333 4.333 
+
+11 Female 59 9 20 11.000 2.667 
+
+12 Female 65 15 21 20.667 5.000 
+
+13 Male 71 12 25 9.333 4.000 
+
+14 Male 69 15 22 6.000 5.333 
+
+15 Male 67 9 25 11.667 3.667 
+
+7/8(Male/Female) 64.73±5.18 12.00±2.95 23.00±2.54 10.69±3.71 4.51±1.02 
+
+838

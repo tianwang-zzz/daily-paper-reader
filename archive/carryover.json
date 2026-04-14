@@ -1,6 +1,17 @@
 {
-  "generated_at": "2026-03-06T19:11:18.471356+00:00",
-  "updated_date": "20260306",
+  "generated_at": "2026-04-14T20:02:09.330494+00:00",
+  "updated_date": "20260414",
   "carryover_days": 9,
-  "items": []
+  "tag_states": {
+    "EEG ER": {
+      "updated_date": "20260414",
+      "carryover_days": 9,
+      "items": []
+    },
+    "MCI AD": {
+      "updated_date": "20260414",
+      "carryover_days": 9,
+      "items": []
+    }
+  }
 }

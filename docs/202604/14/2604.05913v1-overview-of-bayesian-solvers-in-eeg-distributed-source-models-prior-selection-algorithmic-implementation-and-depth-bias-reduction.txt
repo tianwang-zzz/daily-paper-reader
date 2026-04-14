@@ -1,0 +1,2208 @@
+Title: Overview of Bayesian Solvers in EEG Distributed Source Models: Prior Selection, Algorithmic Implementation, and Depth Bias Reduction
+
+URL Source: https://arxiv.org/pdf/2604.05913v1
+
+Published Time: Wed, 08 Apr 2026 01:21:42 GMT
+
+Number of Pages: 47
+
+Markdown Content:
+# Overview of Bayesian Solvers in EEG Distributed Source Models: Prior Selection, Algorithmic Implementation, and Depth Bias Reduction 
+
+## Joonas Lahtinen, 1∗ Alexandra Koulouri, 2
+
+> 1
+
+Faculty of Information Technology and Communication Sciences, Tampere University, 33720 Tampere, Finland 
+
+> 2
+
+Institute for Mathematical Innovation, University of Bath, Bath BA2 7AY, United Kingdom 
+
+> ∗
+
+Correspondence: joonas.j.lahtinen@tuni.fi 
+
+## April 8, 2026 
+
+Abstract: Electroencephalography (EEG) source imaging aims to reconstruct the spatial distribution of neural activity within the brain from non-invasive scalp measurements. This inverse problem is severely ill-posed due to the low spatial resolution of EEG and the presence of measurement noise, necessitating robust regularization techniques. Bayesian approaches provide a principled framework for incorporating prior knowledge into the solution, where regularization naturally arises through prior distributions and their associated hyperparame-ters. In this work, we provide an overview of key Bayesian methods for EEG source imaging based on Gaussian, Laplace, and group Laplace priors, with particular emphasis on hierarchical models that promote sparsity. We analyse the connections between these hierarchical for-mulations and classical optimization techniques, and provide an analytical description of their implementation using expectation–maximization and alternating optimization algorithms. To address the issue of depth bias—where deeper sources are systematically underestimated or mislocalized—we extend a statistical signal-to-noise ratio (SNR) framework to derive depth-weighted priors that account for differences in how strongly sources at different depths 1
+
+> arXiv:2604.05913v1 [math.NA] 7 Apr 2026
+
+2 1 INTRODUCTION 
+
+are reflected in the measurements. Finally, we illustrate the behaviour of the considered models through simulation studies involving sources at varying depths. The results highlight the impact of prior selection and depth weighting on reconstruction accuracy and demonstrate the importance of informed model design for depth-sensitive EEG source localization. 
+
+Keywords: Maximum a posteriori, expectation maximization, alternating optimization, focal sources, depth bias, sensitivity weighting, Laplace prior, Gaussian Prior, Group Prior, Hierarchical models, Sparsity prior, EEG algorithms 
+
+# 1 Introduction 
+
+Electroencephalography (EEG) is a non-invasive neuroimaging technique that measures the brain’s elec-trical activity with high temporal resolution (Nunez & Srinivasan, 2006). Despite its advantages, EEG suffers from low spatial resolution and high sensitivity to noise, making the reconstruction of brain source activity from EEG recordings an ill-posed inverse problem (J. Kaipio & Somersalo, 2007; Natterer, 2001). This ill-posedness means that many different source configurations can explain the observed measure-ments, requiring robust inversion techniques to obtain a stable and meaningful solution. The first step in solving this inverse problem is to formulate the EEG forward model in either a continuous or a discrete setting. While analytic solutions are feasible in simplified geometries (e.g., spherical conduc-tivity models), realistic source localization requires modeling the true geometry (Vanrumste et al., 2002; Vatta et al., 2010) and conductivity of the head (Antonakakis et al., 2019). This is often achieved using the finite element method (FEM), which allows for anatomically accurate, subject-specific models de-rived from MRI scans and accommodates complex properties such as anisotropic conductivity. Although FEM modeling is computationally intensive (Miinalainen et al., 2019), it has been shown to significantly improve localization accuracy—by as much as 0.5 cm compared to spherical models (Vanrumste et al., 2002)—highlighting the importance of accurate forward models in achieving reliable source estimates. In the FEM framework, the brain volume is discretized into small polyhedral elements, and often each element node is associated with a source basis function whose coefficient reflects the amplitude and possibly orientation of neural activity at that location. This formulation is often referred to as distributed source modeling (Michel et al., 2004). The inverse problem then becomes estimating these coefficients from the observed EEG data, for example in (Calvetti & Somersalo, 2007b; Dale & Sereno, 1993; K. Friston et al., 2008; Gorodnitsky et al., 1995; Gramfort et al., 2014; M. S. Hämäläinen & Ilmoniemi, 1994; Liang et al., 2023; Ou et al., 2008; Uutela et al., 1999; Wipf & Nagarajan, 2010). Because the problem 3is underdetermined and susceptible to measurement noise, different regularization strategies, including sparsity or smoothness constraints, are employed to ensure stable estimates(Darbas & Lohrengel, 2018; Ghosh & Rudy, 2009). In particular, a promising framework for addressing these challenges is the Bayesian approaches (J. P. Kaipio & Somersalo, 2004), which integrate prior knowledge about sources and noise directly into the inversion process. One of the key advantages is that regularization, often introduced as an explicit penalty term in classical optimization, arises naturally through the specification of prior distributions and their associated parameters, e.g., prior variances, (Heinz Werner Engl, 1996; J. P. Kaipio & Somersalo, 2004). These parameters, often called hyperparameters, which act as regularization coefficients, can be estimated directly from the data via simple statistical inference methods such as Markov Chain Monte Carlo (MCMC) (J. P. Kaipio & Somersalo, 2004; Lucka, 2016) . As a result, there is no need to rely on heuristic or deterministic techniques—such as L-curves (Hansen, 1998)—for tuning regularization parameters. Several studies have addressed the time-invariant EEG source imaging problem from the Bayesian perspective (Calvetti et al., 2009; K. J. Friston et al., 2008; M. Hämäläinen et al., 1993; J. P. Kaipio & Somersalo, 2004; Koulouri, 2015; Lahtinen et al., 2022; Sato et al., 2004; Uutela et al., 1999; Wipf & Nagarajan, 2009), particularly in the context of distributed source models (Michel et al., 2004) 
+
+> 1
+
+. These methods aim to impose informative priors that better reflect underlying neural activity while providing robustness to measurement noise and modeling uncertainties. In this work, we revisit a core set of Bayesian approaches for solving the EEG inverse problem, with particular emphasis on the algorithmic implementations to reconstruct focal brain activity. Furthermore, we focus on the well-known depth bias challenge (Badia & Duong, 1998), a systematic error in EEG source imaging, wherein neural sources located closer to the scalp (i.e., superficial regions) are more likely to be detected and reconstructed with higher accuracy than those located deeper within the brain, such as in subcortical or medial regions. To reduce this bias, several studies have introduced sensitivity weighting schemes that modify the prior covariance structure or regularization terms to enhance depth sensitivity. Notable contributions include (Buchner et al., 1997; Fuchs et al., 1999; Gramfort et al., 2014; Köhler et al., 1996; Palmero-Soler et al., 2007; Pascual-Marqui, n.d.; Pascual-Marqui et al., 1994; Wagner et al., 2000), each offering different strategies to balance source visibility across depths. In our current review, we build upon the statistical framework for automatic sensitivity weighting proposed by Calvetti, Pascarella, et al. (2019a). We extend this framework to a variety of Bayesian prior models and evaluate their effect on localization accuracy through simulation studies, with a focus on reconstructing sources at varying depths. 
+
+> 1Other Bayesian approaches not covered in this review include parametric models based on non-linear dipole fitting (Sorrentino et al., 2014), Bayesian model evidence methods (Mattout et al., 2006), and time-varying frameworks (Bekhti et al., 2018; Gramfort et al., 2012) to name but a few.
+
+4 2 BAYESIAN INFERENCE IN EEG SOURCE IMAGING 
+
+While numerous studies have independently proposed various Bayesian methods for EEG source imaging, the literature remains fragmented, with many algorithms presented in isolation and under different mod-eling assumptions. This work aims to consolidate a coherent overview of major Bayesian approaches— particularly for distributed source models—and to offer practical insights into their implementation. First, we provide a comprehensive overview of EEG source imaging from a Bayesian perspective, focusing on models that incorporate Gaussian, Laplace, and group Laplace priors. We also consider hierarchical formulations that promote sparsity and structured sparsity in the source estimates and detail their al-gorithmic implementations. Second, we elaborate on how prior variances—and the parameters of their associated hyperpriors—can be systematically derived from the signal-to-noise ratio (SNR), by extending the statistical framework introduced by Calvetti et al. (Calvetti, Pascarella, et al., 2019a). This approach eliminates the need for manual tuning of regularization parameters, helping to mitigate the well-known depth bias problem in source localization. Finally, we present analytical formulations of the optimization procedures associated with each prior type and evaluate their performance through simulation studies. These experiments highlight the impact of model choice on localization accuracy, depth sensitivity, and spatial focality, providing practical guidance for method selection. 
+
+# 2 Bayesian Inference in EEG source imaging 
+
+In the Bayesian framework, all the variables are random, and estimating the unknown vector x is inter-preted as a probabilistic inference problem. The observed data, denoted by y is linked to the unknowns through the likelihood p(y | x), while prior information about x is encoded through a prior distribution 
+
+p(x). The goal is to compute the posterior distribution p(x | y), which combines these two sources of information. The first step is to define a numerical tractable observation model and thus to derive the likelihood function. In practice, for the EEG source imaging problem, the domain is discretized, and following the distributed source modelling(Baillet et al., 2001; Nunez & Srinivasan, 2006), a linear mapping that connects dipole sources with observations is obtained, i.e. 
+
+y = Lx + ξ, (1) where y ∈ Rm are the measured electrical potentials on the scalp at a certain time point, L ∈ Rm×dn is the lead field matrix, and x are the coefficients of n dipole sources with degree of freedom of the dipole orientation d (e.g., d = 2 if radial and tangential sources with respect to the gray matter). Therefore, 5we can write x ∈ Rdn into n blocks of size d as: 
+
+x =
+
+[
+
+x⊤ 
+
+> 1
+
+· · · x⊤
+
+> n
+
+]⊤
+
+, xk ∈ Rd for k = 1 , . . . , n 
+
+and ξ ∈ Rm is the additive measurement noise. If the noise follows a known distribution pnoise , we can write the likelihood as: 
+
+p(y | x) = 
+
+∫
+
+> Rm
+
+p(y | x, ξ) pnoise (ξ | x) d ξ. (2) Given x and ξ, the conditional likelihood is a Dirac delta function: 
+
+p(y | x, ξ) = δ(y − Lx − ξ),
+
+leading to a simplified likelihood, determined by the distribution of the noise: 
+
+p(y | x) = pnoise (y − Lx | x).
+
+In this problem, the additive noise ξ is modeled as Gaussian, i.e. is ξ ∼ N (ξ∗, Γξ), where ξ∗ ∈ Rm
+
+is the mean and Γξ ∈ Rm×m is the measurement noise covariance matrix. Therefore, the likelihood is Gaussian given by 
+
+p(y | x) ∝ exp 
+
+(
+
+−12(y − Lx − ξ∗)⊤Γ−1 
+
+> ξ
+
+(y − Lx − ξ∗)
+
+)
+
+. (3) The posterior distribution is then obtained via Bayes’ theorem: 
+
+p(x | y) = p(y | x) p(x)
+
+p(y) ,
+
+Since p(y = yob ) for a given set of measurements yob ∈ Rm, it is often omitted, yielding: 
+
+p(x | y) ∝ p(y | x) p(x).
+
+In practice, the full posterior is often intractable or difficult to visualize, so we resort to point estimates. In our analysis, we will employ the Maximum a posteriori (MAP) given by 
+
+ˆx = arg max 
+
+> x∈Rdn
+
+p(x | y). (4) 6 2 BAYESIAN INFERENCE IN EEG SOURCE IMAGING 
+
+Based on the Gaussian likelihood and Bayes’ theorem, we have 
+
+ˆx = arg min 
+
+> x∈Rdn
+
+{12(y − Lx − ξ∗)⊤Γ−1 
+
+> ξ
+
+(y − Lx − ξ∗) − log( p(x)) }
+
+}
+
+(5) As we will see later, when the prior includes unknown parameters γ, known as hyperparameters , we can model them as random variables with a distribution p(γ), called the hyperprior . This leads to a hierarchical Bayesian model where both x and γ are inferred from the data. 
+
+## 2.1 Bayesian formulation of standard EEG source imaging 
+
+The most common source modelling approach considers smooth sources represented by a zero-mean Gaussian distribution with isotropic covariance. Specifically, x ∼ N (0 , γI dn ), with the corresponding prior density given by 
+
+p(x | γ) ∝ exp 
+
+(
+
+− 12γ ∥x∥22
+
+)
+
+, (6) where γ is a constant prior variance controlling the energy of the dipole sources. Here ∥x∥22 = ∑dn k=1 x2
+
+> k
+
+denotes the ℓ2 norm. From (5) and p(x) Gaussian, the MAP estimate is 
+
+ˆx = LT (LL T + γ−1Γξ
+
+)−1 (y − ξ∗). (7) This is equivalent to Tikhonov regularization (Tikhonov, 1963), which is known as Minimum Norm Estimate (MNE) (Dale & Sereno, 1993; M. Hämäläinen & Ilmoniemi, 1994). Another common prior, promoting sparsity (i.e., only a few active sources), is the Laplace prior, given by 
+
+Lap( x | μ, γ) = 
+
+> dn
+
+∏
+
+> k=1
+
+γk
+
+2 exp ( −γk |μi − xi|) , (8) where often the mean parameter μ is a zero vector and the scaling parameters γk are equal to each other. For μ = 0 and scaling parameter γ, the MAP estimate (5) becomes 
+
+ˆx = arg min 
+
+> x∈Rdn
+
+{(y − Lx − ξ∗)⊤Γ−1 
+
+> ξ
+
+(y − Lx − ξ∗) + γ ∥x∥1
+
+} , (9) 2.2 Hierarchical Bayesian methods for EEG source imaging 7where ∥x∥1 = ∑dn k=1 |xk| is ℓ1 norm. This is the well-known Minimum Current Estimate (MCE) (Uutela et al., 1999). 
+
+## 2.2 Hierarchical Bayesian methods for EEG source imaging 
+
+In the Bayesian inference process, where hyperpriors such as Gamma or inverse-Gamma distributions are employed, sparsity-promoting effects similar to those achieved by ℓ1 norm-based regularization in classical frameworks can be achieved. In particular, by placing hyperpriors on parameters that control the variance or precision of the primary variables (e.g., source amplitudes), the model gains the flexibility to adaptively shrink irrelevant components toward zero while retaining significant ones. This adaptive shrinkage arises naturally in this hierarchical framework. Currently, several hierarchical Bayesian methods have been proposed for source localization (add reference here). The advantage of these types of hyperpriors is the increased focality of the estimation compared to the methods with fixed parametrization (Calvetti et al., 2020; Rezaei et al. , 2021). In this framework, the prior modelling becomes 
+
+x ∼ p(x | γ) (Prior) 
+
+γ ∼ p(γ) (Hyperprior) The Bayesian inference is 
+
+p(x, γ | y) ∝ p(y | x)p(x | γ)p(γ) (10) and the standard MAP estimate is 
+
+(xMAP , γMAP ) = arg max 
+
+> x,γ
+
+{log p(y | x) + log p(x | γ) + log p(γ)} (11) Two main strategies to obtain MAP estimates have been proposed: the Iterative Alternating Sequential (IAS) or Expectation Maximization. In IAS (Calvetti & Somersalo, 2007a), they solve iteratively 
+
+x(t+1) = arg max 
+
+> x∈Rdn
+
+{log p(y | x) + log p (x | γ(t))} (12) 
+
+γ(t+1) = arg max 
+
+> γ>0
+
+{log p (x(t+1) | γ) + log p(γ)} (13) In Expectation-Maximization (EM) algorithm (Caron & Doucet, 2008; Figueiredo, 2003), we alternate 8 2 BAYESIAN INFERENCE IN EEG SOURCE IMAGING 
+
+between optimization of the lower bound of the log-posterior (E-step) and maximization of the said lower bound with respect to the model parameters (M-step). In practice, this means that in the E-step, we define the objective function: 
+
+Q(x; ¯ γ) = log p(y | x) + Eγ|ˆx [log p(x | γ)] , (14) and in the M-step, we solve the following optimization problem 
+
+ˆx = arg max 
+
+> x∈Rdn
+
+Q(x; ¯ γ). (15) The hyperparameters are updated implicitly inside the expectation in Equation (14). 
+
+2.2.1 Conditionally Gaussian with gamma or inverse gamma hyperprior distributions 
+
+The method proposed by Calvetti et al. is based on a conditionally Gaussian (CG) model, where the hyperparameters, the Gaussian prior variances, are either set to be gamma (Ga) or inverse gamma (IG) distributed (Calvetti et al., 2009). As described in the publication, both of the distributions of the hyperpriors fall under the generalized gamma distribution (add reference here). Hence, 
+
+x ∼ N (0 , γ) (Prior) 
+
+γ ∼ GenGamma( γ; α, β, s ) (Hyperprior) where 
+
+GenGamma( γ; α, β, s ) ∝ exp 
+
+(
+
+−
+
+> n
+
+∑
+
+> k=1
+
+γsk
+
+βs + ( sα − 1) 
+
+> n
+
+∑
+
+> k=1
+
+log γk
+
+)
+
+, (16) where α > 0 is the scaling parameter and β > 0 is the shape parameter . The gamma distribution follows from the selection s = 1 and inverse gamma by setting s = −1. Here, we consider one γk > 0 to be associated with d-dimensional dipole xk ∈ Rd for each k = 1 , · · · , n .2.2 Hierarchical Bayesian methods for EEG source imaging 9The posterior distribution with the generalized gamma hyperprior reads: 
+
+p(x, γ | y) ∝ p(y | x) · p(x | γ) · p(γ)= N (y | Lx, Γξ) ·
+
+> n
+
+∏
+
+> k=1
+
+N (xk | 0, γ kId) ·
+
+> n
+
+∏
+
+> k=1
+
+GenGamma( γk | α, β, s )
+
+∝ exp 
+
+(
+
+− 12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) −
+
+> n
+
+∑
+
+> k=1
+
+∥xk∥2
+
+2γk
+
+−
+
+> n
+
+∑
+
+> k=1
+
+γsk
+
+βs +
+
+(
+
+sα − d + 2 2
+
+) n∑
+
+> k=1
+
+log γk
+
+)
+
+.
+
+(17) where the measurement noise is assumed zero-mean Gaussian; ξ ∼ N (0, Γξ).
+
+Optimizations using IAS: 
+
+With IAS, we perform iterative MAP estimation by alternating between updates for x and γ.• Step 1: Optimize x for fixed γ:
+
+x∗ = arg min 
+
+> x∈Rdn
+
+{12 (y − Lx)⊤ Γ−1 
+
+> ξ
+
+(y − Lx) + 12x⊤Γ−1 
+
+> x
+
+x
+
+}
+
+,
+
+where Γx = diag( γ1Id, . . . , γ nId) ∈ Rnd ×nd .• Step 2: Optimize γ for fixed x:We optimize each γk separately. Since, log p(γk | xk) ∝ − ∥xk ∥2 
+
+> 2γk
+
+− γsk 
+
+> βs
+
++ (sα − d+2 2
+
+) log γk. by taking the derivative w.r.t. γk and setting to zero we have 
+
+∥xk∥2
+
+2γ2
+
+> k
+
+− sγ s−1
+
+> k
+
+βs + sα − d+2 2
+
+γk
+
+= 0 .
+
+This is a nonlinear equation with respect to γk, which can be solved numerically (e.g., Newton-Raphson or bisection). In the following algorithm, we also show special cases for the hyperprior. 10 2 BAYESIAN INFERENCE IN EEG SOURCE IMAGING 
+
+Algorithm 1: Alternating Optimization for Posterior with Generalized Gamma Hyperprior  
+
+> 1:
+
+Input: Data y, forward model L, noise covariance Γξ, hyperparameters α, β, s ∈ [−1, 1]  
+
+> 2:
+
+Initialize: ˆx(0) , set t ← 0 
+
+> 3:
+
+Initialize γ(0)  
+
+> k
+
+> 0 for all k = 1 , . . . , n (e.g., γ(0)  
+
+> k
+
+= 1 ) 
+
+> 4:
+
+repeat  
+
+> 5:
+
+Update x(t+1) by solving:  
+
+> 6:
+
+x(t+1) = (L⊤Γ−1 
+
+> ξ
+
+L + Γ −1
+
+> x
+
+)−1 L⊤Γ−1 
+
+> ξ
+
+y 
+
+> 7:
+
+for k = 1 to n do  
+
+> 8:
+
+if s = 1 {Gamma hyperprior} then  
+
+> 9:
+
+γ(t+1)  
+
+> k
+
+= β
+
+2
+
+α − d + 2 2 +
+
+√(
+
+α − d + 2 2
+
+)2
+
++ 2∥x(t+1)  
+
+> k
+
+∥2
+
+β
+
+ 
+
+> 10:
+
+else if s = −1 {Inverse Gamma hyperprior} then  
+
+> 11:
+
+γ(t+1)  
+
+> k
+
+= ∥x(t+1)  
+
+> k
+
+∥2/2 + βα − d + 2 2 
+
+> 12:
+
+else  
+
+> 13:
+
+Solve for γ(t+1)  
+
+> k
+
+: 
+
+> 14:
+
+∥x(t+1)  
+
+> k
+
+∥2
+
+2γ2
+
+> k
+
+− sγ s−1
+
+> k
+
+βs + sα − d+2 2
+
+γk
+
+= 0  
+
+> 15:
+
+end if  
+
+> 16:
+
+end for  
+
+> 17:
+
+until convergence 
+
+Optimization based on EM: 
+
+To apply the EM, we need to derive the conditional p(γ | x).• when s = 1 in (16), i.e. p(γ) ∼ GenGamma( γ; α, β, 1) we have a Gamma hyperprior. In this case, we can show that p(γk | xk) is a generalized inverse Gaussian distribution ( GIG )(Good, 1953) 
+
+p(γk | xk) = GIG 
+
+(
+
+γk | 2
+
+β , ∥ˆxk∥2, α − d
+
+2
+
+)
+
+which analytically is given by 
+
+p(γk | ˆxk) = 
+
+(∥ˆxk∥2 · β
+
+2
+
+)α− d
+
+> 22
+
+2Kα− d
+
+> 2
+
+(√ 
+
+2∥ˆxk∥2
+
+β
+
+)γα− d  
+
+> 2−1
+> k
+
+exp 
+
+(
+
+−∥ˆxk∥2
+
+2γk
+
+− γk
+
+β
+
+)
+
+.2.2 Hierarchical Bayesian methods for EEG source imaging 11 where Kα− d
+
+> 2
+
+(·) is a modified Bessel function of the second kind (Abramowitz & Stegun, 2002). Now, using the properties of the generalized inverse Gaussian distribution (Joergensen, 1982), we get 
+
+Q(x; ˆ x) = −12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) −
+
+> n
+
+∑
+
+> k=1
+
+∥xk∥2
+
+√2β ∥ˆxk∥
+
+Kα−d/ 2−1(√2/β ∥ˆxk∥)
+
+Kα−d/ 2(√2/β ∥ˆxk∥) , (18) • When s = −1 in (16), i.e. p(γ) ∼ GenGa( γ; α, β, −1) and we deal with an inverse gamma hyperprior, we can just use conjugacy to obtain γk | xk ∼ IG( ∥ˆxk∥2 + β, α + d/ 2) and thus 
+
+Q(x; ˆ x) = −12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) −
+
+> n
+
+∑
+
+> k=1
+
+∥xk∥2
+
+2 Eγk ∼IG 
+
+[γ−1
+
+> k
+
+]
+
+= −12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) −
+
+> n
+
+∑
+
+> k=1
+
+∥xk∥2
+
+2 Eηk ∼Ga [ηk]= −12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) −
+
+> n
+
+∑
+
+> k=1
+
+∥xk∥2
+
+2
+
+α + d/ 2
+
+∥ˆxk∥2 + β ,
+
+(19) which differs from the IAS algorithm only in terms of the factor containing the scale and shape parameters. 12 2 BAYESIAN INFERENCE IN EEG SOURCE IMAGING 
+
+Algorithm 2: Expectation-Maximization for Conditionally Gaussian Model with Generalized Gamma Hyperprior for s = ±1 
+
+> 1:
+
+Input: Data y, forward model L, noise covariance Γξ, hyperparameters α, β, s ∈ {− 1, 1},perturbation term δ for Gamma hyperprior  
+
+> 2:
+
+Initialize: ˆx(0) , set t ← 0 
+
+> 3:
+
+repeat  
+
+> 4:
+
+E-step: Compute expectations for each k = 1 , . . . , n  
+
+> 5:
+
+if s = 1 {Gamma hyperprior} then  
+
+> 6:
+
+Compute: 
+
+1
+
+w(t)
+
+> k
+
+= √2β∥ˆx(t) 
+
+> k
+
+∥ · 
+
+Kα− d
+
+> 2
+
+(√ 2 
+
+> β
+
+∥ˆx(t) 
+
+> k
+
+∥
+
+)
+
+Kα− d 
+
+> 2−1
+
+(√ 2 
+
+> β
+
+∥ˆx(t) 
+
+> k
+
+∥
+
+)
+
++ δ 
+
+> 7:
+
+else if s = −1 {Inverse Gamma hyperprior} then  
+
+> 8:
+
+Compute expected inverse: 
+
+w(t) 
+
+> k
+
+= α + d
+
+> 2
+
+∥ˆx(t) 
+
+> k
+
+∥2 + β 
+
+> 9:
+
+end if  
+
+> 10:
+
+M-step: Update ˆx(t+1) using regularized least squares  
+
+> 11:
+
+Define the prior precision matrix: 
+
+Γx = diag 
+
+(
+
+1
+
+w(t)1
+
+Id, . . . , 1
+
+w(t)
+
+> n
+
+Id
+
+) 
+
+> 12:
+
+Solve: 
+
+ˆx = Γ xL⊤ (LΓxL⊤ + Γ ξ
+
+)−1 y 
+
+> 13:
+
+t ← t + 1  
+
+> 14:
+
+until convergence  
+
+> 15:
+
+Output: Final estimate ˆx
+
+Marginal distributions: Based on the choices of the scaling and shape parameters of the hyperprior of the generalized gamma distribution, we can end up with a closed-form expression for the prior p(x)
+
+useful for comprehending and modeling sparsity. 2.2 Hierarchical Bayesian methods for EEG source imaging 13 For each xk the conditional distribution: 
+
+xk | γk ∼ N (0, γ kId).
+
+where the hyperprior is p(γk) ∝ γsα −1 
+
+> k
+
+exp 
+
+(
+
+−
+
+(γk
+
+> β
+
+)s)
+
+.Then, the marginal density of x becomes 
+
+p(x) = 
+
+> n
+
+∏
+
+> k=1
+
+∫ ∞
+
+> 0
+
+1(2 πγ k)d/ 2 exp 
+
+(
+
+−∥xk∥2
+
+2γk
+
+)
+
+· γsα −1 
+
+> k
+
+exp 
+
+(
+
+−
+
+(γk
+
+β
+
+)s)
+
+dγ k. (20) Each integral is a scale mixture of multivariate Gaussians, resulting in a heavy-tailed marginal distribution for each source xk.We now consider specific settings of the generalized gamma distribution that lead to known closed-form marginal distributions for each xk.• Case 1: s = 1 (Gamma Prior) If: 
+
+γk ∼ Gamma( α, β ),
+
+then the marginal belongs to the variance-gamma family. No general closed form exists, but special cases are tractable. For example, as has been shown in (Calvetti, Somersalo, & Strang, 2019), a special case of the previous conditionally Gaussian is the group Laplace prior. In particular, the Laplace distribution can be written as a mixture of a Gaussian with a Gamma distribution 
+
+Lap( xk) = π(xk) ∝ exp ( −λ∥xk∥2) = 
+
+∫
+
+> γ
+
+π(xk|γk) π(γk) dγ (21) where π(xk|γk) is Gaussian and π(γk) is Gamma with shape parameter α = 1+ d 
+
+> 2
+
+and scale β = 2 /λ 2
+
+and s = 1 and ∥xk∥2 =
+
+√∑di=1 x2(k−1) d+i.• Case 2: γk ∼ InvGamma( α, β )
+
+For γk ∼ InvGamma( α, β ), p(xk) is a classical heavy-tailed prior. the marginal distribution of xk is a multivariate Student-t distribution 
+
+xk ∼ Student-t2α
+
+(
+
+0, βα Id
+
+)
+
+(22) which is given by: 14 2 BAYESIAN INFERENCE IN EEG SOURCE IMAGING 
+
+p(xk) = Γ (α + d
+
+> 2
+
+)
+
+Γ( α)( πβ )d/ 2
+
+(
+
+1 + ∥xk∥2
+
+β
+
+)−α− d
+
+> 2
+
+(23) • Summary Table 
+
+s Prior on γk Parameters Marginal p(xk) Notes 1 Gamma α, β Variance-Gamma No simple closed form 1 Exponential α = 1+ d 
+
+> 2
+
+, β = 2 /λ 2 Laplace-like Scalar case is exact Laplace –1 Inverse-Gamma α, β Student-t2α
+
+(0, βα Id
+
+) Closed form for all d̸
+
+= 1 GenGamma α, β, s No closed form Numerical methods required 
+
+2.2.2 Conditionally Laplace with Gamma Hyperprior 
+
+To mitigate the intensity bias induced by ℓ1-type norm priors (i.e., Lasso or conditionally Gaussian) 2
+
+indiscriminately, as well as the impact of measurement noise, we adopt the hierarchical adaptive scheme proposed in (Figueiredo, 2003; Lee et al., 2010). This approach introduces additional flexibility and adaptivity to the prior, allowing for better discrimination between active and inactive sources and reducing the over-shrinkage commonly associated with fixed sparse regularizers. In particular, in our previous work (Lahtinen et al., 2022), we proposed the hierarchical prior modeling 
+
+x ∼ Lap( x|0, γ) (Prior) 
+
+γ ∼ Gamma( γ; α, β ) (Hyperprior) which is referred to as Hierarchical Adaptive L1-Regularization (HAL1R) in Lahtinen et al., 2024, and utilizes the gamma distribution as a hypermodel for the Laplace distribution’s parameter. Then, the conditionally Laplace, HAL1R, posterior distribution is 
+
+p(x, γ | y) ∝ exp 
+
+(
+
+−12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) −
+
+> n
+
+∑
+
+> k=1
+
+γk ∥xk∥1 −
+
+> n
+
+∑
+
+> k=1
+
+βkγk +
+
+> n
+
+∑
+
+> k=1
+
+αk log γk
+
+)
+
+. (24) 
+
+> 2These distributions rely on the assumption that the source amplitudes follow a distribution with thin tails, which may not be suitable in cases where there are substantial differences in the strengths of the sources and thus may underestimate strong sources, leading to biased reconstructions
+
+2.2 Hierarchical Bayesian methods for EEG source imaging 15 Then, the IAS algorithm solves : 
+
+ˆx = arg max 
+
+> x∈Rdn
+
+{
+
+12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) + 
+
+> dn
+
+∑
+
+> i=1
+
+ˆγi |xi|
+
+}
+
+, (25) 
+
+ˆγi = αβ + |ˆxi| for i = 1 , · · · , dn. (26) Similarly to the conditionally Gaussian model with an inverse gamma hyperprior, we get the EM hyper-parameter update rule ¯γi = ( α + 1) /(|ˆxi| + β) for the HAL1R. 
+
+Algorithm 3: IAS or EM for conditional Laplace with same α and β 
+
+> 1:
+
+Input: Data y, forward model L, noise covariance Γξ, hyperparameters α, β  
+
+> 2:
+
+Initialize: x(0) = 0 , γ(0) > 0 and max i
+
+∣∣∣(L⊤Γ−1 
+
+> ξ
+
+y)
+
+> i
+
+∣∣∣ > ˆγ(0) 
+
+> i
+
+iteration count t = 0  
+
+> 3:
+
+repeat  
+
+> 4:
+
+Step 1: Update x (ℓ1 norm minimization) 
+
+x(t+1) = arg min 
+
+> x∈Rdn
+
+{
+
+12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) + 
+
+> dn
+
+∑
+
+> i=1
+
+ˆγ(t) 
+
+> i
+
+|xi|
+
+}
+
+{to solve see Algorithm 4}  
+
+> 5:
+
+Step 2: Update γ
+
+IAS: 
+
+ˆγ(t+1)  
+
+> i
+
+= αβ + |x(t+1)  
+
+> i
+
+|, for i = 1 , . . . , dn 
+
+or EM: 
+
+¯γ(t+1)  
+
+> i
+
+= ( α + 1) /(|ˆxi| + β), for i = 1 , . . . , dn  
+
+> 6:
+
+t ← t + 1  
+
+> 7:
+
+until Convergence  
+
+> 8:
+
+Output: ˆx, ˆγ
+
+To solve the previous ℓ1 norm (or LASSO) problem, a fast and efficient algorithm is the Majorization-Minimization using Local Quadratic Approximation (MM-LQA) 3. (Kim et al., 2018). Here we give it: 
+
+> 3Other solver e.g. ADMM(add reference) or Barrier methods (add ref) can be employed
+
+16 3 SNR-BASED WEIGHTS OR PRIOR PARAMETER ESTIMATION 
+
+Algorithm 4: MM-LQA for ℓ1-Minimization  
+
+> 1:
+
+Input: L, y, Γξ, initial u(0) = x(t), γ(t), tolerance δ, small constant ϵ 
+
+> 2:
+
+repeat  
+
+> 3:
+
+Compute weights: 
+
+q(l) 
+
+> i
+
+= 2γ(t)
+
+> i
+
+2|u(l) 
+
+> i
+
+| + ϵ, for i = 1 , . . . , dn  
+
+> 4:
+
+Form diagonal matrix Q(l) = diag( q(l)1 , . . . , q (l)
+
+> dn
+
+) 
+
+> 5:
+
+Solve: 
+
+u(l+1) = (L⊤Γ−1 
+
+> ξ
+
+L + Q(l))−1 L⊤Γ−1 
+
+> ξ
+
+y 
+
+> 6:
+
+l ← l + 1  
+
+> 7:
+
+until convergence ( ∥u(t) − u(t−1) ∥ < δ ) 
+
+> 8:
+
+Update: x(t+1) = u(l)
+
+# 3 SNR-based weights or prior parameter estimation 
+
+To reduce the depth bias (Badia & Duong, 1998), different prior parameters have to be assigned for different source locations. An effective way to tune parameters or hyperparameters, that is called Sen-sitivity weighting proposed in (Calvetti, Pascarella, et al., 2019a), where a single weight is assigned to each location k and employs the signal-to-noise ratio (SNR), i.e. 
+
+SNR = E[∥y∥22]
+
+E[∥ξ∥22] = E[∥Lx + ξ∥22]
+
+E[∥ξ∥22] = trace {E[( Lx + ξ)( Lx + ξ)⊤]}
+
+trace {E[ξξ ⊤]} = trace {LE[xx ⊤]L⊤}
+
+trace {Cov[ ξ]} + 1 . (27) where Cov[ ξ] = Γ ξ is the covariance of ξ and E[xx ⊤] = Cov[ x], when E[x] = 0. Here, we have that 
+
+x and ξ are independent. Furthermore, in the current analysis, xk are statistically independent. Now, if q is the number of active sources (usually we consider only q = 1 ), and we have the expectation 
+
+E[xx ⊤] = diag( θ1, . . . , θ n) ⊗ Id where ⊗ Kronecker 4, we have based on the analysis in (Calvetti, Pascarella, et al., 2019a) 
+
+θk = 1
+
+q
+
+(SNR − 1)trace {Γξ}∥Lk∥2
+
+> F
+
+, (28) where Lk = [ L(k−1) d+1 , . . . , L (k−1) d+d] ∈ Rm×d and ∥ · ∥ 2 
+
+> F
+
+is the Frobenius norm.   
+
+> 4here we denote the variances in different locations with θ, we note that for the Gaussian and Conditionally Gaussian priors, this coincides with γ, however this is not the case for the Laplace prior
+
+17 The previous formulation allows us to relate the weights wk or prior variances θk for different priors— such as Gaussian, Laplace, and hierarchical models—to the signal-to-noise ratio (SNR) and the norms of the lead field matrix columns. To estimate these weights or variances for various prior models, including Gaussian, Laplace, Group Laplace, and hierarchical formulations, we define the corresponding prior distributions and their associated variances as follows: • Weighted Gaussian Prior: 
+
+p(x) ∝
+
+> n
+
+∏
+
+> k=1
+
+exp (−wk∥xk∥22
+
+) (29) and since E[xk] = 0 and cov [ xk] = θkId for a source at location k, wk = 12θk from the equation (28) we get wk = q∥Lk ∥2 
+
+> F
+> 2(SNR −1) trace {Γξ}
+
+• Weighted Laplace prior: 
+
+p(x) = 
+
+> n
+
+∏
+
+> k=1
+
+wk
+
+2 exp ( −wk∥xk∥1) , (30) where ∥xk∥1 = ∑di=1 |x(k−1) d+i|. Since E[xk] = 0 and covariance cov [ xk] = θkId = 2
+
+> w2
+> k
+
+, based on (28), we get wk =
+
+√
+
+2 q∥Lk ∥2  
+
+> F
+> (SNR −1) trace {Γξ}
+
+.• Weighted group Laplace prior: 
+
+p(x) ∝
+
+> n
+
+∏
+
+> k=1
+
+wk
+
+2 exp ( −wk∥xk∥2) , (31) where ∥xk∥2 =
+
+√∑di=1 x2(k−1) d+i. Now for this zero mean distribution, the covariance is cov[ xk] = 
+
+θkId = d+1 
+
+> w2
+> k
+
+· Id, thus from (28), we have wk =
+
+√
+
+(d + 1) q∥Lk ∥2  
+
+> F
+> (SNR −1) trace {Γξ}
+
+.• For the hierarchical modelling 
+
+xk ∼ p(xk | γk) (Prior) 
+
+γk ∼ p(γk; αk, β k) (Hyperprior) for k = 1 , . . . , n and xk = ( xd(k−1)+1 , . . . , x d(k−1)+ d), we are interested in specifying hyperpriors 
+
+αk and βk. Usually, one parameter is set fixed, for example αk = ¯ α, and βk is estimated. 1. For the CG formulation of section 2.2.1, as it was proposed in (Calvetti, Pascarella, et al., 2019b), we can 
+
+cov[ xk] = θkId = E[γk]Id,18 3 SNR-BASED WEIGHTS OR PRIOR PARAMETER ESTIMATION 
+
+where the mean of the hyperparameter E[γk] = βk Γ(αk +1  
+
+> s
+
+)
+
+> Γ
+
+(αks ) with s > 0 and αk > 1 for a GenGamma distribution. Therefore, based on the hypeprior mean and (28) for these zero mean distributions, we have that 
+
+βk = Γ ( ¯αs
+
+)
+
+Γ ( ¯α+1 
+
+> s
+
+) 1
+
+q
+
+(SNR − 1)trace {Γξ}∥Lk∥2
+
+> F
+
+(32) For special cases where a close form for p(xk) exists, the corresponding covariance cov[ xk]
+
+or E[xkxT 
+
+> k
+
+] can be estimated. (a) When s = −1 in (16), the marginal distribution is xk ∼ Student-t2αk
+
+(
+
+0, βk 
+
+> αk
+
+Id
+
+)
+
+, the covariance exists for αk > 1, and is given by: 
+
+Cov[ xk] = θkId = βk
+
+αk − 1Id
+
+Therefore, we have that 
+
+βk = (¯ α − 1) 1
+
+q
+
+(SNR − 1)trace {Γξ}∥Lk∥2
+
+> F
+
+. (33) (b) When s = 1 and α = d+1 2 , the marginal p(xk) ∝ exp ( −λk∥xk∥2) with α = 1+ d 
+
+> 2
+
+and scale βk = 2 /λ 2
+
+> k
+
+. The covariance is cov[ xk] = θkId = d+1  
+
+> λ2
+
+Id = βk d+1 2 Id, and thus 
+
+βk = 2(d + 2) q
+
+(SNR − 1)trace {Γξ}∥Lk∥2
+
+> F
+
+. (34) 2. For the weighted version of the CL of section 2.2.2 when we introduce different hyperparam-eter per location k, we have that 
+
+xk | γk ∼ Lap( xk|0, γ k)
+
+γk ∼ Ga( γk; αk, β k)
+
+where p(xk|γk) ∝ γdk exp ( −γk∥xk∥1) and 
+
+p(xk) ∝
+
+∫ ∞
+
+> 0
+
+γdk exp ( −γk∥xk∥1) · βαk
+
+> k
+
+Γ( αk)γαk −1 
+
+> k
+
+exp ( −βkγk) dγ k
+
+So, 
+
+p(xk) = βαk 
+
+> k
+
+· Γ( d + αk)2Γ( αk) · (∥xk∥1 + βk)−(d+αk ),3.1 Algorithms with weights for EEG source imaging 19 that is called the multivariate Lomax distribution (Nayak, 1987). The hyperparameters are computed using 
+
+E [xkx⊤
+
+> k
+
+] = β2 
+
+> k
+
+Γ ( αk − 2) Γ (3) Γ ( αk) Id = 2β2
+
+> k
+
+(αk − 1)( αk − 2) Id (35) with condition αk > 2. Therefore, given ¯α we estimate 
+
+βk =
+
+√
+
+(¯ α − 1)(¯ α − 2)(SNR − 1)trace {Γξ}
+
+2q∥Lk∥2
+
+> F
+
+(36) Algorithm 6 gives the steps to solve the weighted conditional ℓ1 Laplace problem described here. Moreover, considering the hierachical model 
+
+xk | γk ∼ GroupLap( xk|0, γ k)
+
+γk ∼ Ga( γk; αk, β k)
+
+where p(xk|γk) ∝ γdk exp ( −γk∥xk∥2) and p(xk) ∝ (βk + ∥xk∥2)−(αk +d), hence we have 
+
+E [xkx⊤
+
+> k
+
+] = (d + 1) β2
+
+> k
+
+(¯ α − 1)(¯ α − 2) Id (37) and thus 
+
+βk =
+
+√
+
+(¯ α − 1)(¯ α − 2)(SNR − 1)trace {Γξ}
+
+(d + 1) q∥Lk∥2
+
+> F
+
+(38) Algorithm 7 presents the implementation for this setup. In the following table, we summarize the estimated weights or hyperparameters. 
+
+## 3.1 Algorithms with weights for EEG source imaging 
+
+In this section, we present the algorithms designed to solve the EEG source imaging problem with structured sparsity using weighted priors. First, we describe the MM-LQA algorithm 5 for minimizing cost functions with either standard Laplace or group Laplace regularization, where the depth weights 
+
+wk (estimated in the previous section) are incorporated into a majorization-minimization framework for efficient updates. We then describe two iterative algorithms, employing either the IAS or EM optimization framework, for solving the EEG source problem under the weighted conditional Laplace (wCL) and weighted conditional group Laplace (wCGL) priors. These methods iteratively update the source estimate 20 3 SNR-BASED WEIGHTS OR PRIOR PARAMETER ESTIMATION 
+
+Prior Marginal prior p(x) Weight / Hyperparameter 
+
+Weighted Gaussian (wG) p(x) ∝ ∏nk=1 exp (−wk∥xk∥22
+
+) wk = q∥Lk∥2
+
+> F
+
+2(SNR − 1) trace(Γ ξ)
+
+Weighted Laplace (wL) p(x) = ∏nk=1 
+
+wk
+
+2 exp ( −wk∥xk∥1) wk =
+
+√
+
+2 q∥Lk∥2
+
+> F
+
+(SNR − 1) trace(Γ ξ)
+
+Weighted Group Laplace (wGL) p(x) ∝ ∏nk=1 
+
+wk
+
+2 exp ( −wk∥xk∥2) wk =
+
+√
+
+(d + 1) q∥Lk∥2
+
+> F
+
+(SNR − 1) trace(Γ ξ)
+
+weighted Conditional Gaussian (wCG) with no closed form marginal 
+
+xk ∼ N (0 , γ kId)
+
+γk ∼ GenGamma( αk, β k, s ) βk = Γ ( ¯αs
+
+)
+
+Γ ( ¯α+1 
+
+> s
+
+) · (SNR − 1) trace(Γ ξ)
+
+q∥Lk∥2
+
+> F
+
+Student-t (wCG: s = −1, ¯α > 1, βk) p(xk) ∼ t2αk (0 , βk 
+
+> αk
+
+Id) βk = (¯ α − 1) · (SNR − 1) trace(Γ ξ)
+
+q∥Lk∥2
+
+> F
+
+Group Laplace (wCG: s = 1 , α = d+1 2 , βk = 2
+
+> w2
+> k
+
+) p(xk) ∝ exp( −wk∥xk∥2) βk = 2(d + 2) q · (SNR − 1) trace(Γ ξ)
+
+∥Lk∥2
+
+> F
+
+Weighted conditional Laplace (wCL), ¯α > 2 p(xk) ∝ (∥xk∥1 + βk)−(d+ ¯ α) βk =
+
+√ ( ¯ α−1)( ¯ α−2)(SNR −1)trace {Γξ } 
+
+> 2q∥Lk∥2
+> F
+
+Weighted conditional Group Laplace (wCGL), ¯α > 2 p(xk) ∝ (∥xk∥2 + βk)−(d+ ¯ α) βk =
+
+√ ( ¯ α−1)( ¯ α−2)(SNR −1)trace {Γξ } 
+
+> (d+1) q∥Lk∥2
+> F
+
+Table 1: Summary of priors, expressions of marginal priors, and corresponding weights or hyperparameters derived based on the SNR formula. and associated hyperparameters to reflect both sparsity (or group sparsity) and SNR-based prior weights (or variances). The algorithms also include mechanisms to avoid degeneracy in the initial iterations, ensuring meaningful reconstructions. 3.1 Algorithms with weights for EEG source imaging 21 
+
+Algorithm 5: MM-LQA for Weighted Laplace or Group Laplace Minimization 
+
+1: Input: p = 1 (Laplace) or 2 (Group Laplace), data y, operator L, noise covariance Γξ, weights wk
+
+(from table 1), block size d, tolerance δ, small ϵ > 0
+
+2: Initialize: x(0) ∈ Rnd , set t ← 0
+
+3: repeat 
+
+4: for k = 1 to n do 
+
+5: Extract block x(t) 
+
+> k
+
+=
+
+[
+
+x(t)(k−1) d+1 , . . . , x (t)(k−1) d+d
+
+]
+
+6: Compute block weight: 
+
+q(t) 
+
+> k
+
+= wk
+
+∥x(t) 
+
+> k
+
+∥p + ϵ
+
+7: end for 
+
+8: Form block-diagonal matrix: 
+
+Q(t) = block-diag 
+
+(
+
+q(t)1 Id, . . . , q (t) 
+
+> n
+
+Id
+
+)
+
+9: Update estimate: 
+
+x(t+1) = (L⊤Γ−1 
+
+> ξ
+
+L + Q(t))−1 L⊤Γ−1 
+
+> ξ
+
+y
+
+10: t ← t + 1 
+
+11: until convergence: ∥x(t) − x(t−1) ∥ < δ 
+
+12: Return: ˆx = x(t)22 3 SNR-BASED WEIGHTS OR PRIOR PARAMETER ESTIMATION 
+
+Algorithm 6: IAS or EM for weighted conditional Laplace (wCL) 
+
+1: Input: EEG Data y, forward model L, noise covariance Γξ,
+
+2: Hyperparameters α, β : for IAS: ˆγ(0)  
+
+> k
+
+= ¯αβk or for EM: ¯γ(0)  
+
+> k
+
+= ¯α+1  
+
+> βk
+
+select ¯α > 2 and estimate 
+
+βk =
+
+√( ¯ α−1)( ¯ α−2)(SNR −1)trace {Γξ } 
+
+> 2p∥Lk∥2
+> F
+
+for k = 1 , . . . , n .
+
+3: Non-degeneracy condition to avoid x(1) = 0: ensure that 
+
+1 < max 
+
+> k,i
+
+{
+
+1ˆγ(0) 
+
+> k
+
+∣∣∣[L⊤Γ−1 
+
+> ξ
+
+y]
+
+> (k−1) d+i
+
+∣∣∣}
+
+, for k = 1 , . . . , n and i = 1 , . . . , d 
+
+If the condition is not satisfied, rescale ˆγ(0)  
+
+> k
+
+as : 
+
+ˆγ(0)  
+
+> k
+
+← ˆγ(0)  
+
+> k
+
+· μ · max 
+
+> j,i
+
+{
+
+1ˆγ(0) 
+
+> j
+
+∣∣∣[L⊤Γ−1 
+
+> ξ
+
+y]
+
+> (j−1) d+i
+
+∣∣∣}
+
+, with μ < 1.
+
+4: Initialize: x(0) = 0 iteration count t = 0 
+
+5: repeat 
+
+6: Step 1: Update xx(t+1) = arg min 
+
+> x∈Rdn
+
+{
+
+12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) + 
+
+> n
+
+∑
+
+> k=1
+
+ˆγ(t) 
+
+> k
+
+∥xk∥1
+
+}
+
+where ∥xk∥1 = ∑di=1 |x(k−1) d+i|.
+
+7: Step 2: Update γ
+
+IAS: 
+
+ˆγ(t+1)  
+
+> k
+
+= ¯αβk + ∥x(t+1)  
+
+> k
+
+∥1
+
+, for k = 1 , . . . , n 
+
+or EM: 
+
+¯γ(t+1)  
+
+> k
+
+= (¯ α + 1) /(∥ˆxk∥1 + βk), for k = 1 , . . . , n 
+
+8: t ← t + 1 
+
+9: until Convergence 
+
+10: Output: ˆx, ˆγ3.1 Algorithms with weights for EEG source imaging 23 
+
+Algorithm 7: IAS or EM for weighted conditional group Laplace (wCGL) 
+
+1: Input: Data y, forward model L, noise covariance Γξ, d
+
+2: Hyperparameters α, β : Set ¯α > 2 and βk =
+
+√( ¯ α−1)( ¯ α−2)(SNR −1)trace {Γξ } 
+
+> (d+1) p∥Lk∥2
+> F
+
+, for k = 1 , . . . , n 
+
+• For IAS: ˆγ(0)  
+
+> k
+
+= ¯α+d−1
+
+> βk
+
+• For EM: ¯γ(0)  
+
+> k
+
+= ¯α+dβk
+
+3: Non-degeneracy condition to avoid x(1) = 0: ensure that 
+
+max 
+
+> k=1 ,...,n
+
+{
+
+1
+
+γ(0) 
+
+> k
+
+∥∥∥[L⊤Γ−1 
+
+> ξ
+
+y]
+
+> (k)
+
+∥∥∥2
+
+}
+
+> 1
+
+where [L⊤Γ−1 
+
+> ξ
+
+y] 
+
+> (k)
+
+=
+
+[[L⊤Γ−1 
+
+> ξ
+
+y] 
+
+> (k−1) d+1
+
+, . . . , [L⊤Γ−1 
+
+> ξ
+
+y]
+
+> kd
+
+]T
+
+denotes the kth block of size d.
+
+If the condition is not satisfied, rescale the weights as: 
+
+ˆγ(0)  
+
+> k
+
+← ˆγ(0)  
+
+> k
+
+· μ · max 
+
+> j=1 ,...,n
+
+{
+
+1
+
+γ(0) 
+
+> k
+
+∥∥∥[L⊤Γ−1 
+
+> ξ
+
+y]
+
+> (j)
+
+∥∥∥2
+
+}
+
+, with μ < 1 for k = 1 , . . . , n. 
+
+4: Initialize: x(0) = 0 ; set iteration count t = 0 
+
+5: repeat 
+
+6: Step 1: Update xx(t+1) = arg min 
+
+> x∈Rdn
+
+{
+
+12(y − Lx)⊤Γ−1 
+
+> ξ
+
+(y − Lx) + 
+
+> n
+
+∑
+
+> k=1
+
+ˆγ(t) 
+
+> k
+
+∥xk∥2
+
+}
+
+where ∥xk∥2 =
+
+√∑di=1 x2(k−1) d+i
+
+7: Step 2: Update γ:
+
+IAS update (MAP): 
+
+ˆγ(t+1)  
+
+> k
+
+= ¯α + d − 1
+
+βk + ∥x(t+1)  
+
+> k
+
+∥2
+
+, for k = 1 , . . . , n 
+
+EM update (expectation): 
+
+¯γ(t+1)  
+
+> k
+
+= ¯α + d
+
+∥ˆxk∥2 + βk
+
+, for k = 1 , . . . , n 
+
+8: t ← t + 1 
+
+9: until Convergence 
+
+10: Output: ˆx, ˆγ24 4 COMPARATIVE STUDY 
+
+# 4 Comparative Study 
+
+A descriptive comparison of Bayesian EEG source imaging solvers developed over the years is not straight-forward, primarily because many of these methods have been evaluated in vastly different EEG experimen-tal or simulation settings. This variability makes it difficult to draw definitive conclusions from previous findings. To address this, and to enable a more objective and quantitative comparison—particularly with regard to sensitivity weighting strategies— we design and conduct a dedicated simulation study in the following section. To ease the reading of this section, we have included Table 2 that summarizes the names and the Maximum a Posteriori (MAP) expressions for the various EEG optimizations that were tested here. Table 2: Bayesian EEG algorithms and their cost functions                                                     
+
+> EEG Solver Name Cost Function
+> Weighted Gaussian (wMNE) ˆx= arg min x
+> {
+> 12∥y−Lx∥2Γ−1
+> ξ
+> +∑nk=1 wk∥xk∥22
+> }
+> Weighted Laplace (wMCE) ˆx= arg min x
+> {
+> 12∥y−Lx∥2Γ−1
+> ξ
+> +∑nk=1 wk∥xk∥1
+> }
+> Weighted Group Laplace (wGL) ˆx= arg min x
+> {
+> 12∥y−Lx∥2Γ−1
+> ξ
+> +∑nk=1 wk∥xk∥2
+> }
+> Weighted Conditionally Gaussian (wCG) ˆx,ˆγ= arg min x,γ
+> {
+> 12∥y−Lx∥2Γ−1
+> ξ
+> +∑nk=1
+> (∥xk∥22
+> 2γk+penalty (γk)
+> )}
+> Weighted Conditional Laplace (wCL) ˆx,ˆγ= arg min x,γ
+> {
+> 12∥y−Lx∥2Γ−1
+> ξ
+> +∑nk=1 γk∥xk∥1+penalty (γk)
+> }
+> Weighted Conditional Group Laplace (wCGL) ˆx,ˆγ= arg min x,γ
+> {
+> 12∥y−Lx∥2Γ−1
+> ξ
+> +∑nk=1 γk∥xk∥2+penalty (γk)
+> }
+
+## 4.1 Simulation Setup 
+
+For our study, we built one 3D mesh with the help of the MRI data of the so-called Ernie subject and SimNIBS 5 4 software (Puonti et al., 2020). The mesh consisted of 743,575 tetrahedral elements joined in 136,868 nodes. Four different tissue compartments (scalp, skull, cerebrospinal fluid, and brain) were considered, and 76 electrodes were placed around the head according to the international 10-10 system. The lead field matrix used in this study was constructed with the help of custom-made software that exploited the Finite Element Method with linear basis functions, as in (Wolters et al., 2004). The tissue electric conductivity values were 0.43 S/m for the scalp, 0.0103 S/m for the skull, 1.79 S/m for cerebrospinal fluid, and 0.33 S/m for the brain (gray matter and white matter) (Ramon et al., 2006). The dipole source space used for reconstructions consisted of 10,000 sources distributed throughout the 
+
+> 5
+
+https://simnibs.github.io/simnibs/build/html/index.html 4.2 Visualization of Source Reconstructions 25 gray matter. To avoid the inverse crime, two different forward models of 10,000 sources were constructed so that they do not share a source at exactly the same location; however, the distance to the closest corresponding source in one model to another is at most 3 mm . The source spaces are structured so that the sources on the grey matter layer are equally spread on 0 to 30 mm depth from the surface of the inner skull surface. The average distance between the simulated sources and their nearest neighbors in the reconstruction space was approximately 1.3-2.5 mm. First, we perform two validation tests. In Experiment(I), the objective is to localize a cortical source located on a sulcal wall. The source is positioned near the bottom of the sulcus to assess whether the estimators can recover activity at the true source location when sensitivity weighting is applied, or whether the estimates remain biased toward the tops of the adjacent gyri. The same forward and inversion models as described previously described, and 5% noise is added to the simulated observations. The reconstructions are visualized by interpolating the estimated values from the source points nearest to the cutting plane onto the corresponding MRI slice. When hyperparameter updating is required, both algorithms (EM and IAS) are presented only if there is a notable difference between their estimates; otherwise, only the results obtained with the EM algorithm are shown. Experiment (II) aims to show visualize the reconstruction results in slightly deeper location... While Experiment I and II provides qualitative insight into the spatial characteristics of the reconstruc-tions, we next present a systematic numerical analysis to quantitatively evaluate the performance of the considered methods. This analysis focuses on localization accuracy, focality, and depth bias for dipolar sources placed at different depths relative to the inner skull surface. The evaluation is structured as follows. First, we assess the overall algorithmic performance and robustness to noise using the Earth Mover’s Distance (EMD) as a measure of focality and localization accuracy. Next, we examine how reconstruction performance varies as a function of source depth by analyzing the average EMD across depths. This is followed by a statistical comparison of the methods at two selected depth ranges. Fi-nally, we evaluate depth bias by comparing the depth of the reconstructed maximum with the true source depth. The simulated data include both low (1%) and high (10%) measurement noise levels. The results are presented using histograms, depth-dependent curves, and summary statistics. 
+
+## 4.2 Visualization of Source Reconstructions 
+
+In this subsection, we visualize the reconstruction results on the MRI images. The algorithms are grouped according to their ability to recover either spread or focal source activity. In particular, Figures 1 and 2 illustrate the corresponding reconstruction results for methods using Gaussian priors and Laplace or 26 4 COMPARATIVE STUDY 
+
+group Laplace priors, respectively, with data from a cortical source. In another setup, we picked a source at 12 mm depth with results shown for spread Gaussian methods in Figure 3 and focal Laplace methods in Figure 4. The measurements are contaminated by 5 % of additive Gaussian noise. Moreover, we computed the EMDs of each reconstruction and presented those in Table 3. By observing the estimations interpolated to the MRI slices when conditionally Gaussian models are used in Figures 1 and 3, we see very similar and widely spread estimates for wMNE and the weighted Conditionally Gaussian model with Inverse-Gamma hyperprior, and in the case of the Gamma prior when the IAS algorithm is used. Maximum estimate values in yellow are too frontal and lateral with wMNE and two Conditionally Gaussian models when estimating the superficial source. However, the spread of the mentioned high-value region does reach the true source location. With the deeper source, the estimation spreads are wider, and the estimated maxima are slightly too frontal and significantly too lateral. There is no visible difference in estimate distribution among most of the compared Gaussian methods. However, when the EM algorithm is used with the Conditional Gaussian model and the gamma hyperprior, the estimation becomes highly focal. The estimates from focal-by-design methods, presented in Figures 2 and 4, are highly similar and estimate both sources close to the true locations. Methods using Group Laplace estimated the superficial source more frontal than methods with Laplace priors. The deeper source is estimated to be nearly at the correct depth by all these methods. Although Laplace methods can, Weighted Group Laplace (wGL) estimates the source slightly too frontal, while Weighted Conditional Group Laplace (wCGL) estimates the source a bit too laterally. The best estimation among all of the compared methods is obtained with the Weighted Conditional Laplace with EM algorithm for both sources, based on the EMD results provided in Table 3. Comparing hyperparameter updating algorithms, we find that EM yields smaller EMDs than IAS across all methods in both source configurations. Overall, focal methods, including CG-Ga-EM, provide more accurate estimates of the deeper source than methods with wider spreads, as they tend to yield more superficial estimates. 4.2 Visualization of Source Reconstructions 27   
+
+> Transversal Coronal Sagittal
+> wMNE CG-Ga (EM) CG-Ga (IAS) CG-IG (EM) CG-IG (IAS)
+
+Figure 1: Estimated distributions of the simulated superficial brain activity computed using methods with Gaussian priors. The distributions are presented in three plain cuts of magnetic resonance images. The turquoise ring shows the location of the actual source to be estimated. The colored region, ranging from dark red to yellow, represents the distribution and its local magnitude. Slices have been taken at the location of the maximum estimated magnitude. 28 4 COMPARATIVE STUDY 
+
+> wL wGL wCL (EM) wCL (IAS) wCGL (EM) wCGL (IAS)
+
+Figure 2: Estimated distributions of the simulated superficial brain activity computed using methods with Laplace priors. The distributions are presented in three plain cuts of magnetic resonance images. The turquoise ring shows the location of the actual source to be estimated. The colored region, ranging from dark red to yellow, represents the distribution and its local magnitude. Slices have been taken at the location of the maximum estimated magnitude. 4.2 Visualization of Source Reconstructions 29   
+
+> Transversal Coronal Sagittal
+> wMNE CG-Ga (EM) CG-Ga (IAS) CG-IG (EM) CG-IG (IAS)
+
+Figure 3: Estimated distributions of the simulated brain activity at 12 mm depth computed using methods with Gaussian priors. The distributions are presented in three plain cuts of magnetic resonance images. The turquoise ring shows the location of the actual source to be estimated. The colored region, ranging from dark red to yellow, represents the distribution and its local magnitude. Slices have been taken at the location of the maximum estimated magnitude. 30 4 COMPARATIVE STUDY 
+
+> wL wGL wCL (EM) wCL (IAS) wCGL (EM) wCGL (IAS)
+
+Figure 4: Estimated distributions of the simulated brain activity at 12 mm depth computed using methods with Laplace priors. The distributions are presented in three plain cuts of magnetic resonance images. The turquoise ring shows the location of the actual source to be estimated. The colored region, ranging from dark red to yellow, represents the distribution and its local magnitude. Slices have been taken at the location of the maximum estimated magnitude. 4.3 Numerical Evaluation of Focality, Depth Bias, and Noise Robustness 31                          
+
+> Superficial source Method CG-Ga EM CG-Ga IAS CG-IG EM CG-IG IAS wCGL EM wCGL IAS wCL EM wCL IAS wGL wL wMNE EMD 47.7 56.1 50.1 54.0 45.7 46.3 44.3 44.8 48.2 44.7 56.5 Source at 12 mm depth EMD 58.1 69.0 64.2 67.8 52.3 52.9 53.3 53.7 55.4 55.4 69.2
+
+Table 3: Earth Mover’s Distances in millimeters for the compared method to estimate the superficial source and a source at 12 mm depth. 
+
+## 4.3 Numerical Evaluation of Focality, Depth Bias, and Noise Robustness 
+
+4.3.1 Overall algorithmic performance in the presence of noise 
+
+To better understand the overall performance of the Bayesian algorithms and their robustness to noise, we evaluate the reconstructions and the corresponding EMD values using observations generated from radially oriented sources (with respect to the cortical surface). The simulated sources are uniformly distributed across different depths, with approximately 28–30 sources per depth level. The depth is defined with respect to the inner skull surface (i.e., the closest distance from the source to the inner skull boundary). The EMD quantifies the spatial discrepancy between the true and reconstructed source dis-tributions; lower values indicate that the estimated activity is closer to the true source location (i.e., more accurate and focal reconstruction), whereas higher values reflect increased spatial spread, mislocalization, or depth bias. Figure 5 shows the distribution of EMD values across all tested methods for two noise levels (1% and 10%), evaluated over all source depths. At the lower noise level (1%), the weighted focal models (wCGL and wCL) exhibit the lowest median EMD values, particularly when hyperparameters are estimated using the EM algorithm, indicating more accurate and spatially precise reconstructions. In contrast, the classical conditionally Gaussian approaches (CG variants) and wMNE yield significantly higher EMD values, reflecting more spread and less accurate localization. However, a notable difference can be obtained with CG-Ga-EM. which produces a lower EMD, especially with 1% of noise. When the noise level increases to 10%, all methods show performance degradation, as evidenced by higher EMD values and greater variability. Nevertheless, the wCGL and wCL with EM updates remain the most robust, maintaining relatively low median EMD and tighter distributions compared to the other approaches, as we have shown in our previous study (Lahtinen et al., 2022). The IAS-based variants generally exhibit higher variability and slightly worse median performance than their EM counterparts. Among the non-Bayesian approaches, wMNE continues to produce relatively high EMD values, indicat-32 4 COMPARATIVE STUDY 
+
+Figure 5: Distribution of EMD values across reconstruction methods for all source depths at two noise levels (1% and 10%). Lower EMD indicates better localization accuracy and ing limited robustness to noise. Overall, the present results demonstrate that incorporating sensitivity weighting and EM-based hyperparameter estimation leads to improved focality, reduced depth bias, and greater robustness to noise. 
+
+4.3.2 Effect of Source Depth on Reconstruction Performance (Average EMD per depth) 
+
+In this subsection, we investigate how the performance of different algorithms is affected by the depth of the simulated source. To enhance clarity and reduce visual complexity in the subsequent figures, we limit the number of compared methods. As the EM-based approaches consistently show slightly better overall performance, the IAS-based variants are excluded from the current analysis. Figures 6 shows the average EMD as a function of source depth for the considered algorithms under low (1%) and moderate (10%) noise levels. For all methods, the EMD generally increases with depth (especially after 15mm depth), indicating a degradation in localization accuracy for deeper sources and highlighting the presence of depth bias. Among the compared approaches, the weighted conditionally Laplace models (wCGL-EM and wCL-EM) consistently achieve the lowest EMD values across depths, demonstrating better robustness to depth-related effects. In contrast, classical conditionally Gaussian methods (CG variants) and wMNE exhibit 4.3 Numerical Evaluation of Focality, Depth Bias, and Noise Robustness 33 
+
+Figure 6: Average EMD as a function of source depth for different reconstruction algorithms. Lower EMD values indicate more accurate source localization. The results show that localization accuracy degrades with increasing depth, highlighting depth bias across methods, while higher noise further amplifies this effect. significantly higher EMD values, with relatively weak sensitivity to depth but overall poorer localization accuracy. Increasing the noise level to 10% amplifies these effects, leading to higher EMD values across all depths and methods. Nevertheless, the relative performance ranking remains similar, with weighted models maintaining superior performance, particularly for deeper sources. 
+
+4.3.3 Statistical analysis for sources in two different depths 
+
+Based on the previous results (Figure 6), we observed that for shallow sources (0–15 mm), the algo-rithms exhibit similar performance on average, whereas for deeper sources (greater than 15 mm), a clear degradation in performance is evident. To better understand this depth-dependent behavior, we further analyze the estimated EMD values at two representative depth ranges. In the following, figure 7 illustrates the distribution of EMD across methods for deep sources (17.81– 21.74 mm) under low (1%) and high (10%) noise levels, showing higher error values and slightly increased dispersion across most methods. Figure 8 illustrates the EMD distributions for shallow sources (1.78–3.46 mm), where several meth-ods exhibit lower errors and tighter distributions, though this improvement is not consistent across all approaches. Overall, for deeper sources (17.8–21.7 mm), a clear degradation in performance is observed across all methods. The EMD values are significantly higher and more dispersed, particularly under higher noise 34 4 COMPARATIVE STUDY 
+
+Figure 7: Deep sources (17.81–21.74 mm). Each panel shows results under 1% (left) and 10% (right) noise levels. Performance degrades significantly for deeper sources, especially under higher noise. levels (10%). While methods such as wCGL-EM (IAS) and wCL-EM (IAS) remain relatively stable, others exhibit increased variability, indicating reduced robustness to depth and noise. For shallow sources, several focal methods demonstrate comparable performance with generally lower EMD values than for deep simulated source. For most of the methods, the distributions are slightly tighter and less sensitive to noise, indicating improved reliability of source localization in superficial regions. Table 4 provides a quantitative summary of the EMD statistics across all methods for both depth ranges and noise levels. The reported median values confirm the trends observed in Figures 7 and 8, with consistently higher errors for deeper sources and under increased noise. For shallow sources (1.78–3.5 mm) at low noise (1%), several focal methods, such as wCGL and wCL variants, achieve substantially lower median EMD values compared to CG-based approaches, indicating improved localization accuracy. This behavior persists under higher noise (10%), where these methods remain comparatively robust, while CG-Ga and CG-IG methods exhibit significantly higher median errors. For deeper sources (17.81–21.74 mm), all methods show increased median EMD values, reflecting the greater difficulty of reconstructing deeper activity. Although wCGL and wCL approaches still outperform others in terms of median error, their variability (as indicated by higher Std and IQR values) increases under higher noise levels but not significantly. In contrast, methods such as wGL and wL exhibit moderate performance. Overall, the table highlights the combined impact of depth and noise on reconstruction 4.3 Numerical Evaluation of Focality, Depth Bias, and Noise Robustness 35 
+
+Figure 8: Superfical sources (1.78–3.5 mm). Each panel shows results under 1% (left) and 10% (right) noise levels. Shallow sources exhibit lower and more stable EMD values. accuracy, and confirms that the relative performance of the methods remains strongly method-dependent. 36 4 COMPARATIVE STUDY 
+
+1 % of measurement noise 
+
+1.78–3.5 mm depth Method CG-Ga EM CG-Ga IAS CG-IG EM CG-IG IAS wCGL EM wCGL IAS wCL EM wCL IAS wGL wL wMNE Median 29.52 49.43 49.42 49.40 13.40 11.56 13.61 13.75 22.92 13.73 49.43 Std 5.24 4.87 4.87 4.82 5.15 4.16 4.40 4.32 5.41 4.16 4.87 IQR 5.80 6.21 6.32 6.20 6.56 5.35 5.35 5.06 6.12 5.03 6.21 17.81–21.74 mm depth Median 39.58 53.35 53.35 53.35 17.52 22.19 24.57 24.58 28.61 25.37 53.35 Std 5.83 3.54 3.54 3.54 5.55 7.37 6.66 6.65 5.62 5.68 3.54 IQR 7.26 4.27 4.27 4.27 7.59 10.29 8.96 9.40 7.05 6.99 4.27 
+
+10 % of measurement noise 
+
+1.78–3.5 mm depth Method CG-Ga EM CG-Ga IAS CG-IG EM CG-IG IAS wCGL EM wCGL IAS wCL EM wCL IAS wGL wL wMNE Median 76.05 79.36 79.41 79.42 13.32 13.07 16.75 16.97 32.33 18.04 79.36 Std 8.94 7.82 7.89 7.93 8.21 7.34 6.43 7.58 7.51 5.47 7.82 IQR 9.32 7.35 7.75 7.48 8.10 8.77 8.55 8.25 8.20 6.93 7.35 17.81–21.74 mm depth Median 78.67 78.31 78.30 78.30 20.40 22.61 26.40 27.00 40.95 29.77 78.31 Std 5.75 5.11 5.11 5.11 8.65 9.28 8.67 9.11 8.32 7.14 5.11 IQR 5.75 4.34 4.35 4.34 10.77 12.07 12.04 12.33 8.76 8.83 4.34 
+
+Table 4: Summary of Earth Mover’s Distance (EMD) statistics across methods for two representative depth ranges (1.78–3.5 mm and 17.81–21.74 mm) under 1% and 10% measurement noise. For each method, the median, standard deviation (Std), and interquartile range (IQR) are reported. Lower EMD values indicate improved localization accuracy, with performance generally degrading for deeper sources and higher noise levels. 4.3 Numerical Evaluation of Focality, Depth Bias, and Noise Robustness 37 
+
+4.3.4 Assessment of Depth Bias in Source Reconstruction Algorithms 
+
+In this subsection, we examine the relationship between the true source depth and the depth of the reconstructed maximum. By comparing these quantities, we assess whether the algorithms accurately localize sources in correct depths or exhibit systematic biases, such as a tendency to shift the estimated activity toward the cortical surface. It is important to note that this analysis focuses specifically on depth estimation and does not fully reflect overall localization error. In particular, a source may be reconstructed at the correct depth while still being mislocalized in the tangential directions. Figure 9 presents the relationship between the reconstructed maximum depth and the true source depth for all considered methods. The diagonal line represents perfect agreement between the estimated and true depths. The weighted conditionally Laplace models, particularly wCGL with EM updates, show the best agreement with the diagonal, indicating more accurate depth recovery across a wide range of source depths. Their regression lines closely follow the identity line, suggesting reduced depth bias compared to other methods. In contrast, the classical conditionally Gaussian models (CG variants) exhibit a clear bias toward superficial regions, as reflected by the flatter slope of the regression lines and the clustering of reconstructed depths at lower values. This indicates that deeper sources are systematically reconstructed closer to the cortical surface. An exception to this is CG-Ga with the EM parameter update algorithm, which exhibits almost as much depth-bias reduction as weighted Laplace (wL).                                                                          
+
+> Method Depth error >20 mm (15 ,20] mm (10 ,15] mm (5 ,10] mm (1 ,5] mm
+> ≤1mm
+> wMNE 8.3 12.0 17.5 20.0 31.2 11.0 wMCE 2.1 5.0 9.7 24.8 42.2 16.2 wGL 0.3 2.5 6.7 24.7 45.0 20.8 CG-IG (IAS) 8.3 12.0 17.5 20.1 30.7 11.4 CG-IG (EM) 8.3 12.0 17.5 20.1 30.7 11.4 CG-Ga (IAS) 8.3 12.0 17.5 20.0 31.1 11.1 CG-Ga (EM) 2.5 4.6 13.4 24.1 38.9 16.5 wCL (IAS) 1.8 5.0 9.6 23.1 45.0 15.5 wCL (EM) 2.3 5.6 9.6 23.1 44.1 15.3 wCGL (IAS) 2.0 3.0 11.1 21.0 40.8 22.2 wCGL (EM) 0.2 1.5 6.3 21.0 48.8 22.2
+
+Table 5: The table reports the percentage of reconstructed sources whose absolute depth error, defined as |drecon − dtrue |, falls within predefined error intervals in millimeters for each method. Percentages are computed over 1000 simulated sources and provide a quantitative complement to the reconstructed-versus-true depth plots, highlighting differences in depth localization accuracy across methods. 38 4 COMPARATIVE STUDY                                                     
+
+> CG-Ga (EM) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 CG-Ga (IAS) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 CG-IG (EM) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 CG-IG (IAS) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40
+> wCGL (EM) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 wCGL (IAS) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 wCL (EM) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 wCL (IAS) 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40
+> wMNE 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 wGL 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40 wL 010 20 30 40
+> 0
+> 10
+> 20
+> 30
+> 40
+
+Figure 9: Plots of reconstructed versus true source depths for 1000 simulated sources across different methods. The x-axis shows the depth of the true source maximum, and the y-axis shows the depth of the reconstructed maximum. The black diagonal line indicates perfect agreement (zero depth error). Point color encodes the distance between true and estimated source using the indicated color scale (orange, magenta, purple, blue), with larger magnitude indicating larger depth mismatch. The gray line shows the linear regression line obtained from the data with 95 % confidence interval presented by the dashed gray lines. The wMNE method shows the strongest depth bias, with reconstructed maxima largely concentrated at shallow depths regardless of the true source depth. Similarly, wGL and wL demonstrate intermediate behavior, with improved depth tracking compared to wMNE but still noticeable deviations from the ideal diagonal trend. Overall, these results confirm that sensitivity weighting combined with EM-based hyperparameter esti-mation significantly reduces depth bias and improves the ability to recover deeper sources. Table 5 provides a quantitative summary of these findings by reporting the percentage of reconstructed sources whose absolute depth error falls within predefined intervals. The results show that the weighted conditionally Laplace models, particularly wCGL (EM), achieve the highest proportion of small depth 4.4 Discussion 39 errors (e.g., within 1–5 mm and 5–10 mm), while also minimizing the occurrence of large errors (greater than 20 mm). In contrast, methods such as wMNE and the classical conditionally Gaussian variants exhibit a higher proportion of large depth errors, consistent with their observed bias toward superficial reconstructions. Overall, the table reinforces the trends observed in Figure 9, confirming the improved depth localization accuracy of the weighted models with EM-based hyperparameter estimation. Overall, these findings are consistent with the EMD-based analysis presented earlier and further emphasize the importance of algorithm selection in reducing depth-related effects in source reconstruction. 
+
+## 4.4 Discussion 
+
+In this work, we reviewed principal Bayesian methods for EEG source imaging, focusing on how each approach addresses the ill-posed nature of the inverse problem. Particular emphasis was placed on the role of sensitivity weighting, especially within the Bayesian formalism proposed by Calvetti, Pascarella, et al. (2019a). We examined two primary families of Bayesian models for EEG source localization: Gaussian and Conditionally Gaussian models (Calvetti et al., 2009; M. Hämäläinen & Ilmoniemi, 1994), and Laplace-type models (Lahtinen et al., 2022; Uutela et al., 1999). For each class, we provided detailed derivations and algorithmic formulations, highlighting how sensitivity weighting (Calvetti, Pascarella, et al., 2019b) can be used to automatically determine model parameters based on the signal-to-noise ratio (SNR) and lead field properties. Bayesian models employing Laplace-type priors are well known for promoting sparse solutions. Our comparisons using the Earth Mover’s Distance (EMD), however, indicate that these models exhibit increased spatial spread under higher noise levels. Sensitivity weighting partially mitigates this effect, resulting in comparable performance between Laplace and conditional Laplace priors, particularly in terms of noise robustness and depth preservation. Interestingly, even when SNR is used to modulate sensitivity weights, the anticipated improvement in noise robustness is not uniformly observed across all methods. Nevertheless, sensitivity weighting provides a principled and automatic mechanism for parameter tuning and can substantially reduce the risk of gross mislocalization, especially in cortical source estimation. We further noted that sensitivity weighting shares conceptual similarities with the weighting employed in weighted Minimum Norm Estimates (wMNE) (Lin et al., 2006), which also aims to counteract depth bias. Our findings show that beyond approximately 5 mm depth, a pronounced bias emerges across most methods. However, sparsity-promoting approaches—particularly those using group Laplace priors— 40 4 COMPARATIVE STUDY 
+
+demonstrate improved localization within the cortical grey matter, suggesting that sensitivity weighting is most effective when combined with focal prior structures. In addition, we investigated the performance of two hyperparameter updating algorithms, EM and IAS, within conditional models. Both approaches lead to analytically tractable update steps but differ subtly in their treatment of hyperpriors. A key finding is that for the Conditionally Gaussian model with a Gamma hyperprior, EM clearly outperforms IAS in terms of both sparsity and localization accuracy. For other models, EM consistently produces slightly more compact source estimates, albeit at the cost of increased derivational and implementation complexity. Overall, the improved localization accuracy achievable with hierarchical Bayesian methods offers valuable opportunities for non-invasive diagnostics. For example, such approaches may enhance presurgical plan-ning by improving the identification of functional cortical areas or epileptogenic zones (Diamond et al., 2023). While sensitivity weighting mitigates the depth effect in EEG, causing the signal to decay further from the potential-measuring electrodes, the difficulty remains in distinguishing focal deep activity from widespread weak superficial activity that extends across the whole neocortex. Both alternative source distributions can yield the same measured observations, so it is up to the prior model to decide which is more likely to be true. Essentially, all the priors investigated here prefer the weaker, more widely spread activity to some degree, as evidenced by the increase in EMD with depth. However, unless the measurement data is almost noiseless, a highly focal estimate of a deep source should not be anticipated due to the subtlety of changes in the measurement data caused by sources at different locations in the deep regions. Beyond measurement noise and the inherent ill-posedness of EEG source imaging, our results underscore the significant impact of numerical and discretization-induced model discrepancies between the forward simulations and the inverse model. In practice, the inverse solver relies on a discretized approximation of the forward operator, and mismatches arising from mesh resolution, source-space discretization, and assumed conductivity distributions introduce systematic biases that are not captured by noise models or sensitivity weighting alone. These effects manifest as increased EMD values and spatial spreading that persist even when sensitivity weighting is applied. While sensitivity weighting effectively compen-sates for depth-related sensitivity decay, it cannot correct structural inaccuracies in the forward model. Consequently, numerical bias and conductivity mismatch constitute an additional and distinct limita-tion, separate from depth bias and stochastic noise, which must be addressed through explicit model discrepancy handling rather than weighting schemes alone. Thus, although sensitivity weighting can reduce inherent depth bias, improve noise robustness in low to 4.4 Discussion 41 moderate noise regimes, and provide a rational and automatic approach to parameter tuning—features that are particularly valuable in clinical settings where manual tuning is impractical—it cannot mitigate biases arising from numerical inaccuracies and forward-model uncertainty. Finally, open questions remain regarding how to design priors that are both informative and non-restrictive, particularly in the presence of modeling uncertainty and inter-individual variability. One promising di-rection is the incorporation of multimodal constraints, such as fMRI or DTI-based connectivity priors (Skudlarski et al., 2008), which can provide complementary structural or functional information to guide source localization without overly constraining the solution space. At the same time, the increased model complexity introduced by such priors highlights the need for scalable inference strategies. In this context, further work should explore efficient approximation techniques, including variational Bayesian and Monte Carlo methods, to make fully Bayesian treatments computationally feasible in clinical and real-time set-tings. Moreover, extending sensitivity-weighting schemes to time-varying or adaptive priors may offer a natural way to integrate dynamic information and more accurately model temporally evolving neural processes. 
+
+# Data and Code Availability 
+
+To be added a link upon acceptance 
+
+# Funding 
+
+The work of J. Lahtinen was supported by the Research Council of Finland (RCF) through the Flagship of Advanced Mathematics for Sensing, Imaging and modeling (FAME) (359185), and Doctoral Education Pilot on Advanced Mathematics for Modelling, Sensing, and Imaging (DREAM), Ministry of Education and Culture, Finland, VN/3137/2024. A. Koulouri was supported by the Institute for Mathematical Innovation, University of Bath, UK. Supplementary Material (created during production as a web link to online material). 42 REFERENCES 
+
+# References 
+
+Abramowitz, M., & Stegun, I. A. (2002). Handbook of mathematical functions with formulas, graphs, and mathematical tables (partially mathcad-enabled) . U.S. Department of Commerce, NIST. Antonakakis, M., Schrader, S., Wollbrink, A., Oostenveld, R., Rampp, S., Haueisen, J., & Wolters, C. H. (2019). The effect of stimulation type, head modeling, and combined eeg and meg on the source reconstruction of the somatosensory p20/n20 component. Human brain mapping , 40 (17), 5011– 5028. Badia, A. E., & Duong, T. H. (1998). Some remarks on the problem of source identification from boundary measurements. Inverse Problems , 14 (4), 883–891. https://doi.org/10.1088/0266-5611/14/4/008 Baillet, S., Mosher, J. C., & Leahy, R. M. (2001). Electromagnetic brain mapping. IEEE Signal Processing Magazine , 18 , 14–30. https://doi.org/10.1109/79.962275 Bekhti, Y., Lucka, F., Salmon, J., & Gramfort, A. (2018). A hierarchical bayesian perspective on majorization-minimization for non-convex sparse regression: Application to m/eeg source imaging. 
+
+Inverse Problems , 34 (8), 085010. https://doi.org/10.1088/1361-6420/aac9b3 Buchner, H., Knoll, G., Fuchs, M., Rien’́acker, A., Beckmann, R., Wagner, M., Silny, J., & Pesch, J. (1997). Inverse localization of electric dipole current sources in finite element models of the human head. Electroencephalogr. Clin. Neurophysiol. , 102 , 267–278. Calvetti, D., & Somersalo, E. (2007a). Gaussian hypermodels and recovery of blocky objects. Inverse Problems , 23 , 733–754. Calvetti, D., & Somersalo, E. (2007b). Introduction to Bayesian scientific computing – Ten lectures on subjective computing . Springer Verlag. Calvetti, D., Somersalo, E., & Strang, A. (2019). Hierachical Bayesian models and sparsity: ℓ2-magic. 
+
+Inverse problems , 35 (3), 35003–. Calvetti, D., Hakula, H., Pursiainen, S., & Somersalo, E. (2009). Conditionally Gaussian hypermodels for cerebral source localization. SIAM Journal on Imaging Sciences , 2(3), 879–909. https://doi. org/10.1137/080723995 Calvetti, D., Pascarella, A., Pitolli, F., Somersalo, E., & Vantaggi, B. (2019a). Brain activity mapping from MEG data via a hierarchical Bayesian algorithm with automatic depth weighting. Brain topography , 32 (3), 363–393. Calvetti, D., Pascarella, A., Pitolli, F., Somersalo, E., & Vantaggi, B. (2019b). Brain activity mapping from MEG data via a hierarchical bayesian algorithm with automatic depth weighting. Brain topography , 32 (3), 363–393. REFERENCES 43 Calvetti, D., Pragliola, M., Somersalo, E., & Strang, A. (2020). Sparse reconstructions from few noisy data: Analysis of hierarchical bayesian models with generalized gamma hyperpriors. Inverse prob-lems , 36 (2), 25010–. Caron, F., & Doucet, A. (2008). Sparse bayesian nonparametric regression. Proceedings of the 25th international conference on Machine learning - ICML ’08 , 88–95. https : / / doi . org / 10 . 1145 / 1390156.1390168 Dale, A. M., & Sereno, M. I. (1993). Improved localizadon of cortical activity by combining eeg and meg with mri cortical surface reconstruction: A linear approach. Journal of cognitive neuroscience ,
+
+5(2), 162–176. Darbas, M., & Lohrengel, S. (2018). Review on mathematical modelling of electroencephalography (eeg). 
+
+Jahresbericht der Deutschen Mathematiker-Vereinigung , 121 (1), 3–39. https://doi.org/10.1365/ s13291-018-0183-z Diamond, J. M., Withers, C. P., Chapeton, J. I., Rahman, S., Inati, S. K., & Zaghloul, K. A. (2023). Interictal discharges in the human brain are travelling waves arising from an epileptogenic source. 
+
+Brain , 146 (5), 1903–1915. https://doi.org/10.1093/brain/awad015 Figueiredo, M. (2003). Adaptive sparseness for supervised learning. IEEE Transactions on Pattern Analysis and Machine Intelligence , 25 (9), 1150–1159. https://doi.org/10.1109/tpami.2003.1227989 Friston, K., Harrison, L., Daunizeau, J., Kiebel, S., Phillips, C., Trujillo-Barreto, N., Henson, R., Flandin, G., & Mattout, J. (2008). Multiple sparse priors for the m/eeg inverse problem. NeuroImage ,
+
+39 (3), 1104–1120. https://doi.org/https://doi.org/10.1016/j.neuroimage.2007.09.048 Friston, K. J., Harrison, L., Daunizeau, J., Kiebel, S. J., Phillips, C., Trujillo-Barreto, N., Henson, R. N., Flandin, G., & Mattout, J. (2008). Multiple sparse priors for the m/eeg inverse problem. Neu-roImage , 39 (3), 1104–1120. https://doi.org/10.1016/j.neuroimage.2007.09.048 Fuchs, M., Wagner, M., Köhler, T., & Wischmann, H.-A. (1999). Linear and nonlinear current density reconstructions. Journal of Clinical Neurophysiology , 16 (3), 267–295. https://doi.org/10.1097/ 00004691-199905000-00006 Ghosh, S., & Rudy, Y. (2009). Application of l1-norm regularization to epicardial potential solution of the inverse electrocardiography problem. Annals of Biomedical Engineering , 37 (5), 902–912. https://doi.org/10.1007/s10439-009-9665-6 Good, I. J. (1953). The population frequencies of species and the estimation of population parameters. 
+
+Biometrika , 40 (3/4), 237–. Gorodnitsky, I. F., George, J. S., & Rao, B. D. (1995). Neuromagnetic source imaging with focuss: A re-cursive weighted minimum norm algorithm. Electroencephalography and clinical neurophysiology ,
+
+95 (4), 231–251. 44 REFERENCES 
+
+Gramfort, A., Kowalski, M., & Hämäläinen, M. (2012). Mixed-norm estimates for the m/eeg inverse problem using accelerated gradient methods. Physics in Medicine and Biology , 57 (7), 1937– 1961. https://doi.org/10.1088/0031-9155/57/7/1937 Gramfort, A., Luessi, M., Larson, E., Engemann, D. A., Strohmeier, D., Brodbeck, C., Parkkonen, L., & Hämäläinen, M. S. (2014). Mne software for processing meg and eeg data. NeuroImage , 86 ,446–460. https://doi.org/10.1016/j.neuroimage.2013.10.027 Hämäläinen, M., Hari, R., Ilmoniemi, R. J., Knuutila, J., & Lounasmaa, O. V. (1993). Magnetoen-cephalography — theory, instrumentation, and applications to invasive studies of the working human brain. Reviews of Modern Physics , 65 , 413–498. Hämäläinen, M. S., & Ilmoniemi, R. J. (1994). Interpreting magnetic fields of the brain: minimum norm estimates. Medical and Biological Engineering and Computing , 32 , 35–42. https://doi.org/10. 1007/BF02512476 Hämäläinen, M., & Ilmoniemi, R. (1994). Interpreting magnetic fields on the brain: Minimum norm estimates. Medical & biological engineering & computing , 32 (1), 35–42. Hansen, P. C. (1998). Rank-deficient and discrete ill-posed problems: Numerical aspects of linear inver-sion . Society for Industrial; Applied Mathematics. Heinz Werner Engl, A. N., Martin Hanke. (1996). Regularization of inverse problems (mathematics and its applications, 375) . Springer Science & Business Media. Joergensen, B. (1982). Statistical properties of the generalized inverse gaussian distribution (1st ed., Vol. 9). Springer. Kaipio, J. P., & Somersalo, E. (2004). Statistical and computational inverse problems . Springer. Kaipio, J., & Somersalo, E. (2007). Statistical inverse problems: Discretization, model reduction and inverse crimes. J. Comput. Appl. Math. , 198 (2), 493–504. https://doi.org/10.1016/j.cam.2005. 09.027 Kim, B., Yu, D., & Won, J.-H. (2018). Comparative study of computational algorithms for the lasso with high-dimensional, highly correlated data. Applied intelligence (Dordrecht, Netherlands) , 48 (8), 1933–1952. Köhler, T., Wagner, M., Fuchs, M., Wischmann, H.-A., Drenckhahn, R., & Theissen, A. (1996). Depth normalization in meg/eeg current density imaging. Engineering in Medicine and Biology Soci-ety, 1996. Bridging Disciplines for Biomedicine. Proceedings of the 18th Annual International Conference of the IEEE , 2, 812–813 vol.2. https://doi.org/10.1109/IEMBS.1996.651989 Koulouri, A. (2015). Reconstruction of bio-electric fields and source distributions in eeg brain imaging 
+
+[Doctoral dissertation, Imperial College London]. https://spiral.imperial.ac.uk/handle/10044/1/ 41519 REFERENCES 45 Lahtinen, J., Koulouri, A., Rampp, S., Wellmer, J., Wolters, C., & Pursiainen, S. (2024). Standardized hierarchical adaptive lp regression for noise robust focal epilepsy source reconstructions. Clinical neurophysiology , 159 , 24–40. https://doi.org/10.1016/j.clinph.2023.12.001 Lahtinen, J., Koulouri, A., Rezaei, A., & Pursiainen, S. (2022). Conditionally exponential prior in focal near- and far-field EEG source localization via randomized multiresolution scanning (ramus). 
+
+Journal of Mathematical Imaging and Vision , 64 , 587–608. https://doi.org/10.1007/s10851-022-01081-3 Lee, A., Caron, F., Doucet, A., & Holmes, C. (2010). A hierarchical bayesian framework for constructing sparsity-inducing priors. Liang, J., Yu, Z. L., Gu, Z., & Li, Y. (2023). Electromagnetic source imaging with a combination of sparse bayesian learning and deep neural network. IEEE Transactions on Neural Systems and Rehabilitation Engineering , 31 , 2338–2348. https://doi.org/10.1109/tnsre.2023.3251420 Lin, F.-H., Witzel, T., Ahlfors, S. P., Stufflebeam, S. M., Belliveau, J. W., & Hämäläinen, M. S. (2006). Assessing and improving the spatial accuracy in meg source localization by depth-weighted minimum-norm estimates. NeuroImage (Orlando, Fla.) , 31 (1), 160–171. Lucka, F. (2016). Fast gibbs sampling for high-dimensional bayesian inversion. Inverse problems , 32 (11), 115019–. Mattout, J., Phillips, C., Penny, W. D., Rugg, M. D., & Friston, K. J. (2006). Meg source localization under multiple constraints: An extended bayesian framework. NeuroImage , 30 (3), 753–767. https: //doi.org/10.1016/j.neuroimage.2005.10.037 Michel, C. M., Murray, M. M., Lantz, G., Gonzalez, S., Spinelli, L., & Grave De Peralta, R. (2004). EEG source imaging. Clin Neurophysiol , 115 (10), 2195–2222. Miinalainen, T., Rezaei, A., Us, D., Nüßing, A., Engwer, C., Wolters, C. H., & Pursiainen, S. (2019). A realistic, accurate and fast source modeling approach for the EEG forward problem. NeuroImage ,
+
+184 , 56–67. Natterer, F. (2001). The mathematics of computerized tomography . Society for Industrial; Applied Math-ematics. Nayak, T. K. (1987). Multivariate lomax distribution: Properties and usefulness in reliability theory. 
+
+Journal of applied probability , 24 (1), 170–177. Nunez, P. L., & Srinivasan, R. (2006). Electric fields of the brain: The neurophysics of eeg (2. ed.). Oxford University Press. Ou, W., Golland, P., & Hämäläinen, M. (2008). A distributed spatio-temporal eeg/meg inverse solver. In 
+
+Medical image computing and computer-assisted intervention – miccai 2008 (pp. 26–34). Springer Berlin Heidelberg. https://doi.org/10.1007/978-3-540-85988-8_4 46 REFERENCES 
+
+Palmero-Soler, E., Dolan, K., Hadamschek, V., & Tass, P. A. (2007). Swloreta: A novel approach to robust source localization and synchronization tomography. Physics in Medicine and Biology ,
+
+52 (7), 1783–1800. https://doi.org/10.1088/0031-9155/52/7/002 Pascual-Marqui, R. D. (n.d.). Standardized low resolution brain electromagnetic tomography (sLORETA): technical details. Pascual-Marqui, R., Michel, C., & Lehmann, D. (1994). Low resolution electromagnetic tomography: A new method for localizing electrical activity in the brain. International Journal of Psychophysiol-ogy , 18 (1), 49–65. https://doi.org/10.1016/0167-8760(84)90014-x Puonti, O., Van Leemput, K., Saturnino, G. B., Siebner, H. R., Madsen, K. H., & Thielscher, A. (2020). Accurate and robust whole-head segmentation from magnetic resonance images for individualized head modeling. NeuroImage , 219 , 117044. https : / / doi . org / https : / / doi . org / 10 . 1016 / j . neuroimage.2020.117044 Ramon, C., Schimpf, P. H., & Haueisen, J. (2006). Influence of head models on EEG simulations and inverse source localizations. Biomed. Eng. Online , 5(10). Rezaei et al. , A. (2021). Reconstructing subcortical and cortical somatosensory activity via the RAMUS inverse source analysis technique using median nerve SEP data. NeuroImage (Orlando, Fla.) , 245 ,118726–118726. Sato, M.-a., Yoshioka, T., Kajihara, S., Toyama, K., Goda, N., Doya, K., & Kawato, M. (2004). Hier-archical bayesian estimation for meg inverse problem. NeuroImage (Orlando, Fla.) , 23 (3), 806– 826. Skudlarski, P., Jagannathan, K., Calhoun, V. D., Hampson, M., Skudlarska, B. A., & Pearlson, G. (2008). Measuring brain connectivity: Diffusion tensor imaging validates resting state temporal correlations. NeuroImage (Orlando, Fla.) , 43 (3), 554–561. Sorrentino, A., Luria, G., & Aramini, R. (2014). Bayesian multi-dipole modelling of a single topography in meg by adaptive sequential monte carlo samplers. Inverse problems , 30 (4), 45010–22. Tikhonov, A. N. (1963). Solution of incorrectly formulated problems and the regularization method. 
+
+Soviet Math. Dokl. , 4, 1035–1038. Uutela, K., Hämäläinen, M., & Somersalo, E. (1999). Visualization of magnetoencephalographic data using minimum current estimates. NeuroImage , 10 (2), 173–180. https://doi.org/10.1006/nimg. 1999.0454 Vanrumste, B., Van Hoey, G., Van de Walle, R., D’Havé, M. R., Lemahieu, I. A., & Boon, P. A. (2002). Comparison of performance of spherical and realistic head models in dipole localization from noisy EEG. Medical engineering & physics , 24 (6), 403–418. REFERENCES 47 Vatta, F., Meneghini, F., Esposito, F., Mininel, S., & Di Salle, F. (2010). Realistic and spherical head modeling for EEG forward problem solution: A comparative cortex-based analysis. Computational Intelligence and Neuroscience , 2010 , 972060–11. Wagner, M., Wischmann, H.-A., Fuchs, M., Köhler, T., & Drenckhahn, R. (2000). Current density reconstructions using the l1 norm. In Biomag 96 (pp. 393–396). Springer New York. https : //doi.org/10.1007/978-1-4612-1260-7_96 Wipf, D., & Nagarajan, S. (2009). A unified bayesian framework for meg/eeg source imaging. NeuroIm-age , 44 (3), 947–966. https://doi.org/10.1016/j.neuroimage.2008.02.059 Wipf, D., & Nagarajan, S. (2010). Iterative reweighted ℓ1 and ℓ2 methods for finding sparse solutions. 
+
+IEEE journal of selected topics in signal processing , 4(2), 317–329. Wolters, C. H., Grasedyck, L., & Hackbusch, W. (2004). Efficient computation of lead field bases and influence matrix for the FEM-based EEG and MEG inverse problem. Inverse Problems , 20 (4), 1099–1116. https://doi.org/10.1088/0266-5611/20/4/007

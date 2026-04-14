@@ -1,0 +1,1782 @@
+Title: Explainable machine learning identifies candidate shared neuroanatomical features in Alzheimer's and Parkinson's via importance inversion transfer
+
+URL Source: https://www.biorxiv.org/content/10.64898/2026.04.10.717735v1.full.pdf
+
+Number of Pages: 28
+
+Markdown Content:
+# Explainable machine learning identifies candidate shared neuroanatomical features in Alzheimer’s and Parkinson’s via importance inversion transfer 
+
+## Daniele Caligiore, Simone Torsello and for the Alzheimer’s Disease Neuroimaging Initiative ∗
+
+> 1*
+
+Computational and Translational Neuroscience Laboratory, Institute of Cognitive Sciences and Technologies, National Research Council (CTNLab-ISTC-CNR), Via Gian Domenico Romagnosi, 18A, Rome, 00196, Italy. 
+
+> 2
+
+AI2Life s.r.l., Innovative Start-Up, ISTC-CNR Spin-Off,, Via Sebino, 32, Rome, 00199, Italy. 
+
+> 3
+
+Department of Human Sciences, Communication, Education and Psychology, Libera Universit` a Maria Ss. Assunta (LUMSA), Via della Traspontina, 21, Rome, 00193, Italy. *Corresponding author(s). E-mail(s): daniele.caligiore@istc.cnr.it; 
+
+Abstract 
+
+Despite significant neurobiological and pathological overlaps, Alzheimer’s (AD) and Parkinson’s (PD)—the primary threats to healthy aging—are still managed as distinct clinical entities. Standard machine learning exacerbates this frag-mentation by prioritizing divergent markers over shared traits, obscuring the invariant foundations of neurodegeneration. This study introduces an explainable framework leveraging Importance Inversion Transfer (IIT) to identify candi-date neuroanatomical features that show relative stability across both disorders. By prioritizing structural anchors invariant across the neurodegenerative spec-trum, IIT isolates candidate shared structural features. Analysis of multi-regional brain volumes identifies eight shared anchors, confirmed via an inductive valida-tion protocol with high diagnostic robustness (AUC = 0.894). Findings reveal a morphological continuum between healthy aging and neurodegeneration, sug-gesting the presence of partially shared structural substrates. These results 
+
+> ∗
+
+A complete listing of ADNI investigators can be found at: http://adni.loni.usc.edu/ wp-content/uploads/how to apply/ADNI Acknowledgement List.pdf. 
+
+1
+
+.CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint are consistent with—though do not demonstrate—a potential common early-phase vulnerability across neurodegenerative conditions, as conceptualized by the Neurodegenerative Elderly Syndrome (NES) framework, establishing a possible paradigm for early, system-level diagnosis.  
+
+> Keywords: Neurodegenerative Elderly Syndrome (NES), Importance Inversion Transfer (IIT), Alzheimer’s disease, Parkinson’s disease, Explainable Artificial Intelligence (XAI), Structural anchors, Brain morphometry, System-level neurodegeneration
+
+# 1 Introduction 1
+
+Alzheimer’s disease (AD) and Parkinson’s disease (PD) constitute the foremost causes 2
+
+of neurodegeneration in geriatric populations, imposing a mounting strain on global 3
+
+healthcare infrastructure [1, 2]. As the most prevalent neurodegenerative conditions, 4
+
+these disorders impact tens of millions worldwide; while AD manifests primarily 5
+
+through progressive cognitive erosion and memory loss, PD is clinically distinguished 6
+
+by hallmark motor impairments, including bradykinesia, tremor, and rigidity [3–5]. 7
+
+Conventional clinical paradigms categorize these disorders as separate entities defined 8
+
+by symptomatic silos. However, emerging evidence highlights substantial pathological 9
+
+convergences at the molecular and cellular levels which frequently manifest decades 10 
+
+prior to clinical onset [6–11]. 11 
+
+These convergences have led to the hypothesis that AD and PD may share partially 12 
+
+overlapping pathological mechanisms, potentially reflecting a common early vulnera-13 
+
+bility phase. This perspective has been formalized as the Neurodegenerative Elderly 14 
+
+Syndrome (NES) hypothesis [8, 12]. The NES framework delineates a three-phase 15 
+
+progression: an initial seeding stage defined by subclinical αSyn and monoaminer-16 
+
+gic failure; a compensatory stage wherein homeostatic regulation preserves functional 17 
+
+integrity despite incipient decay; and a terminal bifurcation stage in which damage 18 
+
+to specific neural circuits yields phenotype-specific manifestations. Despite this theo-19 
+
+retical foundation, mapping the shared neuroanatomical backbone that sustains the 20 
+
+syndrome prior to clinical divergence remains a critical challenge in geriatric neurology. 21 
+
+Exploring the plausibility of the NES hypothesis requires analytical methods 22 
+
+capable of capturing both shared and divergent features within complex, multimodal 23 
+
+datasets. While machine learning (ML) offers powerful pattern detection capabilities, 24 
+
+clinical application demands transparency to ensure safety and reliability. Explainable 25 
+
+machine learning (XML) addresses this requirement by identifying the specific features 26 
+
+driving model predictions, thereby enabling a mechanistic interpretation of neurode-27 
+
+generative trajectories. Recent literature underscores the versatility of XML in this 28 
+
+domain, spanning from broad applications in diagnosis and treatment monitoring [13] 29 
+
+to the identification of manifestations through digital phenotyping [10] and the opti-30 
+
+mization of multi-target drug combinations [14]. Specifically, XML has proved pivotal 31 
+
+in unraveling sex-specific pathological signatures in both PD [15] and AD, facilitating 32 
+
+the development of clinician-tailored diagnostic interfaces [16]. However, despite these 33 
+
+2
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+advancements, current diagnostic models and ML protocols primarily emphasize fea-34 
+
+ture selection based on maximum divergence. This heavy reliance on discriminative 35 
+
+utility inherently obscures the invariant structural anchors that constitute the shared 36 
+
+pathological core of neurodegeneration. 37 
+
+To address this limitation, the present study employs the Importance Inversion 38 
+
+Transfer (IIT) mechanism [17] to map the set of candidate invariant neuroanatomical 39 
+
+features of AD and PD. Drawing on the identification of universal invariant principles 40 
+
+within complex multiscale systems [18], the IIT logic inverts standard selection proto-41 
+
+cols by prioritizing neuroanatomical descriptors that exhibit high structural invariance 42 
+
+and statistical stability across disease states. This methodological shift prioritizes fea-43 
+
+tures with low discriminative power, enabling the identification of candidate regions 44 
+
+that may reflect shared structural properties across disease states. 45 
+
+Analysis of multi-regional brain volumes across Healthy Control, PD, and AD 46 
+
+cohorts suggests the potential existence of a unified neuroanatomical signature. The 47 
+
+identification of stable structural anchors points toward a shared pathological trunk, 48 
+
+encouraging a transition from phenotype-specific classification toward a broader 49 
+
+system-level view of brain aging [19, 20]. Such findings offer a preliminary framework 50 
+
+for intervention strategies aimed at universal neurodegenerative mechanisms during 51 
+
+stages preceding definitive clinical bifurcation. 52 
+
+# 2 Results 53 
+
+## 2.1 Volumetric Signatures and Phenotypic Bifurcation 54 
+
+Morphometric profiling across 84 regions delineates distinct structural signatures for 55 
+
+AD and PD relative to healthy aging (Table 5). Analysis reveals patterns consistent 56 
+
+with an antagonistic relationship: AD manifests as a systemic structural collapse of 57 
+
+limbic and associative networks, whereas PD exhibits localized shifts and selective 58 
+
+volumetric expansion. 59 
+
+AD pathology shows aggressive progression centered on the medial temporal lobe. 60 
+
+Entorhinal (LH: 34.11%) and amygdala (LH: 32.21%) atrophy identify the primary 61 
+
+sites of tissue loss ( p < 0.001), followed by significant hippocampal contraction (LH: 62 
+
+28.36%, p < 0.001). This neuroanatomical degradation extends symmetrically to the 63 
+
+inferior temporal gyrus and the precuneus. Widespread tissue depletion coincides with 64 
+
+bilateral expansion of the lateral ventricles ( > 85%) and total CSF volume (34.07%), 65 
+
+marking the macroscopic stage of advanced neurodegeneration. 66 
+
+The PD cohort displays a divergent morphological trajectory, frequently maintain-67 
+
+ing statistical contiguity with the healthy baseline. Significant volumetric expansion 68 
+
+occurs in the brain stem (5.25% increase, p = 0 .030) and the hemispheric cere-69 
+
+bral white matter (LH: 4.92%; RH: 5.07%, p < 0.05). A similar hypertrophic trend 70 
+
+appears in the left choroid plexus, where expansion reaches 10.40% without meeting 71 
+
+the conventional significance threshold ( p = 0 .060). 72 
+
+Volumetric distributions identify a bifurcation in neurodegenerative paths between 73 
+
+AD and PD. While AD manifests through moderate white matter contraction (9– 74 
+
+10%), PD sustains or increases white matter volume. Similarly, subcortical nuclei, 75 
+
+including the thalamus and putamen, show significant volumetric separation from the 76 
+
+3
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+healthy baseline in AD, yet remain statistically indistinguishable from controls in the 77 
+
+PD cohort. 78 
+
+## 2.2 Classification Performance and Diagnostic Benchmarking 79 
+
+Performance benchmarking of three machine learning architectures through a multi-80 
+
+seed inductive validation protocol identifies the diagnostic potential of regional brain 81 
+
+volumetric signatures. As summarized in Table 1, the Random Forest (RF) classifier 82 
+
+demonstrates superior diagnostic power for multi-cohort separation, yielding a mean 83 
+
+accuracy of 73 .2% and a robust Area Under the Curve (AUC) of 0 .895. 84 
+
+Table 1. Global 3-way classification performance (Healthy vs. PD vs. AD). Metrics represent ensemble averages marginal-ized over 10 independent random seeds. Accuracy, F1-macro, and ROC-AUC scores confirm the robustness of volumetric features for primary cohort identification. 
+
+Model Accuracy F1-macro ROC-AUC Random Forest 0.732 0.730 0.895 Gradient Boosting 0.709 0.707 0.878 Logistic Regression 0.685 0.686 0.849 
+
+To isolate the set of candidate invariant neuroanatomical features of AD and 85 
+
+PD, the importance inversion logic was applied to a binary disease-only classification 86 
+
+manifold. By removing healthy controls from the discovery phase, the models were 87 
+
+forced to prioritize structural descriptors with the lowest discriminative utility specifi-88 
+
+cally between the two pathologies. This strategy ensures that the identified structural 89 
+
+anchors represent the purest invariants of the neurodegenerative seeding phase, effec-90 
+
+tively filtering out any signal related to the general transition from healthy aging 91 
+
+to disease. The binary diagnostic challenge specifically targeting the differentiation 92 
+
+between PD and AD reveals an even higher degree of separability (Table 2). In this 93 
+
+task, Gradient Boosting (GB) achieves a peak accuracy of 93 .8% and an AUC of 0 .981. 94 
+
+This performance jump indicates that while the global transition from healthy aging 95 
+
+is complex, the phenotype-specific signatures that distinguish PD from AD are highly 96 
+
+unambiguous once the healthy baseline variance is removed. 97 
+
+More in details, Figure 1 reveals distinct structural regimes. In the global 3-way 98 
+
+task, the AD cohort reaches a classification accuracy of 88 .6%, suggesting a highly 99 
+
+specific structural fingerprint. Conversely, the significant overlap between Healthy 100 
+
+Controls (CN) and PD—where 33 .3% of PD subjects are misclassified as CN— 101 
+
+highlights a morphological continuum characteristic of the early neurodegenerative 102 
+
+seeding phase. 103 
+
+This statistical proximity between PD and healthy aging indicates that volumetric 104 
+
+shifts in early PD often reside within the variance of normal physiological aging. This 105 
+
+phenomenon prevents total separation of the manifolds until the bifurcation stage is 106 
+
+4
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+Table 2. Binary classification performance (PD vs. AD bifurcation). Summary of performance metrics for the direct com-parison between disease phenotypes. High accuracy and AUC values across all models indicate nearly absolute structural differentiation between PD and AD cohorts. 
+
+Model Accuracy F1-macro ROC-AUC Gradient Boosting 0.938 0.937 0.981 Random Forest 0.923 0.923 0.979 Logistic Regression 0.917 0.917 0.980 
+
+Fig. 1. Global cohort classification. Average confusion matrix marginalized over 10 independent random seeds for the 3-way Random Forest classifier. Values represent the mean number of subjects per test fold ( ntotal = 60 .5 per fold). The high accuracy for AD (88 .6%) contrasts with the PD/Healthy overlap (33 .3%), highlighting the early-stage morphological continuum. 
+
+reached, further justifying the implementation of the IIT logic (see next section). By 107 
+
+bypassing the classificatory noise inherent in these overlapping distributions, the IIT 108 
+
+mechanism successfully isolates the stable structural anchors that remain invariant 109 
+
+across the neurodegenerative spectrum. 110 
+
+5
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+The diagnostic efficacy of the binary task is further elucidated by the average 111 
+
+confusion matrix for the Gradient Boosting classifier (Figure 2). The results sug-112 
+
+gest a strong separation between the two pathological states, with a mean of 18.8 113 
+
+PD subjects (93 .1%) and 19.1 AD subjects (94 .6%) correctly identified per test fold. 114 
+
+The marginal misclassification rate—averaging only 1.4 PD subjects identified as AD 115 
+
+and 1.1 AD subjects identified as PD—suggests that, once the healthy baseline vari-116 
+
+ance is removed, the neuroanatomical footprints of AD and PD occupy mutually 117 
+
+exclusive morphometric manifolds. This high categorical distinctness provides quan-118 
+
+titative evidence for the phenotypic bifurcation stage of the NES. While the seeding 119 
+
+phase is characterized by structural contiguity, the bifurcation stage is defined by the 120 
+
+emergence of non-overlapping volumetric signatures. 121 
+
+Fig. 2. Binary AD vs. PD separation. Average confusion matrix for the Gra-dient Boosting classifier in the binary task. The diagonal dominance (93.8% overall accuracy) indicates that AD and PD occupy distinct neuroanatomical manifolds when compared directly, facilitating precise phenotypic bifurcation. 
+
+## 2.3 Diagnostic Separators and Structural Anchors 122 
+
+Borda consensus ranking in the binary classifiers highlights the brain regions that most 123 
+
+strongly drive phenotypic separation (Fig. 3). Structural profiling reveals that the 124 
+
+LH Hippocampus , RH Amygdala , LH Entorhinal cortex , and RH Hippocampus exhibit 125 
+
+6
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+the highest discriminative utility. These areas, characterized by extreme statistical 126 
+
+separation ( p < 0.001), define the bifurcation stage of the neurodegenerative process. 127 
+
+Fig. 3. Top Classificatory Discriminants. Borda consensus ranking identifying the brain regions with maximum discriminative utility between AD and PD (Bifur-cation markers). 
+
+Conversely, the IIT score isolates the structural anchors that constitute the shared 128 
+
+pathological core (Fig. 4). The LH Transverse Temporal cortex and the RH Choroid 129 
+
+Plexus emerge as the top-ranked features, identifying a parsimonious neuroanatomical 130 
+
+backbone that remains synchronized across pathologies. Notably, the RH Amygdala 131 
+
+represents the sole descriptor present in both top-tier rankings. Although it serves as 132 
+
+a primary driver for diagnostic separation (ranking 2nd in Fig. 3), it simultaneously 133 
+
+functions as a structural anchor (Fig. 4). The Discussion section further examines the 134 
+
+pathophysiological basis of this dual positioning, identifying the region as a critical 135 
+
+hybrid node within the neurodegenerative manifold. 136 
+
+## 2.4 Hierarchical Audit of the Neuroanatomical Backbone 137 
+
+Statistical validation of top-ranked regions highlights a distinct hierarchy within the 138 
+
+shared neuroanatomical core (Table 3). The LH Transverse Temporal cortex ( p =139 
+
+0.1063) and RH Choroid Plexus (p = 0 .0510) function as Master Anchors . These 140 
+
+regions show reduced statistical separation between AD and PD, indicating limited 141 
+
+discriminatory power in this dataset. Minimal effect sizes ( < 0.34) further establish 142 
+
+these nodes as the invariant neuroanatomical locus of the NES seeding stage. 143 
+
+The remaining structures—including the LH Postcentral gyrus, LH Medial 144 
+
+Orbitofrontal cortex, and RH Amygdala —constitute Transition Pillars . Despite signif-145 
+
+icant volumetric divergence in magnitude ( p < 0.01; Effect Size > 0.53), these regions 146 
+
+maintain absolute rank-order consistency ( ρ = 1 .0). This dissociation between damage 147 
+
+7
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+Fig. 4. Structural Anchors and the NES Core. IIT score ranking identifying the regions with maximum pathological invariance across the neurodegenerative spectrum. 
+
+Table 3. Independent Statistical Validation of the NES Core Hierarchy. Regions are ranked by their Binary IIT Score. Master anchors (in bold) exhibit phenotypic invariance between AD and PD (pP D/AD ≥ 0.05). Transition pillars represent regions with high struc-tural centrality where pathological trajectories begin to diverge signifi-cantly ( pP D/AD < 0.05). 
+
+Brain Region IIT Score pP D/AD Effect Size LH Transverse Temporal 5.4650 0.1063 0.2860 
+
+RH Choroid Plexus 5.4435 0.0510 0.3358 LH Postcentral 4.6012 0.0000 0.8847 LH Medial Orbitofrontal 3.7156 0.0000 1.1178 RH Pericalcarine 3.5960 0.0001 0.6292 RH Caudal Ant. Cingulate 3.4241 0.0047 0.5306 LH Choroid Plexus 3.2874 0.0037 0.4120 RH Amygdala 3.2249 0.0000 1.6916 RH Transverse Temporal 3.2115 0.0177 0.3540 LH Caudal Mid. Frontal 3.2084 0.0000 0.8642 
+
+magnitude (Effect Size) and distributional pattern (Spearman’s ρ) suggests a synchro-148 
+
+nized pathological program across the structural backbone. Specifically, the high effect 149 
+
+sizes in the RH Amygdala (1 .6916) and LH Medial Orbitofrontal cortex (1 .1178) mark 150 
+
+the onset of a bifurcation stage where shared seeding yields to phenotype-specific atro-151 
+
+phy trajectories. Uniform Spearman correlations ( ρ = 1 .0) across all investigated nodes 152 
+
+8
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+confirm a perfectly preserved structural hierarchy. While atrophy magnitude and phe-153 
+
+notypic divergence ( pP D/AD ) vary, the invariant rank-order of these anchors suggests 154 
+
+them as stable topographical landmarks within the neurodegenerative landscape. 155 
+
+## 2.5 Bifurcation and Invariance in Neuroanatomical Manifolds 156 
+
+Statistical profiling of regional brain volumes delineates two distinct morphometric 157 
+
+regimes: phenotypic bifurcation (Fig. 5) and pathological invariance (Fig. 6). 158 
+
+Ensemble distributions derived from 10 independent stochastic realizations visu-159 
+
+alize the transition from invariant seeding to symptomatic differentiation across six 160 
+
+representative regions. Primary discriminants—specifically the LH Entorhinal cortex, 161 
+
+the bilateral Hippocampus , and the RH Amygdala —delineate a clear structural diver-162 
+
+gence between the two neurodegenerative trajectories (Fig. 5a–d). In these hubs, the 163 
+
+AD cohort exhibits profound volumetric collapse relative to both Healthy Controls and 164 
+
+the PD group ( p < 0.001). Conversely, the PD cohort maintains statistical contiguity 165 
+
+with the healthy baseline ( ns ), establishing these regions as the definitive markers of 166 
+
+the bifurcation stage. 167 
+
+In contrast, structural anchors identify a shared neuroanatomical core where AD 168 
+
+and PD trajectories remain synchronized. The LH Transverse Temporal cortex (Fig. 169 
+
+6a) demonstrates global stability across cohorts, with no significant difference between 170 
+
+the pathological groups ( p = 0 .106). 171 
+
+The RH Choroid Plexus (Fig. 6b) functions as a critical transition node within 172 
+
+this shared backbone. While AD subjects exhibit significant expansion relative to 173 
+
+controls ( p < 0.001), the direct comparison between AD and PD yields statistical 174 
+
+indistinguishability ( p = 0 .051). This hierarchical significance suggests a shared hyper-175 
+
+trophic signature that manifests fully in the AD phenotype while remaining in a latent, 176 
+
+compensatory stage in PD ( ns vs. Healthy). Such statistical proximity, despite sig-177 
+
+nificant deviation from the healthy baseline in the AD group, indicates the existence 178 
+
+of a shared neuroanatomical backbone that characterizes the seeding phase of the 179 
+
+neurodegenerative spectrum. 180 
+
+# 3 Discussion 181 
+
+## 3.1 Divergent Morphological Signatures and Pathological 182 
+
+## Trajectories 183 
+
+Regional volumetric profiling across 84 brain regions identifies distinct structural man-184 
+
+ifolds for healthy aging, PD, and AD (Table 5). Aggressive atrophy in the AD cohort 185 
+
+perfectly reproduces established signatures of medial temporal and temporo-parietal 186 
+
+decay [21]. The entorhinal cortex and hippocampus exhibit profound volumetric con-187 
+
+traction, reflecting the initial stages of tau-related neurodegeneration within the medial 188 
+
+temporal memory system [22–24]. This coordinated decay extends through limbic cir-189 
+
+cuits to the amygdala and systemic hubs of the default mode network, such as the 190 
+
+precuneus and temporal association areas [25–28]. Systemic tissue depletion culmi-191 
+
+nate in a dramatic bilateral expansion of the lateral ventricles ( > 80%), serving as a 192 
+
+macroscopic surrogate for global volume loss and cognitive deterioration [24, 29]. 193 
+
+9  
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint (a) (b)
+> (c) (d)
+
+Fig. 5. Morphometric markers of phenotypic bifurcation. (a–d ) LH Entorhi-nal cortex, bilateral Hippocampus , and RH Amygdala showing extreme volumetric separation ( p < 0.001) between AD and PD cohorts. These regions define the stage where phenotype-specific trajectories diverge from the common backbone. White diamonds indicate ensemble means; individual data points illustrate bootstrapped variance. Significance brackets denote post-hoc Dunn’s test results ( ∗ ∗ ∗ p < 0.001, ns: not significant). 
+
+In contrast, the PD cohort exhibits relative structural preservation and prominent 194 
+
+instances of “negative atrophy.” Expansion in the brain stem and cerebral white matter 195 
+
+(+4.92%) challenges traditional models of Parkinsonian progression, suggesting that 196 
+
+regional volumetric increases represent a hallmark of the early-to-mid stage disease 197 
+
+manifold [30–33]. Biologically, this phenomenon likely reflects the impact of neuroin-198 
+
+flammation and reactive gliosis. The accumulation of α-synuclein triggers microglial 199 
+
+10  
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint (a) (b)
+
+Fig. 6. Structural Master Anchors of the neurodegenerative backbone. 
+
+(a,b ) LH Transverse Temporal cortex and RH Choroid Plexus exhibiting statistical indistinguishability ( p ≥ 0.05) between AD and PD cohorts. These nodes identify the invariant seeding phase of the syndrome. White diamonds indicate ensemble means; individual data points illustrate bootstrapped variance. Significance brackets denote post-hoc Dunn’s test results (ns: not significant). 
+
+activation and astrogliosis, resulting in a detectable increase in regional volumes 200 
+
+that effectively masks concurrent neuronal depletion [34–38]. Statistical contiguity 201 
+
+with healthy baselines persists in PD even alongside profound functional connectiv-202 
+
+ity deficits, identifying a state of structural resilience or latency absent in the AD 203 
+
+phenotype [39]. 204 
+
+These divergent signatures suggest a fundamental pathophysiological distinction. 205 
+
+While AD manifests as a systemic structural collapse, PD follows a topographically 206 
+
+localized trajectory driven by a system-level failure in brain homeostasis [6, 40, 41]. 207 
+
+Bilateral hypertrophy of the Choroid Plexus provides key evidence for this global 208 
+
+disruption. As the primary site for cerebrospinal fluid production and waste clearance, 209 
+
+expansion of the Choroid Plexus highlights a compensatory attempt to manage brain-210 
+
+wide proteinopathic overload. This failure of the brain “drainage system” suggest 211 
+
+that systemic neuro-inflammatory responses and impaired glymphatic clearance may 212 
+
+effectively mask neuronal loss during early stages [42, 43]. 213 
+
+Furthermore, brain stem and subcortical expansion suggests compensatory self-214 
+
+reorganization. Mirroring the neural remodeling observed in the thalamus and middle 215 
+
+temporal gyrus of PD patients, these volumetric shifts likely reflect enhanced sensori-216 
+
+motor interactions or adaptive neural remodeling in response to progressing pathology 217 
+
+[44]. Such dynamic subcortical morphology often correlates with clinical status and 218 
+
+cognitive resilience [45]. Antagonistic white matter trajectories—expansion in PD 219 
+
+11 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+(+4.92%) versus collapse in AD (-9.78%)—mark a definitive bifurcation in neu-220 
+
+rodegenerative paths. PD-specific neuro-inflammatory remodeling contrasts with the 221 
+
+irreversible axonal loss characterizing AD [6, 46, 47]. 222 
+
+The antagonistic trajectories identified between AD and PD provide significant 223 
+
+diagnostic utility, establishing that neuroanatomical divergence precedes the point 224 
+
+where phenotypic expressions reach diagnostic maturity. The relative stability of sub-225 
+
+cortical nuclei in PD, contrasted with their systemic decay in AD, suggests robust 226 
+
+structural signatures for differential screening. Crucially, the implementation of rig-227 
+
+orous normalization protocols ensures that these findings—specifically the observed 228 
+
+volumetric resilience and “negative atrophy” in the PD cohort—reflect genuine bio-229 
+
+logical phenomena rather than methodological scaling artifacts. By accounting for 230 
+
+individual differences in total intracranial volume and demographic variance, the 231 
+
+analysis captures a critical transition zone of biological resilience unique to the PD 232 
+
+phenotype. Consequently, these results are compatible with the hypothesis that AD 233 
+
+and PD may share early structural features before diverging into disease-specific tra-234 
+
+jectories. Early systemic failure in AD contrasts with a prolonged phase of homeostatic 235 
+
+struggle in PD, supporting the hierarchical logic of the NES backbone. 236 
+
+## 3.2 Compensatory Latency and Phenotypic Bifurcation 237 
+
+High-accuracy binary classification ( AU C = 0 .981, Table 2) suggests that AD and PD 238 
+
+occupy mutually exclusive morphometric manifolds during advanced disease stages. 239 
+
+Yet, the global 3-way task reveals a critical asymmetry: while the AD signature remains 240 
+
+highly distinct (88 .6% accuracy), the significant misclassification of PD subjects as 241 
+
+Healthy Controls (33 .3%) indicates the morphological continuum underlying early 242 
+
+neurodegeneration (Fig. 1). This statistical proximity is consistent with the proposed 243 
+
+compensatory stage within the NES framework, wherein homeostatic mechanisms 244 
+
+effectively mask structural decay within the variance inherent in physiological aging. 245 
+
+As discussed in the context of antagonistic trajectories (cf., Section 3.1), the 246 
+
+observed “negative atrophy” in the PD brain stem and cerebral white matter highlights 247 
+
+the macrostructural footprint of reactive plasticity or neuro-inflammatory upregu-248 
+
+lation. This hypertrophic signature suggests a systemic effort to maintain network 249 
+
+stability, potentially driven by the upregulation of noradrenergic and serotonergic 250 
+
+systems in response to early dopaminergic depletion [8]. 251 
+
+The pronounced contrast between this structural resilience in PD and the aggres-252 
+
+sive limbic collapse characterizing AD necessitates the application of IIT logic. By 253 
+
+isolating invariant structural anchors that persist across the AD–PD transition, the 254 
+
+framework captures latent pathological signatures well before clinical phenotypes 255 
+
+achieve diagnostic maturity. This non-linear progression, where compensatory remod-256 
+
+eling delays the emergence of hallmark symptoms, supports homeostatic markers as 257 
+
+primary diagnostic indicators capable of bypassing the classificatory noise inherent in 258 
+
+the bifurcation stage. 259 
+
+12 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+## 3.3 Anatomical Divergence and the NES Core Hierarchy 260 
+
+The quantitative divergence between Borda-driven separators and IIT-driven anchors 261 
+
+delineates the structural transition from shared pathological seeding to phenotypic 262 
+
+bifurcation (Figures 3, 4). Unlike traditional diagnostic paradigms prioritizing the Hip-263 
+
+pocampus for classification accuracy, IIT isolates the RH Choroid Plexus and the LH 264 
+
+Transverse Temporal cortex as invariant master anchors. Statistical indistinguisha-265 
+
+bility and absolute structural consistency within these nodes may reflect an early 266 
+
+anatomical locus of shared vulnerability, consistent with the NES seeding stage [8] 267 
+
+(Figure 6, Table 3). 268 
+
+Morphological symmetry in the LH Transverse Temporal cortex may be compati-269 
+
+ble with alterations in neuromodulatory systems (e.g., noradrenergic and serotonergic 270 
+
+pathways), although this interpretation cannot be directly tested with the present 271 
+
+data. As the site of the primary auditory cortex (Heschl’s gyrus), this region relies 272 
+
+on dense projections from the Locus Coeruleus and the Raphe Nuclei to maintain 273 
+
+cortical arousal and auditory signal-to-noise modulation [8, 48–50]. Volumetric analy-274 
+
+sis identifies a hemispheric gradient within this manifold: significant structural decay 275 
+
+characterizes the right hemisphere ( p = 0 .0025), while the left remains statistically 276 
+
+contiguous with the healthy baseline ( p = 0.0606). This lateralized vulnerability 277 
+
+suggests that sensory hub degradation precedes the collapse of associative networks. 278 
+
+Simultaneously, bilateral Choroid Plexus hypertrophy is consistent with the 279 
+
+possibility of altered system-level homeostatic regulation. As the primary site for cere-280 
+
+brospinal fluid (CSF) production and glymphatic waste clearance, invariant Choroid 281 
+
+Plexus expansion suggests that impaired proteostatic drainage precedes the accumu-282 
+
+lation of disease-specific aggregates [51, 52]. The RH Choroid Plexus (p = 0 .051) 283 
+
+represents a node of maximum convergence within a context of brain-wide divergence. 284 
+
+While the magnitude of this hit is more pronounced in AD ( p < 0.001), consistent with 285 
+
+[53], the underlying attempt to manage proteinopathic overload through increased 286 
+
+CSF production remains synchronized across phenotypes. 287 
+
+Molecular Correlates of Structural Anchors 288 
+
+Master anchor identification via IIT logic converges with recent large-scale plasma 289 
+
+proteomics delineating pan-neurodegenerative molecular signatures [11]. Synchronized 290 
+
+volumetric expansion of the RH Choroid Plexus serves as a macrostructural correlate 291 
+
+to shared dysregulation in proteins governing extracellular matrix (ECM) remodel-292 
+
+ing and immune response. Specifically, the consistent elevation of SMOC1 and the 293 
+
+enrichment of ECM organization pathways—including multiple matrix metallopro-294 
+
+teinases—across AD and PD cohorts [11] point toward systemic alterations at cerebral 295 
+
+homeostatic interfaces. As a critical blood-CSF barrier, the Choroid Plexus under-296 
+
+goes structural remodeling in response to these shared proteinopathic hits, mirroring 297 
+
+a universal collapse in proteostasis and glymphatic clearance that precedes clinical 298 
+
+bifurcation. 299 
+
+Similarly, the structural invariance of the LH Transverse Temporal cortex aligns 300 
+
+with identified synaptic and innate immune disruptions common to both disorders. 301 
+
+13 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+Pan-neurodegenerative downregulation of the synaptic protein NPTXR and dysregu-302 
+
+lation of MAPK1-mediated immune signaling [11] substantiate a synchronized patho-303 
+
+logical seeding phase. Within this framework, the Transverse Temporal master anchor 304 
+
+identifies a neuroanatomical “ground zero” where shared molecular failures mani-305 
+
+fest as stable structural patterns. These signatures persist until phenotype-specific 306 
+
+cascades—such as apoptotic pathways in AD or ubiquitin-proteasome impairments 307 
+
+in PD—drive phenotypic bifurcation into distinct clinical silos. By prioritizing these 308 
+
+structural anchors, IIT effectively distills the neuroanatomical manifestation of the 309 
+
+pan-neurodegenerative proteome. 310 
+
+Parkinson’s Disease as a Morphological Transition State 311 
+
+Volumetric distributions identify PD as a transitional state within the neurodegener-312 
+
+ative continuum. Across both Master Anchors and Transition Pillars, the PD cohort 313 
+
+consistently occupies an intermediate position between Healthy Controls and the AD 314 
+
+group. The PD brain exhibits incipient signs of the shared pathological trajectory with-315 
+
+out reaching the systemic collapse of advanced AD. IIT captures this latent footprint 316 
+
+before it becomes statistically overt through standard frequentist testing (Figure 6b, 317 
+
+ns vs. Healthy). 318 
+
+The residence of PD volumes within a statistical “gray zone”—not significantly 319 
+
+differentiated from AD yet contiguous with health—is consistent with the chronologi-320 
+
+cal window of the NES seeding phase. This homeostatic hit, centered on the Choroid 321 
+
+Plexus expansion, is supported by the “expansion model” [43], suggesting that regional 322 
+
+enlargement reflects a compensatory but failing effort to wash out metabolic toxins 323 
+
+rather than the volumetric reduction reported in other studies [54]. In this framework, 324 
+
+the non-significant difference between PD and Healthy controls highlights the clinical 325 
+
+bifurcation, where a shared homeostatic struggle evolves into phenotype-specific decay. 326 
+
+Limbic Bifurcation and Hybrid Pathological Nodes 327 
+
+The common neuroanatomical trunk eventually yields to phenotype-specific atrophy. 328 
+
+During bifurcation, differential regional kinetics of α-synuclein and tau proteinopathies 329 
+
+drive the structural collapse of limbic and temporal networks, yielding the pronounced 330 
+
+statistical separation observed in the Hippocampus and Amygdala [24, 55]. High effect 331 
+
+sizes mark the threshold where proteinopathic loads eclipse shared monoaminergic 332 
+
+failure. 333 
+
+Within this landscape, the RH Amygdala functions as a critical hybrid node. While 334 
+
+its involvement in both pathologies identifies it as a structural anchor, its high discrim-335 
+
+inative rank reveals a degradation morphology that remains pathology-dependent. Its 336 
+
+high connectivity and metabolic cost render it a primary site for differential atrophy, 337 
+
+acting as a bridge between shared vulnerability and diagnostic divergence. 338 
+
+The negligible Effect Size (0 .2860) in the LH Transverse Temporal master anchor 339 
+
+introduces a distinction between atrophy markers and backbone anchors. While tra-340 
+
+ditional paradigms discard this region due to low pathological impact, IIT identifies 341 
+
+it as a shared “control node” and a structural bridge of stability. This sensory ground 342 
+
+14 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+zero reflects the synchronized denervation of norepinephrine and serotonin, establish-343 
+
+ing a common neuroanatomical footprint before clinical bifurcation into cognitive or 344 
+
+motor silos [8, 56–58]. 345 
+
+## 3.4 Etiological Drivers of the Neuroanatomical Backbone 346 
+
+Identification of the RH Choroid Plexus and LH Transverse Temporal cortex as mas-347 
+
+ter anchors aligns with the shared risk profile characteristic of the NES seeding stage 348 
+
+[8]. Common environmental triggers, including high iron intake and pesticide expo-349 
+
+sure, drive this invariant structural backbone by inducing early homeostatic failure 350 
+
+and proteostatic stress [59, 60]. Specifically, expansion of the choroid plexus across 351 
+
+both cohorts suggests a shared response to impaired waste clearance, potentially exac-352 
+
+erbated by systemic factors such as high cholesterol, which compromise blood-CSF 353 
+
+barrier integrity in both phenotypes [61]. 354 
+
+Conversely, etiological factors with divergent risk profiles modulate the transition 355 
+
+to the bifurcation stage—captured through the inductive assessment of discrimina-356 
+
+tive features. Agents such as nicotine and coffee exert antagonistic effects, offering 357 
+
+protection for the PD trajectory while potentially increasing vulnerability in the AD 358 
+
+path [8, 62]. This etiological divergence mirrors the behavior of the identified Transi-359 
+
+tion Pillars (e.g., Amygdala and Hippocampus), which maintain absolute rank-order 360 
+
+consistency ( ρ = 1 .0) despite significant divergence in atrophy magnitude. These 361 
+
+findings suggest the possibility that while shared genetic and environmental factors 362 
+
+may contribute to an invariant neuroanatomical core, subsequent interactions with 363 
+
+lifestyle-related variables could play a role in the bifurcation into divergent clini-364 
+
+cal manifestations. This is consistent with the NES hypothesis that AD and PD 365 
+
+potentially share early structural features before diverging. 366 
+
+# 4 Conclusion 367 
+
+This study introduces a framework for identifying candidate shared neuroanatomi-368 
+
+cal features across neurodegenerative conditions. Implementation of IIT logic suggests 369 
+
+that a stable set of structural anchors remains invariant across the neurodegener-370 
+
+ative spectrum, notwithstanding divergent symptomatic expressions. Identification 371 
+
+of this unified backbone yields quantitative preliminary empirical support for the 372 
+
+NES hypothesis, facilitating a perspective shift from phenotype-specific silos toward 373 
+
+a holistic, system-level view on brain aging [19]. 374 
+
+These insights carry profound implications for geriatric neurology and biomarker 375 
+
+discovery. Isolation of the invariant pathological core pinpoint anatomical landmarks 376 
+
+critical to the subclinical seeding and compensatory stages of neurodegeneration. 377 
+
+By shifting the analytical objective from maximal group separation to structural 378 
+
+commonality, this methodology provides a robust foundation for early intervention 379 
+
+and cross-disciplinary knowledge propagation. Ultimately, this approach transforms 380 
+
+machine learning from a descriptive classifier into a discovery engine capable of 381 
+
+elucidating universal structural laws governing complex neurodegenerative processes. 382 
+
+While the identified backbone appears robust, several limitations should be consid-383 
+
+ered. First, although the analysis incorporates longitudinal information through the 384 
+
+15 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+Cumulative Structural Integrity Index (CSII), this aggregation provides a temporally 385 
+
+averaged representation rather than explicitly modeling disease dynamics, thus limit-386 
+
+ing inference on progression trajectories. Second, the study is based on two cohorts 387 
+
+(ADNI and PPMI), and the lack of external validation may constrain the generaliz-388 
+
+ability of the findings. Finally, structural MRI alone cannot resolve the underlying 389 
+
+molecular mechanisms. Although the identified backbone is consistent with hypothe-390 
+
+sized monoaminergic and glymphatic dysfunction, direct validation through molecular 391 
+
+biomarkers—such as α-synuclein and tau PET imaging—remains necessary to sub-392 
+
+stantiate the proposed proteinopathic drivers. The integration of multimodal data, 393 
+
+including proteomic and metabolomic profiles, within this framework may further 394 
+
+refine the characterization of structural anchors and support the development of more 395 
+
+precise, personalized approaches to neurodegenerative aging [63, 64]. 396 
+
+# 5 Methods 397 
+
+## 5.1 Cohort Selection and Data Acquisition 398 
+
+Data originate from two large-scale repositories: the Alzheimer’s Disease Neuroimaging 399 
+
+Initiative (ADNI) 1 and the Parkinson’s Progression Markers Initiative (PPMI) 2. ADNI 400 
+
+tracks neurodegenerative progression from mild cognitive impairment to AD through 401 
+
+integrated longitudinal markers, while PPMI comprises a comprehensive multi-modal 402 
+
+dataset spanning idiopathic and genetic PD cases alongside healthy controls. 403 
+
+The finalized cohort includes 303 individuals distributed equally across three 404 
+
+experimental groups: Healthy Controls (CN, n = 101), AD ( n = 101), and PD 405 
+
+(n = 101). Strict matching for age, sex, and total intracranial volume ensures cohort 406 
+
+comparability and minimizes demographic confounding. 407 
+
+## 5.2 MRI Acquisition and Image Processing 408 
+
+High-resolution T1-weighted sequences provide the foundation for precise morphomet-409 
+
+ric assessment. The dataset utilizes two optimized protocols: MPRAGE and MPRAGE 410 
+
+GRAPPA , which leverages parallel imaging to reduce scan time without compromis-411 
+
+ing image fidelity [65, 66]. Technical specifications across platforms are standardized 412 
+
+to ensure cross-cohort homogeneity (Table 4). 413 
+
+The FastSurfer pipeline, a GPU-accelerated implementation of FreeSurfer, executes 414 
+
+automated segmentation and parcellation [66]. This framework integrates HypVINN 415 
+
+and CerebNet modules to extend traditional parcellation to hypothalamic and cere-416 
+
+bellar structures [67, 68]. Preprocessing incorporates motion correction, intensity 417 
+
+normalization, and affine registration to the MNI305 coordinate space, followed by 418 
+
+automated skull stripping and subcortical segmentation via atlas-based probabilistic 419 
+
+models. Spherical registration maps cortical folding patterns to an atlas template, 420 
+
+yielding a robust feature set encompassing gray matter volume, cortical thickness, and 421 
+
+surface area across 84 regions. 422 
+
+> 1adni.loni.usc.edu
+> 2ppmi-info.org
+
+16 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+Parameter ADNI (Trio) PPMI (Verio) 
+
+Sequence MPRAGE MPRAGE Acquisition plane Sagittal (3D) Sagittal (3D) TR / TE / TI (ms) 2300 / 3.0 / 900 2300 / 3.0 / 900 Flip angle ( °) 9 9Slice thickness (mm) 1.2 1.0 Matrix size 240 × 256 × 160 240 × 256 × 176 Pixel spacing (mm) 1.0 × 1.0 1.0 × 1.0 
+
+Table 4. Standardized acquisition parameters for T1-weighted scans. 
+
+To provide a proxy of cumulative structural burden, the Cumulative Structural 423 
+
+Integrity Index (CSII) aggregates longitudinal volumes across three time points (0, 424 
+
+12, and 24 months): CSII = ( V0 + V12 + V24 )/3. This temporal integration minimizes 425 
+
+measurement noise and optimizes the signal-to-noise ratio for subsequent analysis. It 426 
+
+smooths temporal variability but does not explicitly model rates of change or disease 427 
+
+trajectories. The analytical framework evaluates the complete set of 84 neuroanatomi-428 
+
+cal descriptors to provide a comprehensive mapping of the neurodegenerative manifold. 429 
+
+Statistical models incorporate sex as a biological variable to account for poten-430 
+
+tial dimorphic patterns of decay across the shared pathological core, ensuring that 431 
+
+identified structural anchors remain invariant regardless of biological sex. 432 
+
+## 5.3 Inductive Benchmarking and Model Generalization 433 
+
+The evaluation of diagnostic robustness follows a dual-path strategy to bifurcate model 434 
+
+benchmarking from structural discovery. The inductive path establishes clinical relia-435 
+
+bility through three optimized architectures: Random Forest (RF), Gradient Boosting 436 
+
+(GB), and Logistic Regression (LR). This selection encompasses both a regularized lin-437 
+
+ear baseline (LR) and models capable of capturing high-order non-linear interactions 438 
+
+(RF, GB). 439 
+
+A stratified 5-fold cross-validation scheme, repeated across 10 independent stochas-440 
+
+tic realizations, ensures that performance metrics remain uninflated by data leakage. 441 
+
+Within each loop, all preprocessing—including median imputation for missing vol-442 
+
+umes and Z-score standardization—is performed nested within the training fold. 443 
+
+An automated GridSearchCV protocol executes hyperparameter optimization within 444 
+
+these folds: RF utilizes 500 estimators with balanced class weights; GB incorpo-445 
+
+rates stochastic subsampling (0.8); and LR employs an L2 penalty with optimized 446 
+
+C coefficients. Evaluation prioritizes ROC-AUC, Accuracy, and F 1-macro to capture 447 
+
+decision-boundary sensitivity and stability under cohort imbalance. 448 
+
+## 5.4 Transductive Discovery via the IIT Framework 449 
+
+While benchmarking ensures reliability, identification of shared structural principles 450 
+
+follows a transductive, unsupervised domain adaptation logic. Unlike the inductive 451 
+
+17 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+path, the IIT calculation leverages the entire disease-specific manifold (AD and PD) 452 
+
+to maximize statistical resolution and identify common pathological laws. 453 
+
+This process first estimates regional importance via a consensus-based Borda score 454 
+
+(Bi) [69, 70]. Optimized RF, GB, and LR architectures undergo training on the full 455 
+
+cohort, and the average importance rank across these M = 3 models defines the 456 
+
+score: Bi = 1
+
+> M
+
+PMm=1 ri,m , where ri,m denotes the rank (e.g., r = 1 for the most 457 
+
+discriminative). Low Bi values identify “Bifurcation Markers” responsible for struc-458 
+
+tural separation, while high Bi values signify discriminative neutrality and serve as 459 
+
+candidates for stable structural anchors. 460 
+
+The IIT mechanism [17] then calculates a directed Importance Inversion Transfer 461 
+
+Score (IIT AD,P D  
+
+> score
+
+) by integrating Borda neutrality with metric consistency (Spear-462 
+
+man’s rank correlation ρ) and geometric proximity (normalized mean difference 463 
+
+∆): 464 
+
+IIT AD,P D  
+
+> score
+
+(fi) = Bi × ρAD,P D i
+
+1 + ∆ AD,P D i
+
+(1) where ∆ AD,P D i = | ¯XAD i − ¯XP D i |/σ CN i . Spearman’s ρ ensures robustness against bio-465 
+
+logical outliers and prioritizes rank-order consistency. The denominator functions as 466 
+
+an inverse mean difference penalty, ensuring that selected anchors identify pathological 467 
+
+hits preceding symptomatic bifurcation. The framework selects the eight descriptors 468 
+
+with the highest scores as the primary NES core anchors. 469 
+
+## 5.5 Dimensionality Control and Statistical Validation 470 
+
+The reduction of 84 initial volumetric descriptors into ten stable invariants optimizes 471 
+
+the effective subject-to-feature ratio from N/p ≈ 3 to N/p ≈ 30. This dimensionality 472 
+
+control ensures that performance gains reflect robust pathological principles rather 473 
+
+than numerical artifacts. Non-parametric statistical validation utilizes the Kruskal-474 
+
+Wallis H-test to assess global variance, while Dunn’s post-hoc analysis with Bonferroni 475 
+
+correction provides the framework for multiple comparisons. Formal identification of 476 
+
+structural anchors relies on the criterion of statistical indistinguishability between AD 477 
+
+and PD cohorts ( pAD/P D ≥ 0.05), with observed trends further substantiated through 478 
+
+paired two-tailed t-tests. 479 
+
+## 5.6 Computational Infrastructure 480 
+
+The framework integrates scikit-learn for machine learning and PyTorch for tensor 481 
+
+operations. A dynamic GPU-selection logic (utilizing nvidia-smi ) assigns computa-482 
+
+tions to the most efficient resource (NVIDIA RTX 4090 or A100-PCIE). Fixed 10 483 
+
+independent random seeds across all modules guarantee computational determinism. 484 
+
+CUDA-optimized operations within PyTorch reduce empirical estimation latency by 485 
+
+over one order of magnitude compared to CPU-based implementations. 486 
+
+18 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+# 6 Supplementary Information 487 
+
+## 6.1 Exhaustive Volumetric Profiling of the Neurodegenerative 488 
+
+## Manifold 489 
+
+This supplementary section presents a systematic topographical mapping of regional 490 
+
+brain volumes across 84 neuroanatomical regions. Bootstrapped ensemble means 491 
+
+characterize the CN, PD, and AD cohorts. Kruskal-Wallis H-tests evaluated global 492 
+
+variance, while pairwise post-hoc Dunn’s tests with Bonferroni correction adjusted for 493 
+
+multiple comparisons. Analysis supports a pervasive structural impact in AD, involv-494 
+
+ing approximately 87% of the investigated manifold, in contrast to the more localized, 495 
+
+region-specific alterations characterizing PD. Negative atrophy values denote volumet-496 
+
+ric expansion relative to the healthy baseline, identifying regions potentially subject 497 
+
+to neuro-inflammatory or compensatory mechanisms. 498 
+
+Table 5. Regional volumetric characterization of the neurodegenerative manifold. Detailed mapping of mean volumes and atrophy percentages across Healthy (H), Parkinson’s disease (PD), and Alzheimer’s disease (AD) cohorts. Regional volumes are expressed in ×10 3 mm 3. P D A and AD A represent percentage atrophy relative to the healthy baseline; negative values identify regions of volumet-ric expansion. Pairwise p-values ( pC/P D and pC/AD ) indicate statistical significance relative to the control group. Region H PD AD P D A AD A pC/P D pC/AD 
+
+Subcortical, Limbic 
+
+Brain Stem 20 .85 21 .95 19 .78 −5.25 5.15 0.03 0.00 LH Accum 0.49 0.50 0.38 −2.79 21 .77 1.00 0.00 LH Amyg 1.67 1.72 1.14 −2.82 32 .21 0.59 0.00 LH Caud 3.44 3.47 3.31 −0.69 3.87 1.00 0.00 LH Cereb Cortex 50 .81 52 .71 47 .07 −3.74 7.36 0.11 0.00 LH Cereb WM 14 .00 14 .82 13 .12 −5.86 6.28 0.04 0.00 LH Ent 1.75 1.82 1.15 −4.11 34 .11 0.56 0.00 LH Hipp 4.02 4.09 2.88 −1.88 28 .36 1.00 0.00 LH Pall 2.00 2.08 1.88 −4.09 6.13 0.14 0.00 LH Put 4.62 4.61 4.19 0.25 9.25 1.00 0.00 LH Thal 7.00 7.32 6.07 −4.56 13 .30 0.04 0.00 RH Accum 0.50 0.52 0.39 −3.54 21 .83 1.00 0.00 RH Amyg 1.78 1.88 1.26 −5.51 28 .90 0.06 0.00 RH Caud 3.63 3.68 3.44 −1.33 5.18 1.00 0.00 RH Cereb Cortex 51 .80 53 .71 47 .59 −3.69 8.12 0.16 0.00 RH Cereb WM 13 .35 14 .16 12 .57 −6.03 5.84 0.02 0.00 RH Ent 1.72 1.76 1.12 −2.35 35 .16 1.00 0.00 RH Hipp 4.09 4.22 2.99 −3.13 26 .82 0.40 0.00 RH Pall 1.91 2.01 1.84 −5.20 3.90 0.03 0.00 RH Put 4.67 4.68 4.29 −0.23 8.15 1.00 0.00 RH Thal 6.89 7.18 6.02 −4.15 12 .64 0.05 0.00 
+
+Cortical (LH) 
+
+LH Cau Ant Cing 2.72 2.94 2.54 −8.09 6.64 0.01 0.00 LH Cau Mid Front 5.63 5.89 5.01 −4.72 10 .98 0.31 0.00 Continued on next page 
+
+19 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+Table 5 – Continued from previous page 
+
+Region H PD AD P D A AD A pC/P D pC/AD 
+
+LH Cuneus 4.12 4.27 3.72 −3.59 9.61 0.54 0.00 LH Fusiform 7.47 7.79 6.18 −4.22 17 .26 0.29 0.00 LH Inf Pariet 10 .61 11 .01 9.26 −3.81 12 .72 0.46 0.00 LH Inftemp 10 .82 11 .17 8.56 −3.23 20 .90 0.78 0.00 LH Insula 6.39 6.61 5.57 −3.49 12 .79 0.51 0.00 LH Lat Occip 9.62 9.93 8.90 −3.21 7.53 0.55 0.00 LH Lat Orbitofront 4.79 5.04 4.36 −5.18 9.06 0.09 0.00 LH Med Orbitofront 4.09 4.27 3.73 −4.42 8.77 0.20 0.00 LH Midtemp 11 .60 12 .15 9.34 −4.73 19 .49 0.15 0.00 LH Paracen 3.46 3.61 3.17 −4.36 8.38 0.23 0.00 LH Parahipp 2.65 2.77 2.04 −4.46 23 .11 0.25 0.00 LH Pars Orbit 1.81 1.92 1.71 −5.88 5.30 0.07 0.00 LH Pars Operc 3.41 3.55 3.08 −4.18 9.64 0.28 0.00 LH Pars Triang 3.44 3.62 3.31 −5.14 3.79 0.25 0.00 LH Pericalc 1.78 1.84 1.62 −3.35 8.79 0.64 0.00 LH Poscen 9.33 9.70 8.63 −4.03 7.51 0.08 0.00 LH Post Cing 3.00 3.14 2.64 −4.59 12 .07 0.13 0.00 LH Precen 10 .15 10 .53 9.38 −3.76 7.59 0.39 0.00 LH Precun 8.20 8.87 6.91 −8.23 15 .70 0.01 0.00 LH Rost Ant Cing 2.47 2.64 2.21 −6.69 10 .61 0.03 0.00 LH Rost Mid Front 14 .52 15 .16 12 .98 −4.42 10 .64 0.21 0.00 LH Sup Front 14 .02 14 .62 12 .64 −4.31 9.82 0.21 0.00 LH Sup Pariet 8.83 9.21 7.80 −4.29 11 .69 0.29 0.00 LH Sup Temp 8.79 9.19 7.65 −4.56 12 .93 0.21 0.00 LH Supramarg 7.40 7.70 6.54 −4.01 11 .61 0.31 0.00 LH Transv Temp 1.68 1.75 1.48 −4.11 11 .74 0.31 0.00 
+
+Cortical (RH) 
+
+RH Cau Ant Cing 2.57 2.75 2.36 −7.01 8.23 0.01 0.00 RH Cau Mid Front 5.14 5.38 4.59 −4.72 10 .68 0.27 0.00 RH Cuneus 4.03 4.17 3.65 −3.53 9.49 0.56 0.00 RH Fusiform 7.66 7.96 6.32 −3.94 17 .47 0.34 0.00 RH Inf Pariet 10 .39 10 .81 9.20 −4.07 11 .44 0.29 0.00 RH Inftemp 10 .90 11 .27 8.62 −3.39 20 .88 0.56 0.00 RH Insula 6.28 6.51 5.44 −3.64 13 .43 0.46 0.00 RH Lat Occip 9.48 9.79 8.70 −3.29 8.21 0.52 0.00 RH Lat Orbitofront 4.83 5.06 4.38 −4.76 9.34 0.12 0.00 RH Med Orbitofront 4.11 4.28 3.75 −4.07 8.68 0.25 0.00 RH Midtemp 11 .73 12 .52 9.71 −6.72 17 .21 0.01 0.00 RH Paracen 3.35 3.48 3.10 −3.88 7.50 0.36 0.00 RH Parahipp 2.67 2.80 2.09 −4.71 21 .79 0.24 0.00 RH Pars Operc 3.38 3.52 3.06 −4.04 9.43 0.30 0.00 RH Pars Orbit 1.86 2.01 1.83 −7.83 1.63 0.00 0.00 RH Pars Triang 3.39 3.47 3.16 −2.29 6.86 1.00 0.00 RH Pericalc 1.72 1.77 1.56 −2.94 9.30 0.71 0.00 RH Poscen 8.65 8.93 8.03 −3.18 7.22 0.16 0.00 RH Post Cing 3.08 3.23 2.69 −4.90 12 .71 0.12 0.00 RH Precen 10 .26 10 .63 9.45 −3.63 7.86 0.41 0.00 RH Precun 8.85 9.50 7.57 −7.35 14 .40 0.01 0.00 RH Rost Ant Cing 2.52 2.66 2.23 −5.42 11 .47 0.06 0.00 RH Rost Mid Front 14 .01 14 .56 12 .56 −3.92 10 .36 0.28 0.00 RH Sup Front 13 .62 14 .16 12 .25 −3.96 10 .05 0.27 0.00 Continued on next page 
+
+20 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+Table 5 – Continued from previous page 
+
+Region H PD AD P D A AD A pC/P D pC/AD 
+
+RH Sup Pariet 8.69 9.03 7.72 −3.95 11 .16 0.36 0.00 RH Sup Temp 8.91 9.29 7.70 −4.28 13 .55 0.24 0.00 RH Supramarg 7.23 7.51 6.39 −3.88 11 .63 0.33 0.00 RH Transv Temp 1.65 1.71 1.46 −3.88 11 .52 0.33 0.00 
+
+White Matt, Ventr, Flui 
+
+CSF 1.15 1.31 1.54 −14 .38 −34 .07 0.00 0.00 LH Cerebr White Mat 221 .23 232 .12 199 .60 −4.92 9.78 0.05 0.00 LH Chor Plex 0.79 0.87 1.00 −10 .40 −26 .08 0.06 0.00 LH Lat Vent 13 .28 15 .72 24 .93 −18 .37 −87 .78 0.23 0.00 RH Cerebr White Mat 221 .08 232 .29 200 .39 −5.07 9.36 0.03 0.00 RH Chor Plex 0.86 0.93 1.02 −7.69 −18 .17 0.46 0.00 RH Lat Vent 11 .97 14 .09 22 .18 −17 .72 −85 .28 0.42 0.00 
+
+Acknowledgements. This work was supported by the National Research Council 499 
+
+(CNR), Italy. The authors acknowledge the Institute of Cognitive Sciences and Technologies 500 
+
+(ISTC-CNR) for providing the necessary research infrastructure. 501 
+
+Data used in the preparation of this article were obtained from the Alzheimer’s Disease 502 
+
+Neuroimaging Initiative (ADNI) database (adni.loni.usc.edu) and the Parkinson’s Progression 503 
+
+Markers Initiative (PPMI) database (www.ppmi-info.org/data). As such, the investigators 504 
+
+within the ADNI and PPMI contributed to the design and implementation of their respective 505 
+
+studies and/or provided data but did not participate in the analysis or writing of this report. 506 
+
+ADNI data collection and sharing was funded by the Alzheimer’s Disease Neuroimaging 507 
+
+Initiative (National Institutes of Health Grant U01 AG024904) and DOD ADNI (Department 508 
+
+of Defense award number W81XWH-12-2-0012). PPMI – a public-private partnership – is 509 
+
+funded by the Michael J. Fox Foundation for Parkinson’s Research and funding partners 510 
+
+(a full list of partners is available at https://www.ppmi-info.org/about-ppmi/who-we-are/ 511 
+
+study-sponsors). 512 
+
+Author Contributions. D.C. conceived the study and developed the IIT mechanism. 513 
+
+Author contributions according to the CRediT taxonomy are as follows: D.C.: Conceptual-514 
+
+ization, Methodology, Software, Validation, Formal analysis, Investigation, Resources, Data 515 
+
+curation, Writing – original draft, Writing – review & editing, Visualization, Supervision, 516 
+
+Project administration, and Funding acquisition. S.T.: Methodology, Software, Validation, 517 
+
+Resources, and Data curation. All authors read and approved the final manuscript. 518 
+
+Funding. This research was funded by the European Union - Next Generation EU - NRRP 519 
+
+M6C2 - Investment 2.1 Enhancement and strengthening of biomedical research in the NHS 520 
+
+and by FISM - Fondazione Italiana Sclerosi Multipla - cod. 2022/R-Multi/040 and financed 521 
+
+or co-financed with the “5 per mille” public funding. 522 
+
+Competing Interests. D.C. is a founding partner of AI2Life s.r.l. His primary employ-523 
+
+ment is with the National Research Council (CNR), Italy. This work was conducted 524 
+
+independently of AI2Life s.r.l. operational activities. The author declares no other competing 525 
+
+financial or non-financial interests. 526 
+
+Ethics approval and consent to participate. This study utilized anonymized 527 
+
+secondary data from the Alzheimer’s Disease Neuroimaging Initiative (ADNI) and the 528 
+
+Parkinson’s Progression Markers Initiative (PPMI). Ethical approval and informed consent 529 
+
+were obtained by the original data collection initiatives. All procedures were conducted in 530 
+
+accordance with the relevant data use agreements and ethical guidelines. 531 
+
+Consent for publication. Not applicable. This manuscript does not contain any 532 
+
+identifying information or individual person’s data in any form. 533 
+
+Data Availability. The neuroimaging data analyzed in this study were obtained from 534 
+
+the Alzheimer’s Disease Neuroimaging Initiative (ADNI) (adni.loni.usc.edu) and the Parkin-535 
+
+son’s Progression Markers Initiative (PPMI) (ppmi-info.org). These datasets are available to 536 
+
+21 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+researchers upon registration and approval of a data utility request through the respective 537 
+
+consortium portals. 538 
+
+Materials availability. Not applicable. No physical materials were generated or used in 539 
+
+this study. 540 
+
+Code Availability. Custom Python code implementing the IIT mechanism and the com-541 
+
+plete statistical validation suite is available as a comprehensive Jupyter Notebook on GitHub: 542 
+
+https://github.com/danielecaligiore/IIT NES. 543 
+
+# References 544 
+
+[1] Su, D., Cui, Y., He, C., Yin, P., Bai, R., Zhu, J., Lam, J.S., Zhang, J., Yan, R., 545 
+
+Zheng, X., et al.: Projections for prevalence of parkinsonˆ as disease and its driving 546 
+
+factors in 195 countries and territories to 2050: modelling study of global burden 547 
+
+of disease study 2021. bmj 388 (2025) 548 
+
+[2] Liu, W., Deng, W., Gong, X., Ou, J., Yu, S., Chen, S.: Global burden of 549 
+
+alzheimerˆ as disease and other dementias in adults aged 65 years and over, and 550 
+
+health inequality related to sdi, 1990–2021: analysis of data from gbd 2021. BMC 551 
+
+Public Health 25 (1), 1256 (2025) 552 
+
+[3] Dorsey, E.R., Elbaz, A., Nichols, E., Abbasi, N., Abd-Allah, F., Abdelalim, A., 553 
+
+Adsuar, J.C., Ansha, M.G., Brayne, C., Choi, J.-Y.J., et al. : Global, regional, 554 
+
+and national burden of parkinson’s disease, 1990–2016: a systematic analysis for 555 
+
+the global burden of disease study 2016. The Lancet Neurology 17 (11), 939–953 556 
+
+(2018) 557 
+
+[4] Dumurgier, J., Tzourio, C.: Epidemiology of neurological diseases in older adults. 558 
+
+Revue neurologique 176 (9), 642–648 (2020) 559 
+
+[5] Ji, Z., Chen, Q., Yang, J., Hou, J., Wu, H., Zhang, L.: Global, regional, and 560 
+
+national health inequalities of alzheimerˆ as disease and parkinsonˆ as disease in 561 
+
+204 countries, 1990–2019. International Journal for Equity in Health 23 (1), 125 562 
+
+(2024) 563 
+
+[6] Caligiore, D., Helmich, R.C., Hallett, M., Moustafa, A.A., Timmermann, L., Toni, 564 
+
+I., Baldassarre, G.: Parkinson’s disease as a system-level disorder. npj Parkinson’s 565 
+
+Disease 2(1), 16025 (2016) https://doi.org/10.1038/npjparkd.2016.25 566 
+
+[7] Castrillo, J.I., Oliver, S.G.: Systems Biology of Alzheimer’s Disease. Springer, 567 
+
+New York, NY, USA (2016) 568 
+
+[8] Caligiore, D., Giocondo, F., Silvetti, M.: The neurodegenerative elderly syndrome 569 
+
+(nes) hypothesis: Alzheimer and parkinson are two faces of the same disease. 570 
+
+IBRO Neuroscience Reports 13 , 330–343 (2022) 571 
+
+[9] Caligiore, D., Silvetti, M., D’Amelio, M., Puglisi-Allegra, S., Baldassarre, G.: 572 
+
+Computational Modeling of Catecholamines Dysfunction in Alzheimer’s Disease 573 
+
+22 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+at Pre-Plaque Stage. Journal of Alzheimer’s Disease 77 , 275–290 (2020) 574 
+
+[10] Alfalahi, H., Dias, S.B., Khandoker, A.H., Chaudhuri, K.R., Hadjileontiadis, 575 
+
+L.J.: A scoping review of neurodegenerative manifestations in explainable digital 576 
+
+phenotyping. npj Parkinson’s Disease 9(1), 49 (2023) 577 
+
+[11] Ali, M., Erabadda, B., Chen, Y., Xu, Y., Gong, K., Liu, M., Pichet Binette, A., 578 
+
+Timsina, J., Western, D., Yang, C., et al. : Shared and disease-specific pathways 579 
+
+in frontotemporal dementia and alzheimerˆ as and parkinsonˆ as diseases. Nature 580 
+
+medicine 31 (8), 2567–2577 (2025) 581 
+
+[12] Malvaso, A., Panarese, S., Catalano, M., Migliore, M., Caligiore, D.: Advanced 582 
+
+perspectives for the diagnosis of parkinsonˆ as and alzheimer’s disease through 583 
+
+machine learning techniques. Parkinsonism & Related Disorders 122 (2024) 584 
+
+[13] Myszczynska, M.A., Ojamies, P.N., Lacoste, A.M., Neil, D., Saffari, A., Mead, 585 
+
+R., Hautbergue, G.M., Holbrook, J.D., Ferraiuolo, L.: Applications of machine 586 
+
+learning to diagnosis and treatment of neurodegenerative diseases. Nature reviews 587 
+
+neurology 16 (8), 440–456 (2020) 588 
+
+[14] Ma, Y., Tian, H., Xiao, W., Ma, Y., Su, H., Zhu, L., Jiang, Y., Ge, L., Li, Y., 589 
+
+Yuan, M., et al. : Machine learning approaches for optimizing drug combinations 590 
+
+in neurodegenerative diseases: A brief review. ACS omega 10 (48), 57950–57973 591 
+
+(2025) 592 
+
+[15] Angelini, G., Malvaso, A., Schirripa, A., Campione, F., D’Addario, S.L., Toschi, 593 
+
+N., Caligiore, D.: Unraveling sex differences in parkinson’s disease through 594 
+
+explainable machine learning. Journal of the Neurological Sciences 462 , 123091 595 
+
+(2024) 596 
+
+[16] D’Amore, F.M., Moscatelli, M., Malvaso, A., D’Antonio, F., Rodini, M., 597 
+
+Panigutti, M., Mirino, P., Carlesimo, G.A., Guariglia, C., Caligiore, D.: Explain-598 
+
+able machine learning on clinical features to predict and differentiate alzheimer’s 599 
+
+progression by sex: Toward a clinician-tailored web interface. Journal of the 600 
+
+Neurological Sciences 468 , 123361 (2025) 601 
+
+[17] Caligiore, D.: Importance inversion transfer identifies shared principles for cross-602 
+
+domain learning. arXiv preprint arXiv:2602.09116 (2026) 603 
+
+[18] Caligiore, D., Monreale, A., Rossetti, G., Bongiorno, A., Fisicaro, G.: Exploring 604 
+
+interconnections among atoms, brain, society, and cosmos with network science 605 
+
+and explainable machine learning. Frontiers in Complex Systems 3, 1604132 606 
+
+(2025) 607 
+
+[19] Caligiore, D.: Healing with Artificial Intelligence. Routledge Taylor & Francis 608 
+
+Group, CRC Press, Boca Raton (2025) 609 
+
+23 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+[20] Caligiore, D., Carli, S.: Simulating the Brain: A Four-Step Method Using 610 
+
+Ordinary Differential Equations and Python. Springer, Singapore (2025) 611 
+
+[21] Tartaglia, M.C., Rosen, H.J., Miller, B.L.: Neuroimaging in dementia. Neurother-612 
+
+apeutics 8(1), 82–92 (2011) 613 
+
+[22] Scahill, R.I., Schott, J.M., Stevens, J.M., Rossor, M.N., Fox, N.C.: Mapping the 614 
+
+evolution of regional atrophy in alzheimer’s disease: unbiased analysis of fluid-615 
+
+registered serial mri. Proceedings of the National Academy of Sciences 99 (7), 616 
+
+4703–4707 (2002) 617 
+
+[23] Karas, G., Scheltens, P., Rombouts, S., Van Schijndel, R., Klein, M., Jones, B., 618 
+
+Van Der Flier, W., Vrenken, H., Barkhof, F.: Precuneus atrophy in early-onset 619 
+
+alzheimerˆ as disease: a morphometric structural mri study. Neuroradiology 49 (12), 620 
+
+967–976 (2007) 621 
+
+[24] Apostolova, L.G., Green, A.E., Babakchanian, S., Hwang, K.S., Chou, Y.-Y., 622 
+
+Toga, A.W., Thompson, P.M.: Hippocampal atrophy and ventricular enlarge-623 
+
+ment in normal aging, mild cognitive impairment (mci), and alzheimer disease. 624 
+
+Alzheimer Disease & Associated Disorders 26 (1), 17–27 (2012) 625 
+
+[25] Poulin, S.P., Dautoff, R., Morris, J.C., Barrett, L.F., Dickerson, B.C., Initiative, 626 
+
+A.D.N., et al. : Amygdala atrophy is prominent in early alzheimer’s disease and 627 
+
+relates to symptom severity. Psychiatry Research: Neuroimaging 194 (1), 7–13 628 
+
+(2011) 629 
+
+[26] Salman, Y., G´ erard, T., Huyghe, L., Colmant, L., Quenon, L., Malotaux, V., 630 
+
+Ivanoiu, A., Lhommel, R., Dricot, L., Hanseeuw, B.J., et al. : Amygdala atrophies 631 
+
+in specific subnuclei in preclinical alzheimer’s disease. Alzheimer’s & dementia 632 
+
+20 (10), 7205–7219 (2024) 633 
+
+[27] Baron, J.-C., Ch ˜A©telat, G., Desgranges, B., Perchey, G., Landeau, B., Sayette, 634 
+
+V., Eustache, F.: In vivo mapping of gray matter loss in mild alzheimerˆ as disease. 635 
+
+NeuroImage 14 (2), 298–309 (2001) https://doi.org/10.1006/nimg.2001.0846 636 
+
+[28] Villain, N., Desgranges, B., Viader, F., Sayette, V., M ˜A©zenge, F., Landeau, B., 637 
+
+Baron, J.-C., Eustache, F., Ch ˜A©telat, G.: Relationships between hippocampal 638 
+
+atrophy, white matter disruption and gray matter hypometabolism in alzheimerˆ as 639 
+
+disease. Journal of Neuroscience 28 (24), 6174–6181 (2008) https://doi.org/10. 640 
+
+1523/JNEUROSCI.1392-08.2008 641 
+
+[29] Thompson, P.M., Hayashi, K.M., Zubicaray, G., Janke, A.L., Rose, S.E., Semple, 642 
+
+J., Hong, M.S., Herman, D., Gravano, D., Doddrell, D.M., Toga, A.W.: Mapping 643 
+
+hippocampal and ventricular change in alzheimer disease. NeuroImage 22 (4), 644 
+
+1754–1766 (2004) https://doi.org/10.1016/j.neuroimage.2004.03.040 645 
+
+24 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+[30] Garg, A., Appel-Cresswell, S., Popuri, K., McKeown, M.J., Beg, M.F.: Morpho-646 
+
+logical alterations in the caudate, putamen, pallidum, and thalamus in parkinson’s 647 
+
+disease. Frontiers in neuroscience 9, 101 (2015) 648 
+
+[31] Chen, Y., Zhu, G., Liu, D., Liu, Y., Yuan, T., Zhang, X., Jiang, Y., Du, T., 649 
+
+Zhang, J.: The morphology of thalamic subnuclei in parkinson’s disease and the 650 
+
+effects of machine learning on disease diagnosis and clinical evaluation. Journal 651 
+
+of the neurological sciences 411 , 116721 (2020) 652 
+
+[32] Laansma, M.A., Bright, J.K., Al-Bachari, S., Anderson, T.J., Ard, T., Assogna, 653 
+
+F., Baquero, K.A., Berendse, H.W., Blair, J., Cendes, F., et al. : International 654 
+
+multicenter analysis of brain structure across clinical stages of parkinson’s disease. 655 
+
+Movement disorders 36 (11), 2583–2594 (2021) 656 
+
+[33] Ozgen, M.N., Sahin, N.E., Ertan, N., Sahin, B.: Investigation of total cerebellar 657 
+
+and flocculonodular lobe volume in parkinsonˆ as disease and healthy individuals: 658 
+
+a brain segmentation study. Neurological Sciences 45 (9), 4291–4298 (2024) 659 
+
+[34] Hirsch, E.C., Hunot, S.: Neuroinflammation in parkinson’s disease: a target for 660 
+
+neuroprotection? The Lancet Neurology 8(4), 382–397 (2009) 661 
+
+[35] Ransohoff, R.M.: How neuroinflammation contributes to neurodegeneration. 662 
+
+Science 353 (6301), 777–783 (2016) 663 
+
+[36] Booth, H.D., Hirst, W.D., Wade-Martins, R.: The role of astrocyte dysfunction in 664 
+
+parkinsonˆ as disease pathogenesis. Trends in neurosciences 40 (6), 358–370 (2017) 665 
+
+[37] Kam, T.-I., Mao, X., Park, H., Chou, S.-C., Karuppagounder, S.S., Umanah, 666 
+
+G.E., Yun, S.P., Brahmachari, S., Panicker, N., Chen, R., et al. : Poly (adp-ribose) 667 
+
+drives pathologic α-synuclein neurodegeneration in parkinsonˆ as disease. Science 668 
+
+362 (6414), 8407 (2018) 669 
+
+[38] Santiago-Balmaseda, A., Aguirre-Orozco, A., Valenzuela-Arzeta, I.E., Villegas-670 
+
+Rojas, M.M., P´ erez-Segura, I., Jim´ enez-Barrios, N., Hurtado-Robles, E., 671 
+
+Rodr´ ıguez-Hern´ andez, L.D., Rivera-German, E.R., Guerra-Crespo, M., et al. :672 
+
+Neurodegenerative diseases: unraveling the heterogeneity of astrocytes. Cells 673 
+
+13 (11), 921 (2024) 674 
+
+[39] Wang, S., Chen, X., Zhang, Y., Gao, Y., Gou, L., Lei, J.: Characterization of 675 
+
+cortical volume and whole-brain functional connectivity in parkinsonˆ as disease 676 
+
+patients: a mri study combined with physiological aging brain changes. Frontiers 677 
+
+in Neuroscience 18 , 1451948 (2024) 678 
+
+[40] Caligiore, D., Pezzulo, G., Baldassarre, G., Bostan, A.C., Strick, P.L., Doya, K., 679 
+
+Helmich, R.C., Dirkx, M., Houk, J., J¨ orntell, H., et al. : Consensus paper: towards 680 
+
+a systems-level view of cerebellar function: the interplay between cerebellum, 681 
+
+basal ganglia, and cortex. The cerebellum 16 (1), 203–229 (2017) 682 
+
+25 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+[41] Helmich, R.C.: The cerebral basis of parkinsonian tremor: a network perspective. 683 
+
+Movement Disorders 33 (2), 219–231 (2018) 684 
+
+[42] Jeong, S.H., Jeong, H.-J., Sunwoo, M.K., Ahn, S.S., Lee, S.-K., Lee, P.H., Kim, 685 
+
+Y.J., Sohn, Y.H., Park, C.J., Chung, S.J.: Association between choroid plexus vol-686 
+
+ume and cognition in parkinson disease. European Journal of Neurology 30 (10), 687 
+
+3114–3123 (2023) 688 
+
+[43] Liu, L., Weng, Q., Cai, Q., Yu, X., Huang, W., Xie, S., Shi, Y., Li, H., Zhang, 689 
+
+Y., Hu, J., et al. : Choroid plexus enlargement contributes to motor severity via 690 
+
+regional glymphatic dysfunction in parkinsonˆ as disease. npj Parkinson’s Disease 691 
+
+11 (1), 134 (2025) 692 
+
+[44] Lin, C.-H., Chen, C.-M., Lu, M.-K., Tsai, C.-H., Chiou, J.-C., Liao, J.-R., Duann, 693 
+
+J.-R.: Vbm reveals brain volume differences between parkinsonˆ as disease and 694 
+
+essential tremor patients. Frontiers in human neuroscience 7, 247 (2013) 695 
+
+[45] Yang, W., Bai, X., Guan, X., Zhou, C., Guo, T., Wu, J., Xu, X., Zhang, M., Zhang, 696 
+
+B., Pu, J., et al. : The longitudinal volumetric and shape changes of subcortical 697 
+
+nuclei in parkinsonˆ as disease. Scientific Reports 14 (1), 7494 (2024) 698 
+
+[46] Chiang, P.-L., Chen, H.-L., Lu, C.-H., Chen, P.-C., Chen, M.-H., Yang, I.-H., 699 
+
+Tsai, N.-W., Lin, W.-C.: White matter damage and systemic inflammation in 700 
+
+parkinsonˆ as disease. BMC neuroscience 18 (1), 48 (2017) 701 
+
+[47] Pieperhoff, P., Suedmeyer, M., Dinkelbach, L., Hartmann, C.J., Ferrea, S., 702 
+
+Moldovan, A.S., Minnerop, M., Diaz-Pier, S., Schnitzler, A., Amunts, K.: Regional 703 
+
+changes of brain structure during progression of idiopathic parkinson’s disease–a 704 
+
+longitudinal study using deformation based morphometry. Cortex 151 , 188–210 705 
+
+(2022) 706 
+
+[48] Warrier, C., Wong, P., Penhune, V., Zatorre, R., Parrish, T., Abrams, D., Kraus, 707 
+
+N.: Relating structure to function: Heschl’s gyrus and acoustic processing. Journal 708 
+
+of Neuroscience 29 (1), 61–69 (2009) 709 
+
+[49] Caligiore, D., Silvetti, M., Dˆ aAmelio, M., Puglisi-Allegra, S., Baldassarre, G.: 710 
+
+Computational modeling of catecholamines dysfunction in alzheimerˆ as disease at 711 
+
+pre-plaque stage. Journal of Alzheimerˆ as Disease 77 (1), 275–290 (2020) 712 
+
+[50] Maness, E.B., Burk, J.A., McKenna, J.T., Schiffino, F.L., Strecker, R.E., McCoy, 713 
+
+J.G.: Role of the locus coeruleus and basal forebrain in arousal and attention. 714 
+
+Brain Research Bulletin 188 , 47–58 (2022) 715 
+
+[51] Fleischer, V., Gonzalez-Escamilla, G., Ciolac, D., Albrecht, P., K¨ ury, P., Gruchot, 716 
+
+J., Dietrich, M., Hecker, C., M¨ untefering, T., Bock, S., et al. : Translational value 717 
+
+of choroid plexus imaging for tracking neuroinflammation in mice and humans. 718 
+
+Proceedings of the National Academy of Sciences 118 (36), 2025000118 (2021) 719 
+
+26 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+[52] Reynolds, J.A., Putterman, C.: The choroid plexus in inflammatory and degen-720 
+
+erative diseases of the central nervous system. Current Opinion in Immunology 721 
+
+95 , 102588 (2025) 722 
+
+[53] Lin, M., Zeng, Q., Zhong, S., Nie, S., Zhang, R., Hong, H., Liu, L., Wang, S., Li, 723 
+
+K., Luo, X., et al. : Association between choroid plexus morphological alterations, 724 
+
+alzheimer pathologies, and cognitive impairment: a longitudinal study. Neurology 725 
+
+105 (12), 213953 (2025) 726 
+
+[54] Yang, D., Zhu, B., Ren, J., Wang, L., Huang, H., Wu, Z., Jin, Q., Lin, Y., Zhang, 727 
+
+Y., Zhou, L., et al.: Investigating the association between choroid plexus volume 728 
+
+and the pathogenesis of parkinson’s disease. Parkinsonism & Related Disorders, 729 
+
+107987 (2025) 730 
+
+[55] Braak, H., Del Tredici, K., R¨ ub, U., De Vos, R.A., Steur, E.N.J., Braak, E.: 731 
+
+Staging of brain pathology related to sporadic parkinsonˆ as disease. Neurobiology 732 
+
+of aging 24 (2), 197–211 (2003) 733 
+
+[56] Zarow, C., Lyness, S.A., Mortimer, J.A., Chui, H.C.: Neuronal loss is greater in 734 
+
+the locus coeruleus than nucleus basalis and substantia nigra in alzheimer and 735 
+
+parkinson diseases. Archives of neurology 60 (3), 337–341 (2003) 736 
+
+[57] Martins, A.R.O., Froemke, R.C.: Coordinated forms of noradrenergic plasticity 737 
+
+in the locus coeruleus and primary auditory cortex. Nature neuroscience 18 (10), 738 
+
+1483–1492 (2015) 739 
+
+[58] Pan, W., Pan, J., Zhao, Y., Zhang, H., Tang, J.: Serotonin transporter defect 740 
+
+disturbs structure and function of the auditory cortex in mice. Frontiers in 741 
+
+neuroscience 15 , 749923 (2021) 742 
+
+[59] Chin-Chan, M., Navarro-Yepes, J., Quintanilla-Vega, B.: Environmental pollu-743 
+
+tants as risk factors for neurodegenerative disorders: Alzheimer and parkinson 744 
+
+diseases. Frontiers in cellular neuroscience 9, 124 (2015) 745 
+
+[60] Doroszkiewicz, J., Farhan, J.A., Mroczko, J., Winkel, I., Perkowski, M., Mroczko, 746 
+
+B.: Common and trace metals in alzheimerˆ as and parkinsonˆ as diseases. Interna-747 
+
+tional journal of molecular sciences 24 (21), 15721 (2023) 748 
+
+[61] Chen, X., Ghribi, O., Geiger, J.D.: Caffeine protects against disruptions of the 749 
+
+blood-brain barrier in animal models of alzheimer’s and parkinson’s diseases. 750 
+
+Journal of Alzheimerˆ as Disease 20 (s1), 127–141 (2010) 751 
+
+[62] Agnihotri, A., Aruoma, O.I.: Alzheimerˆ as disease and parkinsonˆ as disease: a 752 
+
+nutritional toxicology perspective of the impact of oxidative stress, mitochondrial 753 
+
+dysfunction, nutrigenomics and environmental chemicals. Journal of the American 754 
+
+College of Nutrition 39 (1), 16–27 (2020) 755 
+
+27 
+
+> .CC-BY 4.0 International license made available under a (which was not certified by peer review) is the author/funder, who has granted bioRxiv a license to display the preprint in perpetuity. It is The copyright holder for this preprint this version posted April 14, 2026. ;https://doi.org/10.64898/2026.04.10.717735 doi: bioRxiv preprint
+
+[63] Menendez-Gonzalez, M.: Implementing a tridimensional diagnostic framework for 756 
+
+personalized medicine in neurodegenerative diseases. Alzheimer’s & Dementia 757 
+
+21 (2), 14591 (2025) 758 
+
+[64] Ambrosio, F., Artyomov, M.N., Austad, S.N., Barzilai, N., Belmonte, J.C.I., Bel-759 
+
+sky, D.W., Benayoun, B.A., Brunet, A., D¨ onerta¸ s, H.M., Dubal, D.B., et al. : Past, 760 
+
+present and future perspectives on the science of aging. Nature Aging 6(1), 6–22 761 
+
+(2026) 762 
+
+[65] Kouwe, A.J., Benner, T., Salat, D.H., Fischl, B.: Brain morphometry with 763 
+
+multiecho mprage. Neuroimage 40 (2), 559–569 (2008) 764 
+
+[66] Fischl, B.: Freesurfer. Neuroimage 62 (2), 774–781 (2012) 765 
+
+[67] Faber, J., K¨ ugler, D., Bahrami, E., Heinz, L.-S., Timmann, D., Ernst, T.M., 766 
+
+Deike-Hofmann, K., Klockgether, T., Warrenburg, B., Gaalen, J., et al. : Cereb-767 
+
+net: A fast and reliable deep-learning pipeline for detailed cerebellum sub-768 
+
+segmentation. Neuroimage 264 , 119703 (2022) 769 
+
+[68] Estrada, S., K¨ ugler, D., Bahrami, E., Xu, P., Mousa, D., Breteler, M.M., 770 
+
+Aziz, N.A., Reuter, M.: Fastsurfer-hypvinn: Automated sub-segmentation of the 771 
+
+hypothalamus and adjacent structures on high-resolutional brain mri. Imaging 772 
+
+Neuroscience 1, 1 (2023) 773 
+
+[69] Korba, A., Cl´ emen¸ con, S., Sibony, E.: A learning theory of ranking aggregation. 774 
+
+In: Artificial Intelligence and Statistics, pp. 1001–1010 (2017). PMLR 775 
+
+[70] Li, X., Wang, X., Xiao, G.: A comparative study of rank aggregation methods for 776 
+
+partial and top ranked lists in genomic applications. Briefings in bioinformatics 777 
+
+20 (1), 178–189 (2019) 778 
+
+28

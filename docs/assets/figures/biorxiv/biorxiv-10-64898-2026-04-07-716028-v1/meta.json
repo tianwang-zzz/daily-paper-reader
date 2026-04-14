@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-07-716028-v1/fig-001.webp",
+      "caption": "Fig. 3: Hybrid EEG-fNIRS sensor topography. Schematic representation of the optode and electrode montage for the g.NAUTILUS fNIRS wireless system (g.tec medical engineering GmbH, Austria). EEG electrode sites are denoted by red markers, while fNIRS light sources (transmitters) and detectors (receivers) are represented by green and blue markers, respectively, illustrating the integrated spatial distribution across the scalp.",
+      "page": 4,
+      "index": 1,
+      "width": 488,
+      "height": 537
+    },
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-07-716028-v1/fig-002.webp",
+      "caption": "Fig. 4: Confusion matrices for Leave-One-Subject-Out (LOSO) cross-validation. Panels (a)–(c) represent the video modality, and panels (d)–(f) represent the audio modality. Columns correspond to the three fNIRS low-pass filtering tiers: 0.15 Hz (left), 0.6 Hz (center), and 2.0 Hz (right), illustrating the impact of physiological frequency inclusion on classification accuracy.",
+      "page": 6,
+      "index": 2,
+      "width": 1064,
+      "height": 761
+    },
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-07-716028-v1/fig-003.webp",
+      "caption": "Fig. 2: Experimental paradigm and stimulus presentation. Affective stimuli, consisting of Auditory Clips (affective speech) or Visual Clips (facial expressions), were presented in two phases. Note: while real video stimuli were used during the experiment, AI-generated drawings are used in this figure for privacy to mask actor identities while preserving the experimental affect. Initial encoding involved a single Target Stimulus for 3–5s , followed by a retrieval phase after a 3–5s delay. In the retrieval phase, stimuli were presented simultaneously (dichotically for audio; side-by-side for video) to evaluate emotional working memory. Subjects indicated if the emotion was the same via a Button Press Response.",
+      "page": 3,
+      "index": 3,
+      "width": 1044,
+      "height": 635
+    },
+    {
+      "url": "assets/figures/biorxiv/biorxiv-10-64898-2026-04-07-716028-v1/fig-004.webp",
+      "caption": "Fig. 1: Experimental setup for multimodal pBCI data acquisition. During experiments, the participant is equipped with the g.NAUTILUS fNIRS system (g.tec medical engineering GmbH, Austria). The hardware interface features an orange response panel for target stimulus selection and a central blue button for self-paced trial progression. This configuration enables the synchronized recording of neural dynamics and behavioral markers during the affective stimulus paradigm, providing the labeled dataset required to train machine-learning models for the classification of normal versus depressive mental states.",
+      "page": 2,
+      "index": 4,
+      "width": 524,
+      "height": 427
+    }
+  ]
+}
