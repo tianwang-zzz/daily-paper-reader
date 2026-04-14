@@ -73,6 +73,7 @@ subscriptions:
       enabled: true
       paper_sources:
         - arxiv
+        - biorxiv
       keywords:
         - keyword: MCI
           keyword_cn: 轻度认知障碍
@@ -108,7 +109,7 @@ subscriptions:
           enabled: true
           source: manual
           note: ''
-      updated_at: '2026-04-14T12:39:46.316Z'
+      updated_at: '2026-04-14T12:40:03.228Z'
 source_backends:
   arxiv:
     papers_table: arxiv_papers
